@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/** Sources
+/* Sources
  * https://www.youtube.com/watch?v=oBRt9OifJvE
- **/
-
+ */
 public class Player : NetworkBehaviour
 {
     [Header("Movement")]
