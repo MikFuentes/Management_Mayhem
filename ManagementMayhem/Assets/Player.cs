@@ -3,14 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/** Sources
+ * https://www.youtube.com/watch?v=oBRt9OifJvE
+ **/
+
 public class Player : NetworkBehaviour
 {
-    [SerializeField] private Vector3 movement;
-    [SerializeField] private Vector3 jump = new Vector3();
-
+    [Header("Movement")]
     [SerializeField] private float moveSpeed;
-    float horizontalMove = 0f;
-    float verticalMove = 0f;
+    private float horizontalMove = 0f;
+    private float verticalMove = 0f;
+    private Vector3 movement;
 
     [Client]
     private void Update()
@@ -54,7 +57,6 @@ public class Player : NetworkBehaviour
     }
 
     [Client]
-
     private void FixedUpdate()
     {
         movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
