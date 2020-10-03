@@ -14,6 +14,9 @@ public class Player : NetworkBehaviour
     private float verticalMove = 0f;
     private Vector3 movement;
 
+    [Header("Joystick")]
+    [SerializeField] private Joystick joystick;
+
     [Client]
     private void Update()
     {
@@ -25,11 +28,11 @@ public class Player : NetworkBehaviour
         }
 
         //Controls
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W) || joystick.Vertical >= .2f)
         {
             verticalMove = moveSpeed;
         }
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S) || joystick.Vertical <= -.2f)
         {
             verticalMove = -moveSpeed;
         }
@@ -38,11 +41,11 @@ public class Player : NetworkBehaviour
             verticalMove = 0;
         }
 
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
         {
             horizontalMove = -moveSpeed;
         }
-        else if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
         {
             horizontalMove = moveSpeed;
         }
