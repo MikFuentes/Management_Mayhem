@@ -172,10 +172,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   moveSpeed: 7
-  facingRight: 1
   joystick: {fileID: 594301614454633044}
   animator: {fileID: 5425747955083965241}
-  networkAnimator: {fileID: 7002507016618276450}
 --- !u!114 &7683990943109430950
 MonoBehaviour:
   m_ObjectHideFlags: 0
