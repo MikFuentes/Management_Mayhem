@@ -3,66 +3,118 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Sources
+/* SOURCES
+ * 
+ * Multiplayer
  * https://www.youtube.com/watch?v=oBRt9OifJvE
+ * 
+ * Movement
+ * https://www.youtube.com/watch?v=dwcT-Dch0bA
+ * https://www.youtube.com/watch?v=L6Q6VHueWnU
+ * 
+ * Diagonal Movement
+ * https://forum.unity.com/threads/how-do-i-used-normalized-my-diagonal-movement.301696/
+ * 
  */
 public class Player : NetworkBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float moveSpeed;
-    private float horizontalMove = 0f;
-    private float verticalMove = 0f;
+    [SerializeField] private float moveSpeed;    
+    private float horizontalMove, verticalMove;
+    private float horizontalSpeed, verticalSpeed;
     private Vector3 movement;
+    private bool facingRight = true;
 
     [Header("Joystick")]
     [SerializeField] private Joystick joystick;
 
-    [Client]
+    [Header("Animator")]
+    [SerializeField] public Animator animator;
+
+    private void flipPlayer()
+    {
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
+
     private void Update()
     {
-        if (!hasAuthority) { return; }
+        // Will update for the local player
+        if (!isLocalPlayer)
+            return;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //CmdJump();
-        }
 
         //Controls
         if (Input.GetKey(KeyCode.W) || joystick.Vertical >= .2f)
-        {
             verticalMove = moveSpeed;
-        }
         else if (Input.GetKey(KeyCode.S) || joystick.Vertical <= -.2f)
-        {
             verticalMove = -moveSpeed;
-        }
         else
-        {
             verticalMove = 0;
-        }
 
         if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
         {
+            //If moving left while facing right...
+            if (facingRight)
+            {
+                flipPlayer();
+                facingRight = false;
+            }
             horizontalMove = -moveSpeed;
         }
         else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
         {
+            //If moving right while facing left...
+            if (!facingRight)
+            {
+                flipPlayer();
+                facingRight = true;
+            }
             horizontalMove = moveSpeed;
         }
-        else 
+        else
         {
             horizontalMove = 0;
         }
-
-        //CmdMove();
-
     }
 
-    [Client]
     private void FixedUpdate()
     {
+        if (!isLocalPlayer)
+            return;
+
+        horizontalSpeed = Mathf.Abs(horizontalMove);
+        verticalSpeed = Mathf.Abs(verticalMove);
+
+        //if (horizontalSpeed < 0.01 && verticalSpeed < 0.01)
+        //{        
+        //    animator.SetBool("Running", false);
+        //}
+        //else
+        //{
+        //    animator.SetBool("Running", true);
+        //}
+
         movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
         transform.position += movement * Time.fixedDeltaTime * moveSpeed;
+
+        CmdRun();
+    }
+
+    [Command]
+    void CmdRun()
+    {
+        RpcRun();
+    }
+
+    [ClientRpc]
+    void RpcRun()
+    {
+        if (!isLocalPlayer)
+            return;
+
+        animator.SetBool("Running", !(horizontalSpeed < 0.01 && verticalSpeed < 0.01));
     }
 
     //[Command]
