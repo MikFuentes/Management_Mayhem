@@ -38,7 +38,7 @@ public class Player : NetworkBehaviour
 
     private void Update()
     {
-        // Will update for the local player only
+        // Don't control other player's models
         if (!isLocalPlayer)
             return;
 
@@ -69,6 +69,7 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        // Don't move other player's models
         if (!isLocalPlayer)
             return;
 
