@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking.Types;
 
 /* SOURCES
  * 
@@ -35,7 +36,7 @@ public class Player : NetworkBehaviour
         transform.localScale = theScale;
         facingRight = !facingRight;
     }
-
+   
     private void Update()
     {
         // Don't control other player's models

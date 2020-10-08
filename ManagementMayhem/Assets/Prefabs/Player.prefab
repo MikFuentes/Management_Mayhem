@@ -360,12 +360,13 @@ GameObject:
   - component: {fileID: 5043691990583168838}
   - component: {fileID: 5043691990583168837}
   - component: {fileID: 7002507016618276450}
-  - component: {fileID: 5043691990583168836}
-  - component: {fileID: 7683990943109430950}
   - component: {fileID: -8942951857659244711}
   - component: {fileID: 8438644047746302422}
   - component: {fileID: 8316145310307626241}
+  - component: {fileID: 7683990943109430950}
+  - component: {fileID: 5043691990583168836}
   - component: {fileID: 8062918084659090966}
+  - component: {fileID: 4242435723134503912}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -509,39 +510,6 @@ MonoBehaviour:
   syncInterval: 0.1
   clientAuthority: 1
   animator: {fileID: 5425747955083965241}
---- !u!114 &5043691990583168836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043691990583168842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53d63bee8307fc44598fb6cb1b1505c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  joystick: {fileID: 594301614454633044}
-  animator: {fileID: 5425747955083965241}
-  moveSpeed: 7
---- !u!114 &7683990943109430950
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043691990583168842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95db56bf0d9d60842a5cc402b029a93c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  playerTransform: {fileID: 5043691990583168841}
-  virtualCamera: {fileID: 5043691991780758604}
 --- !u!50 &-8942951857659244711
 Rigidbody2D:
   serializedVersion: 4
@@ -605,7 +573,7 @@ CapsuleCollider2D:
   m_Offset: {x: -0.06, y: -0.46}
   m_Size: {x: 0.58, y: 0.26}
   m_Direction: 1
---- !u!114 &8062918084659090966
+--- !u!114 &7683990943109430950
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -613,6 +581,39 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5043691990583168842}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95db56bf0d9d60842a5cc402b029a93c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  playerTransform: {fileID: 5043691990583168841}
+  virtualCamera: {fileID: 5043691991780758604}
+--- !u!114 &5043691990583168836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043691990583168842}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53d63bee8307fc44598fb6cb1b1505c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  joystick: {fileID: 594301614454633044}
+  animator: {fileID: 5425747955083965241}
+  moveSpeed: 7
+--- !u!114 &8062918084659090966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043691990583168842}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41a7e5d16db2a264cb8f4d3761560084, type: 3}
   m_Name: 
@@ -625,12 +626,32 @@ MonoBehaviour:
   holdPoint: {fileID: 5877968147208204965}
   dropPoint: {fileID: 808124578470875593}
   playerTrigger: {fileID: 8316145310307626241}
-  pickupTrigger: {fileID: 0}
-  interactableTrigger: {fileID: 0}
-  deleterTrigger: {fileID: 0}
-  isHolding: 0
-  willHold: 0
-  canDeposit: 0
+  pickup: {fileID: 0}
+  pickUpActive: 0
+--- !u!114 &4242435723134503912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043691990583168842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c03f42bf4cf14ca479b7610b9e40f700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  joystick: {fileID: 594301614454633044}
+  animator: {fileID: 5425747955083965241}
+  interactButton: {fileID: 1882400849100517650}
+  pickUpButton: {fileID: 7063700831196355923}
+  dropButton: {fileID: 3309211552575968738}
+  holdPoint: {fileID: 5877968147208204965}
+  dropPoint: {fileID: 808124578470875593}
+  playerTrigger: {fileID: 8316145310307626241}
+  moveSpeed: 7
+  pickup: {fileID: 0}
   pickUpActive: 0
 --- !u!1 &5043691990957705741
 GameObject:

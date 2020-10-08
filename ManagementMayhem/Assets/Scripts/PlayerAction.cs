@@ -23,8 +23,55 @@ public class PlayerAction : NetworkBehaviour
     public CapsuleCollider2D playerTrigger;
 
     [Header("Debug Info")]
-    public Collider2D pickupTrigger;
+    [SyncVar]
+    public GameObject pickup;
+    [SyncVar]
     public bool pickUpActive = false;
+
+    [Command]
+    void CmdPickUpOnClick()
+    {
+        pickUpActive = true;
+        pickup.transform.position = holdPoint.position;
+        RpcPickUpOnClick();
+    }
+
+    [ClientRpc]
+    void RpcPickUpOnClick()
+    {
+        pickUpButton.gameObject.SetActive(false);
+        dropButton.gameObject.SetActive(true);
+    }
+
+    [Command]
+    void CmdDropOnClick()
+    {
+        pickUpActive = false;
+        pickup.transform.position = dropPoint.position; //doesn't always drop at the drop point
+        RpcDropOnClick();
+    }
+
+    [ClientRpc]
+    void RpcDropOnClick()
+    {
+        dropButton.gameObject.SetActive(false);
+        pickUpButton.gameObject.SetActive(true);
+    }
+
+    [Command]
+    public void CmdPickUp(float time)
+    {   
+        RpcPickUp(holdPoint.position);   
+        pickup.transform.position = holdPoint.position;
+        //Debug.Log("SERVER: " + pickup.transform.position);
+    }
+
+    [ClientRpc]
+    public void RpcPickUp(Vector3 temp)
+    {
+        pickup.transform.position += temp * Time.fixedDeltaTime;
+        //Debug.Log("CLIENT:  " + pickup.transform.position);
+    }
 
     private void Start()
     {
@@ -34,46 +81,8 @@ public class PlayerAction : NetworkBehaviour
         holdPoint.gameObject.SetActive(true);
         dropPoint.gameObject.SetActive(true);
 
-        pickUpButton.onClick.AddListener(PickUpOnClick);
-        dropButton.onClick.AddListener(DropOnClick);
-    }
-
-    void PickUpOnClick()
-    {
-        if (!isLocalPlayer)
-            return;
-
-        pickUpActive = true;
-        pickupTrigger.gameObject.transform.position = holdPoint.position;
-        pickUpButton.gameObject.SetActive(false);
-        dropButton.gameObject.SetActive(true);
-    }
-
-    void DropOnClick()
-    {
-        if (!isLocalPlayer)
-            return;
-
-        pickUpActive = false;        
-        pickupTrigger.gameObject.transform.position = dropPoint.position; //This doesn't always drop at the drop point
-        dropButton.gameObject.SetActive(false);
-        pickUpButton.gameObject.SetActive(true);
-
-    }
-
-    [Command]
-    public void CmdPickUp()
-    {
-        RpcPickUp();
-    }
-
-    [ClientRpc]
-    void RpcPickUp()
-    {
-        if (!isLocalPlayer)
-            return;
-
-        pickupTrigger.gameObject.transform.position = holdPoint.position;
+        pickUpButton.onClick.AddListener(CmdPickUpOnClick);
+        dropButton.onClick.AddListener(CmdDropOnClick);
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -86,10 +95,23 @@ public class PlayerAction : NetworkBehaviour
         {
             if (!pickUpActive)
             {
-                pickupTrigger = collision;
-                pickUpButton.interactable = true;
+                pickup = collision.gameObject;
+                CmdTriggerStay(pickup);
             }
         }
+    }
+
+    [Command]
+    void CmdTriggerStay(GameObject temp)
+    {
+        pickup = temp;
+        RpcTriggerStay();
+    }
+
+    [ClientRpc]
+    void RpcTriggerStay()
+    {
+        pickUpButton.interactable = true;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -102,21 +124,46 @@ public class PlayerAction : NetworkBehaviour
         {
             if (!pickUpActive)
             {
-                pickupTrigger = null;
-                pickUpButton.interactable = false;
+                CmdTriggerExit();
             }
         }
     }
 
+    [Command]
+    void CmdTriggerExit()
+    {
+        pickup = null;
+        RpcTriggerExit();
+    }
+
+    [ClientRpc]
+    void RpcTriggerExit()
+    {
+        pickUpButton.interactable = false;
+    }
+
+    private void Update()
+    {
+        if (!isLocalPlayer)
+            return;
+
+        if (Input.GetKey(KeyCode.J))
+        {
+            CmdPickUpOnClick();
+        }
+
+        if (Input.GetKey(KeyCode.K))
+        {
+            CmdDropOnClick();
+        }
+    }
 
     private void FixedUpdate()
     {
-        //if (!isLocalPlayer)
-        //    return;
+        if (!isLocalPlayer)
+            return;
 
         if (pickUpActive)
-            CmdPickUp();
-
-
+            CmdPickUp(Time.fixedDeltaTime);
     }
 }
