@@ -24,6 +24,8 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Debug Info")]
     [SyncVar]
+    public Vector3 playerPos;
+    [SyncVar]
     public GameObject pickup;
     [SyncVar]
     public bool pickUpActive = false;
@@ -81,16 +83,21 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [Command]
-    public void CmdPickUp(Vector3 playerPosition)
+    public void CmdPickUp()
     {
-        RpcPickUp(playerPosition);
-        pickup.transform.position = playerPosition;
+        //playerPosition.x += 0.1f;
+        //playerPosition.y += 0.1f;
+        //RpcPickUp(playerPosition);
+        //pickup.transform.position = playerPosition;
+        RpcPickUp();
+        pickup.transform.position = holdPoint.position;
     }
 
     [ClientRpc]
-    public void RpcPickUp(Vector3 playerPosition)
+    public void RpcPickUp()
     {
-        pickup.transform.position = playerPosition;
+        //pickup.transform.position = playerPosition;
+        //pickup.transform.position = holdPoint.position;
     }
 
     [Command]
@@ -183,10 +190,16 @@ public class PlayerScript : NetworkBehaviour
         movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
         transform.position += movement * Time.fixedDeltaTime * moveSpeed;
 
+        playerPos = transform.position;
+
         CmdRun();
 
         if (pickUpActive)
-            CmdPickUp(transform.position);
+        {
+            //pickup.transform.position = holdPoint.position;
+            CmdPickUp();
+        }
+            
     }
 
     private void OnTriggerStay2D(Collider2D collision)

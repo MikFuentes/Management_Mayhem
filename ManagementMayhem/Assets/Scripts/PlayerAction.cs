@@ -59,18 +59,16 @@ public class PlayerAction : NetworkBehaviour
     }
 
     [Command]
-    public void CmdPickUp(float time)
+    public void CmdPickUp()
     {   
         RpcPickUp(holdPoint.position);   
         pickup.transform.position = holdPoint.position;
-        //Debug.Log("SERVER: " + pickup.transform.position);
     }
 
     [ClientRpc]
     public void RpcPickUp(Vector3 temp)
     {
-        pickup.transform.position += temp * Time.fixedDeltaTime;
-        //Debug.Log("CLIENT:  " + pickup.transform.position);
+        pickup.transform.position = temp;
     }
 
     private void Start()
@@ -164,6 +162,6 @@ public class PlayerAction : NetworkBehaviour
             return;
 
         if (pickUpActive)
-            CmdPickUp(Time.fixedDeltaTime);
+            CmdPickUp();
     }
 }
