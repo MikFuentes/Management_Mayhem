@@ -59,4 +59,4 @@ sysinfo.txt
 crashlytics-build.properties
 
 *_clone_[0-9]*/
-
+*_build*/
