@@ -5,3 +5,4 @@ Major:
 
 Minor:
 - Client PlayerID is not synced onto the server when interacting with objects.
+- UI elements anchoring is a lil weird
