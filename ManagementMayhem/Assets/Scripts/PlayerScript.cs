@@ -24,11 +24,17 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Debug Info")]
     [SyncVar]
+    public string playerId;
+    [SyncVar]
     public Vector3 playerPos;
     [SyncVar]
     public GameObject pickup;
     [SyncVar]
     public bool pickUpActive = false;
+    [SyncVar]
+    public GameObject interactable;
+    [SyncVar]
+    public GameObject deleter;
 
     private void flipPlayer()
     {
@@ -83,6 +89,20 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [Command]
+    void CmdInteractOnClick()
+    {
+        //Debug.Log(playerId + " interacted with " + interactable.gameObject.name);
+        RpcInteractOnClick();
+    }
+
+    [ClientRpc]
+    void RpcInteractOnClick()
+    {
+        Debug.Log(playerId + " interacted with " + interactable.gameObject.name);
+        //Debug.Log("I interacted with " + interactable.gameObject.name);
+    }
+
+    [Command]
     public void CmdPickUp()
     {
         //playerPosition.x += 0.1f;
@@ -101,29 +121,55 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [Command]
-    void CmdTriggerStay(GameObject temp)
+    void CmdTriggerStayPickup(GameObject temp)
     {
         pickup = temp;
-        RpcTriggerStay();
+        RpcTriggerStayPickup();
     }
 
     [ClientRpc]
-    void RpcTriggerStay()
+    void RpcTriggerStayPickup()
     {
         pickUpButton.interactable = true;
     }
 
     [Command]
-    void CmdTriggerExit()
+    void CmdTriggerExitPickup()
     {
         pickup = null;
-        RpcTriggerExit();
+        RpcTriggerExitPickup();
     }
 
     [ClientRpc]
-    void RpcTriggerExit()
+    void RpcTriggerExitPickup()
     {
         pickUpButton.interactable = false;
+    }
+
+    [Command]
+    void CmdTriggerStayInteractable(GameObject temp)
+    {
+        interactable = temp;
+        RpcTriggerStayInteractable();
+    }
+
+    [ClientRpc]
+    void RpcTriggerStayInteractable()
+    {
+        interactButton.interactable = true;
+    }
+
+    [Command]
+    void CmdTriggerExitInteractable()
+    {
+        interactable = null;
+        RpcTriggerExitInteractable();
+    }
+
+    [ClientRpc]
+    void RpcTriggerExitInteractable()
+    {
+        interactButton.interactable = false;
     }
 
     // Start is called before the first frame update
@@ -137,6 +183,9 @@ public class PlayerScript : NetworkBehaviour
 
         pickUpButton.onClick.AddListener(CmdPickUpOnClick);
         dropButton.onClick.AddListener(CmdDropOnClick);
+        interactButton.onClick.AddListener(CmdInteractOnClick);
+
+        playerId = ClientScene.localPlayer.netId.ToString();
     }
 
     // Update is called once per frame
@@ -179,6 +228,10 @@ public class PlayerScript : NetworkBehaviour
         {
             CmdDropOnClick();
         }
+        if (Input.GetKey(KeyCode.I))
+        {
+            CmdInteractOnClick();
+        }
     }
 
     void FixedUpdate()
@@ -213,9 +266,20 @@ public class PlayerScript : NetworkBehaviour
             if (!pickUpActive)
             {
                 pickup = collision.gameObject;
-                CmdTriggerStay(pickup);
+                CmdTriggerStayPickup(pickup);
             }
         }
+        else if (collision.gameObject.CompareTag("Interactable") && collision.IsTouching(playerTrigger))
+        {
+            interactable = collision.gameObject;
+            CmdTriggerStayInteractable(interactable);
+        }
+        //else if (collision.gameObject.CompareTag("Deleter") && collision.IsTouching(playerTrigger))
+        //{
+        //    deleter = collision.gameObject;
+        //    CmdTriggerStayDeleter(deleter);
+        //    canDeposit = true;
+        //}
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -228,8 +292,12 @@ public class PlayerScript : NetworkBehaviour
         {
             if (!pickUpActive)
             {
-                CmdTriggerExit();
+                CmdTriggerExitPickup();
             }
+        }
+        else if (collision.gameObject.CompareTag("Interactable") && !collision.IsTouching(playerTrigger))
+        {
+            CmdTriggerExitInteractable();
         }
     }
 }

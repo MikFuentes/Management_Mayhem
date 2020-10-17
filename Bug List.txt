@@ -1,0 +1,7 @@
+Bugs:
+
+Major:
+- Box moves on it's own when player is holding box near conveyer belt on client side (not server side). Probably related to how the player is holding the box.
+
+Minor:
+- Client PlayerID is not synced onto the server when interacting with objects.
