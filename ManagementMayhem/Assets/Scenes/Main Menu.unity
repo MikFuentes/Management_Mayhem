@@ -1759,7 +1759,7 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 5194235690431591957, guid: a8736b8edcb84c148ae6445d363b4200,
+  playerPrefab: {fileID: 2125543592562024030, guid: 83c279764e494db45a181c54ac52f19b,
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
@@ -1767,6 +1767,8 @@ MonoBehaviour:
   minPlayers: 2
   menuScene: Assets/Scenes/Main Menu.unity
   roomPlayerPrefab: {fileID: 2956085797749125336, guid: a8736b8edcb84c148ae6445d363b4200,
+    type: 3}
+  gamePlayerPrefab: {fileID: 740951527728588880, guid: 229270462700af1498b082a9a69138a8,
     type: 3}
 --- !u!4 &1122674849
 Transform:

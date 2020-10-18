@@ -14,22 +14,27 @@ public class NetworkManagerLobby : NetworkManager
     [Header("Room")]
     [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
 
+    [Header("Game")]
+    [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
+
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
 
-    //public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
-    //public override void OnStartClient()
-    //{
-    //    var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+    public override void OnStartClient()
+    {
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
 
-    //    foreach(var prefab in spawnablePrefabs)
-    //    {
-    //        ClientScene.RegisterPrefab(prefab);
-    //    }
+        foreach (var prefab in spawnablePrefabs)
+        {
+            ClientScene.RegisterPrefab(prefab);
+        }
 
-    //}
-    public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>(); 
+    }
+    public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
+    public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby>();
+
     public override void OnClientConnect(NetworkConnection conn)
     {
         base.OnClientConnect(conn); //do base logic
@@ -115,5 +120,34 @@ public class NetworkManagerLobby : NetworkManager
         }
 
         return true;
+    }
+
+    public void StartGame()
+    {
+        if(SceneManager.GetActiveScene().path == menuScene)
+        {
+            if (!IsReadyToStart()) { return; }
+
+            ServerChangeScene("Stage 2 - Coordination");
+        }
+    }
+
+    public override void ServerChangeScene(string newSceneName)
+    {
+        //From menu to game
+        if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Stage"))
+        {
+            for(int i = RoomPlayers.Count - 1; i >= 0; i--)
+            {
+                var conn = RoomPlayers[i].connectionToClient;
+                var gameplayerInstance = Instantiate(gamePlayerPrefab);
+                gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
+
+                NetworkServer.Destroy(conn.identity.gameObject); //get rid of room player
+
+                NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject, true); //adding true here gets rid of an error
+            }
+        }
+        base.ServerChangeScene(newSceneName);
     }
 }
