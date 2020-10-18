@@ -521,7 +521,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8062918084659090966}
+      - m_Target: {fileID: 0}
         m_MethodName: interactObject
         m_Mode: 1
         m_Arguments:
@@ -550,8 +550,6 @@ GameObject:
   - component: {fileID: 8438644047746302422}
   - component: {fileID: 8316145310307626241}
   - component: {fileID: 7683990943109430950}
-  - component: {fileID: 5043691990583168836}
-  - component: {fileID: 8062918084659090966}
   - component: {fileID: 4242435723134503912}
   - component: {fileID: 740951527728588880}
   m_Layer: 8
@@ -776,45 +774,6 @@ MonoBehaviour:
   syncInterval: 0.1
   playerTransform: {fileID: 5043691990583168841}
   virtualCamera: {fileID: 5043691991780758604}
---- !u!114 &5043691990583168836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043691990583168842}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53d63bee8307fc44598fb6cb1b1505c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  joystick: {fileID: 594301614454633044}
-  animator: {fileID: 5425747955083965241}
-  moveSpeed: 7
---- !u!114 &8062918084659090966
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043691990583168842}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41a7e5d16db2a264cb8f4d3761560084, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  interactButton: {fileID: 1882400849100517650}
-  pickUpButton: {fileID: 7063700831196355923}
-  dropButton: {fileID: 3309211552575968738}
-  holdPoint: {fileID: 5877968147208204965}
-  dropPoint: {fileID: 808124578470875593}
-  playerTrigger: {fileID: 8316145310307626241}
-  pickup: {fileID: 0}
-  pickUpActive: 0
 --- !u!114 &4242435723134503912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1130,7 +1089,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8062918084659090966}
+      - m_Target: {fileID: 0}
         m_MethodName: holdObject
         m_Mode: 1
         m_Arguments:
@@ -1378,7 +1337,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8062918084659090966}
+      - m_Target: {fileID: 0}
         m_MethodName: holdObject
         m_Mode: 1
         m_Arguments:
@@ -1949,6 +1908,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aaa2c939c0359ac4dbce3f49e8b90252, type: 3}
+--- !u!224 &594301614454633049 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2929252283123773938, guid: aaa2c939c0359ac4dbce3f49e8b90252,
+    type: 3}
+  m_PrefabInstance: {fileID: 2349094798395851691}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &594301614454633044 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2929252283123773951, guid: aaa2c939c0359ac4dbce3f49e8b90252,
@@ -1961,12 +1926,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45977bbae16431c46a013576a1aea384, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &594301614454633049 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 2929252283123773938, guid: aaa2c939c0359ac4dbce3f49e8b90252,
-    type: 3}
-  m_PrefabInstance: {fileID: 2349094798395851691}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4379940091940605787
 PrefabInstance:
   m_ObjectHideFlags: 0

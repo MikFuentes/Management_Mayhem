@@ -1035,6 +1035,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Item Deposit
       objectReference: {fileID: 0}
+    - target: {fileID: 4788537222144068490, guid: 9b69a71576b9aba46bc3dfb432bfefff,
+        type: 3}
+      propertyPath: m_TagString
+      value: Deleter
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b69a71576b9aba46bc3dfb432bfefff, type: 3}
 --- !u!1001 &2678751426102246594

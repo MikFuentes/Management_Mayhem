@@ -10,7 +10,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 
 
     [SyncVar]
-    private string displayName = "Loading...";
+    [SerializeField] private string displayName = "Loading...";
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room

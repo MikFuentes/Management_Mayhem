@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
+/*
+ * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
+ */
 public class PlayerScript : NetworkBehaviour
 {
     [Header("Components")]
@@ -35,6 +38,8 @@ public class PlayerScript : NetworkBehaviour
     public GameObject interactable;
     [SyncVar]
     public GameObject deleter;
+    [SyncVar]
+    public bool canDeposit;
 
     private void flipPlayer()
     {
@@ -78,14 +83,21 @@ public class PlayerScript : NetworkBehaviour
     {
         pickUpActive = false;
         pickup.transform.position = dropPoint.position; //doesn't always drop at the drop point
+
         RpcDropOnClick();
     }
 
     [ClientRpc]
     void RpcDropOnClick()
     {
-        dropButton.gameObject.SetActive(false);
         pickUpButton.gameObject.SetActive(true);
+        dropButton.gameObject.SetActive(false);
+    }
+
+    [Command]
+    void CmdDestroy(GameObject gameObject)
+    {
+        NetworkServer.Destroy(gameObject);
     }
 
     [Command]
@@ -252,6 +264,11 @@ public class PlayerScript : NetworkBehaviour
             //pickup.transform.position = holdPoint.position;
             CmdPickUp();
         }
+
+        if (canDeposit && !pickUpActive)
+        {
+            CmdDestroy(pickup);
+        }
             
     }
 
@@ -274,12 +291,12 @@ public class PlayerScript : NetworkBehaviour
             interactable = collision.gameObject;
             CmdTriggerStayInteractable(interactable);
         }
-        //else if (collision.gameObject.CompareTag("Deleter") && collision.IsTouching(playerTrigger))
-        //{
-        //    deleter = collision.gameObject;
-        //    CmdTriggerStayDeleter(deleter);
-        //    canDeposit = true;
-        //}
+        else if (collision.gameObject.CompareTag("Deleter") && collision.IsTouching(playerTrigger))
+        {
+            //deleter = collision.gameObject;
+            //CmdTriggerStayDeleter(deleter);
+            canDeposit = true;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -298,6 +315,12 @@ public class PlayerScript : NetworkBehaviour
         else if (collision.gameObject.CompareTag("Interactable") && !collision.IsTouching(playerTrigger))
         {
             CmdTriggerExitInteractable();
+        }
+        else if (collision.gameObject.CompareTag("Deleter") && !collision.IsTouching(playerTrigger))
+        {
+            //deleter = collision.gameObject;
+            //CmdTriggerStayDeleter(deleter);
+            canDeposit = false;
         }
     }
 }

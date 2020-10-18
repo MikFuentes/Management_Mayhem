@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pickup
   - Interactable
+  - Deleter
   layers:
   - Default
   - TransparentFX
