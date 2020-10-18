@@ -40,7 +40,7 @@ public class JoinLobbyMenu : MonoBehaviour
     {
         joinButton.interactable = true;
 
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); 
         landingPagePanel.SetActive(false);
     }
 
@@ -48,17 +48,5 @@ public class JoinLobbyMenu : MonoBehaviour
     private void HandleClientDisconnected()
     {
         joinButton.interactable = true;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
