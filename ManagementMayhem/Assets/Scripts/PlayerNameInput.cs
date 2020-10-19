@@ -39,4 +39,10 @@ public class PlayerNameInput : MonoBehaviour
         PlayerPrefs.SetString(PlayerPrefsNameKey, DisplayName);
     }
 
+    public void ClearPlayerName()
+    {
+        nameInputField.text = null;
+        SetPlayerName(null);
+    }
+
 }
