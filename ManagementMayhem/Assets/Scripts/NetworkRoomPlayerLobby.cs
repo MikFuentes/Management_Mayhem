@@ -17,6 +17,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public string DisplayName = "Loading...";
     [SyncVar(hook = nameof(HandleReadyStatusChanged))]
     public bool IsReady = false;
+    public bool onlyHost;
 
     private bool isLeader;
     public bool IsLeader
@@ -25,6 +26,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             isLeader = value;
             startGameButton.gameObject.SetActive(value);
+            startGameButton.interactable = false;
         }
     }
 

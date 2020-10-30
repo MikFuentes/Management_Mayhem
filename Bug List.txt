@@ -7,6 +7,4 @@ Major:
 Minor:
 - Client PlayerID is not synced onto the server when interacting with objects.
 - UI elements anchoring is a lil weird when resizing
-- Back button in the lobby doesn't bring back the landing page (commented out clearing of players)
 - No message for if host dc's
-- Start Game button is interactable at the start (before the host readies up) when it shouldn't be
