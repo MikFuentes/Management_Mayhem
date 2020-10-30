@@ -1074,8 +1074,6 @@ MonoBehaviour:
   - {fileID: 3245645311801729946}
   - {fileID: 6487003022213967331}
   startGameButton: {fileID: 5456615696517194279}
-  landingPagePanel: {fileID: 5152333221401193799, guid: 5f212d0720e2ca6498434c50f57d7ad8,
-    type: 3}
   DisplayName: Loading...
   IsReady: 0
 --- !u!1 &5203394428036927928
@@ -1793,7 +1791,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.4362763, g: 0.44283828, b: 0.7169812, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2098,7 +2096,7 @@ PrefabInstance:
     - target: {fileID: 8392542596747260207, guid: fc1a73923d31b5643877c01646f1cf7f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8392542596747260207, guid: fc1a73923d31b5643877c01646f1cf7f,
         type: 3}
@@ -2109,12 +2107,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 5152333221401193799, guid: 5f212d0720e2ca6498434c50f57d7ad8,
-        type: 3}
+      objectReference: {fileID: 2956085797749125336}
     - target: {fileID: 8392542596747260207, guid: fc1a73923d31b5643877c01646f1cf7f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: SetActive
+      value: LeaveLobby
       objectReference: {fileID: 0}
     - target: {fileID: 8392542596747260207, guid: fc1a73923d31b5643877c01646f1cf7f,
         type: 3}
@@ -2124,7 +2121,7 @@ PrefabInstance:
     - target: {fileID: 8392542596747260207, guid: fc1a73923d31b5643877c01646f1cf7f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fc1a73923d31b5643877c01646f1cf7f, type: 3}

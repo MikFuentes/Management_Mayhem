@@ -12,7 +12,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerNameTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
     [SerializeField] private Button startGameButton = null;
-    [SerializeField] private GameObject landingPagePanel = null;
 
     [SyncVar(hook = nameof(HandleDisplayNameChanged))]
     public string DisplayName = "Loading...";
@@ -129,12 +128,15 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [Command]
     public void CmdLeaveLobby()
     {
-        //if (isLeader) { Room.StopHost(); }
-        //else
-        //{
-        //    Room.StopClient();
-        //    Room.RoomPlayers.Clear();
-        //}
+        if (isLeader) { Room.StopHost(); }
+    }
 
+    public void LeaveLobby()
+    {
+        if (!isLeader && hasAuthority)
+        {
+            Room.StopClient();
+            Room.RoomPlayers.Clear();
+        }
     }
 }

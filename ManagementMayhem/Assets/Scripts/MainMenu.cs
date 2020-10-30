@@ -18,7 +18,7 @@ public class MainMenu : MonoBehaviour
     {
         NetworkManager.StartHost();
 
-        landingPagePanel.SetActive(false);
+        //landingPagePanel.SetActive(false);
     }
 
     public void StartGame()

@@ -41,7 +41,7 @@ public class JoinLobbyMenu : MonoBehaviour
         joinButton.interactable = true;
 
         gameObject.SetActive(false); 
-        landingPagePanel.SetActive(false);
+        //landingPagePanel.SetActive(false);
     }
 
     //Called when the player fails to connect to the server
