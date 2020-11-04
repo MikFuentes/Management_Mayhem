@@ -11,6 +11,9 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 
     [SyncVar]
     [SerializeField] private string displayName = "Loading...";
+    [SerializeField] private TMP_Text playerName = null;
+
+
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -26,6 +29,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     {
         DontDestroyOnLoad(gameObject); //don't wanna destory the player between levels ?
         Room.GamePlayers.Add(this);
+
+        playerName.text = displayName;
     }
 
     public override void OnNetworkDestroy()

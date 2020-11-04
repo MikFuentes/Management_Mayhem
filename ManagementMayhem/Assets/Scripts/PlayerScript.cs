@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
+using System.ComponentModel;
 
 /*
  * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
@@ -18,6 +20,9 @@ public class PlayerScript : NetworkBehaviour
     public Transform holdPoint;
     public Transform dropPoint;
     public CapsuleCollider2D playerTrigger;
+    [SerializeField] private GameObject gameName;
+    //public TMP_Text playerName = null;
+    private const string PlayerPrefsNameKey = "PlayerName";
 
     [Header("Movement")]
     public float moveSpeed;
@@ -42,12 +47,26 @@ public class PlayerScript : NetworkBehaviour
     public bool canDeposit;
 
     private void flipPlayer()
-    {
+    {   
+        Vector3 temp = gameName.transform.localScale; //transform.GetChild(2).GetChild(0).gameObject.transform.localScale;
         Vector3 theScale = transform.localScale;
+
         theScale.x *= -1;
         transform.localScale = theScale;
         facingRight = !facingRight;
-    }
+
+        if (theScale.x < 0)
+        {
+            //facing left
+            temp.x *= -1;
+            gameName.transform.localScale = temp;
+        }
+        else
+        {
+            temp.x = Mathf.Abs(temp.x);
+            gameName.transform.localScale = temp;
+        }
+    } 
 
     [Command]
     void CmdRun()
@@ -196,6 +215,7 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.onClick.AddListener(CmdPickUpOnClick);
         dropButton.onClick.AddListener(CmdDropOnClick);
         interactButton.onClick.AddListener(CmdInteractOnClick);
+
 
         playerId = ClientScene.localPlayer.netId.ToString();
     }
