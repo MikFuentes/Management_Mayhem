@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Mirror;
 using TMPro;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 /*
  * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
@@ -21,6 +22,7 @@ public class PlayerScript : NetworkBehaviour
     public Transform dropPoint;
     public CapsuleCollider2D playerTrigger;
     [SerializeField] private GameObject gameName;
+    public TMP_Text money;
     //public TMP_Text playerName = null;
     private const string PlayerPrefsNameKey = "PlayerName";
 
@@ -29,6 +31,14 @@ public class PlayerScript : NetworkBehaviour
     private float horizontalMove, verticalMove;
     private bool facingRight = true;
     private Vector3 movement;
+
+    [Header("Team Wallet")]
+    [SyncVar]
+    [SerializeField] private float currentMoney;
+    [SyncVar]
+    [SerializeField] private float teamWallet;
+    [SyncVar]
+    [SerializeField] private float value;
 
     [Header("Debug Info")]
     [SyncVar]
@@ -203,6 +213,51 @@ public class PlayerScript : NetworkBehaviour
         interactButton.interactable = false;
     }
 
+    [Command]
+    void CmdUpdateMoney()
+    {
+        value = pickup.GetComponent<MoneyScript>().value;
+        teamWallet += value;
+        money.text = teamWallet.ToString();
+        RpcUpdateMoney();
+    }
+
+    [ClientRpc]
+    void RpcUpdateMoney()
+    {
+        //value = pickup.GetComponent<MoneyScript>().value;
+        //teamWallet += value;
+        //Debug.Log(value);
+        //Debug.Log(teamWallet);
+        //teamWallet += value;
+        //money.text = teamWallet.ToString();
+    }
+
+    //define the event
+    public delegate void MoneyChangedDelegate(float currentMoney);
+    [SyncEvent]
+    public event MoneyChangedDelegate EventMoneyChanged;
+
+    [Server]
+    private void SetMoney(float value)
+    {
+        currentMoney = value;
+        EventMoneyChanged?.Invoke(currentMoney);
+    }
+
+    [Server]
+    private void AddMoney(float value)
+    {
+        currentMoney += value;
+        EventMoneyChanged?.Invoke(currentMoney); //updating the money will raise this event
+    }
+
+    [Command]
+    private void CmdAddMoney() {
+        value = pickup.GetComponent<MoneyScript>().value;
+        AddMoney(value);
+    } 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -230,7 +285,6 @@ public class PlayerScript : NetworkBehaviour
         //Controls
         if (Input.GetKey(KeyCode.W) || joystick.Vertical >= .2f)
             verticalMove = moveSpeed;
-
         else if (Input.GetKey(KeyCode.S) || joystick.Vertical <= -.2f)
             verticalMove = -moveSpeed;
         else
@@ -252,18 +306,11 @@ public class PlayerScript : NetworkBehaviour
             horizontalMove = 0;
 
         if (Input.GetKey(KeyCode.J))
-        {
             CmdPickUpOnClick();
-        }
-
         if (Input.GetKey(KeyCode.K))
-        {
             CmdDropOnClick();
-        }
         if (Input.GetKey(KeyCode.I))
-        {
             CmdInteractOnClick();
-        }
     }
 
     void FixedUpdate()
@@ -287,8 +334,16 @@ public class PlayerScript : NetworkBehaviour
 
         if (canDeposit && !pickUpActive)
         {
+            if(pickup.GetComponent<MoneyScript>().itemType == "Money")
+            {
+                //value = pickup.GetComponent<MoneyScript>().value;
+                CmdUpdateMoney();
+                //CmdAddMoney();
+            } 
             CmdDestroy(pickup);
         }
+        //Debug.Log(teamWallet.ToString());
+        
             
     }
 
@@ -329,6 +384,7 @@ public class PlayerScript : NetworkBehaviour
         {
             if (!pickUpActive)
             {
+                pickup = null;
                 CmdTriggerExitPickup();
             }
         }
