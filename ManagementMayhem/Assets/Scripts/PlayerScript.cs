@@ -6,6 +6,7 @@ using Mirror;
 using TMPro;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System;
 
 /*
  * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
@@ -22,7 +23,7 @@ public class PlayerScript : NetworkBehaviour
     public Transform dropPoint;
     public CapsuleCollider2D playerTrigger;
     [SerializeField] private GameObject gameName;
-    public TMP_Text money;
+
     //public TMP_Text playerName = null;
     private const string PlayerPrefsNameKey = "PlayerName";
 
@@ -33,12 +34,17 @@ public class PlayerScript : NetworkBehaviour
     private Vector3 movement;
 
     [Header("Team Wallet")]
+    [SerializeField] private GameObject moneyUI = null;
+    [SerializeField] private TMP_Text moneyText = null;
+
     [SyncVar]
     [SerializeField] private float currentMoney;
-    [SyncVar]
-    [SerializeField] private float teamWallet;
-    [SyncVar]
-    [SerializeField] private float value;
+    //[SyncVar]
+    //[SerializeField] private float teamWallet;
+    //[SyncVar]
+    //[SerializeField] private float value;
+
+    private static event Action<float> OnMoneyChange;
 
     [Header("Debug Info")]
     [SyncVar]
@@ -213,50 +219,50 @@ public class PlayerScript : NetworkBehaviour
         interactButton.interactable = false;
     }
 
-    [Command]
-    void CmdUpdateMoney()
-    {
-        value = pickup.GetComponent<MoneyScript>().value;
-        teamWallet += value;
-        money.text = teamWallet.ToString();
-        RpcUpdateMoney();
-    }
+    //[Command]
+    //void CmdUpdateMoney()
+    //{
+    //    value = pickup.GetComponent<MoneyScript>().value;
+    //    teamWallet += value;
+    //    moneyText.text = teamWallet.ToString();
+    //    RpcUpdateMoney();
+    //}
 
-    [ClientRpc]
-    void RpcUpdateMoney()
-    {
-        //value = pickup.GetComponent<MoneyScript>().value;
-        //teamWallet += value;
-        //Debug.Log(value);
-        //Debug.Log(teamWallet);
-        //teamWallet += value;
-        //money.text = teamWallet.ToString();
-    }
+    //[ClientRpc]
+    //void RpcUpdateMoney()
+    //{
+    //    //value = pickup.GetComponent<MoneyScript>().value;
+    //    //teamWallet += value;
+    //    //Debug.Log(value);
+    //    //Debug.Log(teamWallet);
+    //    //teamWallet += value;
+    //    //money.text = teamWallet.ToString();
+    //}
 
-    //define the event
-    public delegate void MoneyChangedDelegate(float currentMoney);
-    [SyncEvent]
-    public event MoneyChangedDelegate EventMoneyChanged;
+    ////define the event
+    //public delegate void MoneyChangedDelegate(float currentMoney);
+    //[SyncEvent]
+    //public event MoneyChangedDelegate EventMoneyChanged;
 
-    [Server]
-    private void SetMoney(float value)
-    {
-        currentMoney = value;
-        EventMoneyChanged?.Invoke(currentMoney);
-    }
+    //[Server]
+    //private void SetMoney(float value)
+    //{
+    //    currentMoney = value;
+    //    EventMoneyChanged?.Invoke(currentMoney);
+    //}
 
-    [Server]
-    private void AddMoney(float value)
-    {
-        currentMoney += value;
-        EventMoneyChanged?.Invoke(currentMoney); //updating the money will raise this event
-    }
+    //[Server]
+    //private void AddMoney(float value)
+    //{
+    //    currentMoney += value;
+    //    EventMoneyChanged?.Invoke(currentMoney); //updating the money will raise this event
+    //}
 
-    [Command]
-    private void CmdAddMoney() {
-        value = pickup.GetComponent<MoneyScript>().value;
-        AddMoney(value);
-    } 
+    //[Command]
+    //private void CmdAddMoney() {
+    //    value = pickup.GetComponent<MoneyScript>().value;
+    //    AddMoney(value);
+    //} 
 
     // Start is called before the first frame update
     void Start()
@@ -273,6 +279,38 @@ public class PlayerScript : NetworkBehaviour
 
 
         playerId = ClientScene.localPlayer.netId.ToString();
+    }
+
+    public override void OnStartAuthority()
+    {
+        moneyUI.SetActive(true);
+
+        OnMoneyChange += HandleMoneyChange; //subcribe to the event
+    }
+
+    [ClientCallback]
+    public void OnDestroy()
+    {
+        if (!hasAuthority) { return; } //do nothing if we don't have authority
+        OnMoneyChange -= HandleMoneyChange;
+    }
+
+    private void HandleMoneyChange(float value)
+    {
+        currentMoney += value;
+        moneyText.text = currentMoney.ToString();
+    }
+
+    [Command]
+    private void CmdUpdateMoney(float value)
+    {
+        RpcUpdateMoney(value);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateMoney(float value)
+    {
+        OnMoneyChange?.Invoke(value);
     }
 
     // Update is called once per frame
@@ -336,9 +374,10 @@ public class PlayerScript : NetworkBehaviour
         {
             if(pickup.GetComponent<MoneyScript>().itemType == "Money")
             {
-                //value = pickup.GetComponent<MoneyScript>().value;
-                CmdUpdateMoney();
+                float value = pickup.GetComponent<MoneyScript>().value;
+                //CmdUpdateMoney();
                 //CmdAddMoney();
+                CmdUpdateMoney(value);
             } 
             CmdDestroy(pickup);
         }

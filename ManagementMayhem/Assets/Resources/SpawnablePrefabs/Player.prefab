@@ -1070,10 +1070,10 @@ MonoBehaviour:
   dropPoint: {fileID: 808124578470875593}
   playerTrigger: {fileID: 8316145310307626241}
   gameName: {fileID: 4456678193710744960}
-  money: {fileID: 5628230729841163362}
   moveSpeed: 7
+  moneyUI: {fileID: 3847905101789368524}
+  moneyText: {fileID: 5628230729841163362}
   currentMoney: 0
-  teamWallet: 0
   playerId: 
   playerPos: {x: 0, y: 0, z: 0}
   pickup: {fileID: 0}
