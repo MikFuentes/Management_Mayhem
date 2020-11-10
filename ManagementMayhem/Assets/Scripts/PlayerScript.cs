@@ -7,9 +7,11 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEditor;
+using System.Security.Policy;
 /*
- * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
- */
+* https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
+*/
 public class PlayerScript : NetworkBehaviour
 {
     [Header("Components")]
@@ -38,6 +40,10 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private float currentMoney;
     private static event Action<float> OnMoneyChange;
 
+    [Header("Items")]
+    public GameObject itemPrefab;
+    public GameObject[] spawnablePrefabs;
+
     [Header("Debug Info")]
     [SyncVar]
     public string playerId;
@@ -54,6 +60,10 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     public bool canDeposit;
 
+    public void Start()
+    {
+        spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+    }
     public override void OnStartAuthority()
     {
         moneyUI.SetActive(true);
@@ -129,24 +139,37 @@ public class PlayerScript : NetworkBehaviour
 
         if (pickUpActive)
         {
-            //pickup.transform.position = holdPoint.position;
             CmdPickUp();
         }
 
-        if (canDeposit && !pickUpActive)
+        if (canDeposit && !pickUpActive && pickup != null)
         {
-            if(pickup.GetComponent<MoneyScript>().itemType == "Money")
+            if(pickup.GetComponent<PickupProperties>().itemType == "Money")
             {
-                float value = pickup.GetComponent<MoneyScript>().value;
-                //CmdUpdateMoney();
-                //CmdAddMoney();
+                float value = pickup.GetComponent<PickupProperties>().value;
                 CmdUpdateMoney(value);
-            } 
-            CmdDestroy(pickup);
+                CmdDestroy(pickup);
+            }
+            else if(pickup.GetComponent<PickupProperties>().itemType == "Box")
+            {
+                float cost = pickup.GetComponent<PickupProperties>().value;
+                string itemName = pickup.GetComponent<PickupProperties>().itemName;
+                itemPrefab = FindItem(itemName);
+
+                if(currentMoney - cost >= 0 && itemPrefab != null)
+                {
+                    CmdUpdateMoney(-cost);
+                    //spawn corresponding item
+                    //Debug.Log(itemPrefab.name);
+                    CmdSpawn(itemPrefab);
+                    CmdDestroy(pickup);
+                }
+                else
+                {
+                    //not enough funds
+                }
+            }
         }
-        //Debug.Log(teamWallet.ToString());
-        
-            
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -189,6 +212,41 @@ public class PlayerScript : NetworkBehaviour
                 canDeposit = false;
         }
     }
+    #region Items
+
+    [Command]
+    void CmdDestroy(GameObject gameObject)
+    {
+        NetworkServer.Destroy(gameObject);
+    }
+
+    [Command]
+    void CmdSpawn(GameObject itemPrefab)
+    {
+        Debug.Log("Instantiating " + itemPrefab.name);
+        GameObject item = Instantiate(itemPrefab, pickup.transform);
+
+        Debug.Log("Spawning " + item.name);
+        NetworkServer.Spawn(item);
+        
+    }
+
+    private GameObject FindItem(string name)
+    {
+        string temp = "Item (" + name + ")";
+        //Debug.Log(temp);
+        foreach (var prefab in spawnablePrefabs)
+        {
+            if (temp == prefab.name)
+            {
+                //Debug.Log("Prefab " + prefab.name + " found!");
+                return prefab;
+            }
+        }
+
+        return null;
+    }
+    #endregion
 
     #region Actions
     [Command]
@@ -220,12 +278,6 @@ public class PlayerScript : NetworkBehaviour
     {
         pickUpButton.gameObject.SetActive(true);
         dropButton.gameObject.SetActive(false);
-    }
-
-    [Command]
-    void CmdDestroy(GameObject gameObject)
-    {
-        NetworkServer.Destroy(gameObject);
     }
 
     [Command]

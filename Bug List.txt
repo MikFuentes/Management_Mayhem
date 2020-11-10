@@ -1,6 +1,7 @@
 Bugs:
 
 Major:
+- https://forum.unity.com/threads/nullreferenceexception-when-passing-local-gameobjects-through-command-and-clientrpc-solved.509002/
 - Box moves on it's own when player is holding box near conveyer belt on client side (not server side). Probably related to how the player is holding the box.
 - Box sometimes doesn't get picked up on client?
 - Money sometimes doubles when CLIENT deposits
