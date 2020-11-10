@@ -3,7 +3,9 @@ Bugs:
 Major:
 - Box moves on it's own when player is holding box near conveyer belt on client side (not server side). Probably related to how the player is holding the box.
 - Box sometimes doesn't get picked up on client?
-- Money is not synched when deposited
+- Money sometimes doubles when CLIENT deposits
+- If the Host dc's, player's should be brought back to the main menu (after an error message)
+- if the client dc's player's should be able to rejoin?
 
 Minor:
 - Client PlayerID is not synced onto the server when interacting with objects.

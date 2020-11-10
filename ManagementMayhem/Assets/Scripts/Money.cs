@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Money : NetworkBehaviour
 {
+
     private float moneyAdded;
 
     [SyncVar]

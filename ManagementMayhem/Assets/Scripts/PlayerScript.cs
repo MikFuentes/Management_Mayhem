@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using Mirror;
-using TMPro;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System;
-
+using Mirror;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 /*
  * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
  */
@@ -16,6 +15,8 @@ public class PlayerScript : NetworkBehaviour
     [Header("Components")]
     public Joystick joystick;
     public Animator animator;
+
+    [Header("UI Elements")]
     public Button interactButton;
     public Button pickUpButton;
     public Button dropButton;
@@ -24,26 +25,17 @@ public class PlayerScript : NetworkBehaviour
     public CapsuleCollider2D playerTrigger;
     [SerializeField] private GameObject gameName;
 
-    //public TMP_Text playerName = null;
-    private const string PlayerPrefsNameKey = "PlayerName";
-
     [Header("Movement")]
     public float moveSpeed;
     private float horizontalMove, verticalMove;
     private bool facingRight = true;
     private Vector3 movement;
 
-    [Header("Team Wallet")]
+    [Header("Money")]
     [SerializeField] private GameObject moneyUI = null;
     [SerializeField] private TMP_Text moneyText = null;
-
     [SyncVar]
     [SerializeField] private float currentMoney;
-    //[SyncVar]
-    //[SerializeField] private float teamWallet;
-    //[SyncVar]
-    //[SerializeField] private float value;
-
     private static event Action<float> OnMoneyChange;
 
     [Header("Debug Info")]
@@ -62,42 +54,143 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     public bool canDeposit;
 
-    private void flipPlayer()
-    {   
-        Vector3 temp = gameName.transform.localScale; //transform.GetChild(2).GetChild(0).gameObject.transform.localScale;
-        Vector3 theScale = transform.localScale;
-
-        theScale.x *= -1;
-        transform.localScale = theScale;
-        facingRight = !facingRight;
-
-        if (theScale.x < 0)
-        {
-            //facing left
-            temp.x *= -1;
-            gameName.transform.localScale = temp;
-        }
-        else
-        {
-            temp.x = Mathf.Abs(temp.x);
-            gameName.transform.localScale = temp;
-        }
-    } 
-
-    [Command]
-    void CmdRun()
+    public override void OnStartAuthority()
     {
-        RpcRun();
+        moneyUI.SetActive(true);
+
+        holdPoint.gameObject.SetActive(true);
+        dropPoint.gameObject.SetActive(true);
+
+        pickUpButton.onClick.AddListener(CmdPickUpOnClick);
+        dropButton.onClick.AddListener(CmdDropOnClick);
+        interactButton.onClick.AddListener(CmdInteractOnClick);
+
+        playerId = ClientScene.localPlayer.netId.ToString();
+
+        OnMoneyChange += HandleMoneyChange; //subcribe to the money event
     }
 
-    [ClientRpc]
-    void RpcRun()
+    [ClientCallback]
+    public void OnDestroy()
     {
+        if (!hasAuthority) { return; } //do nothing if we don't have authority
+        OnMoneyChange -= HandleMoneyChange;
+    }
+
+    void Update()
+    {
+        // Don't control other player's models
         if (!isLocalPlayer)
             return;
-        animator.SetBool("Running", !(Mathf.Abs(horizontalMove) < 0.01 && Mathf.Abs(verticalMove) < 0.01));
+
+        //Controls
+        if (Input.GetKey(KeyCode.W) || joystick.Vertical >= .2f)
+            verticalMove = moveSpeed;
+        else if (Input.GetKey(KeyCode.S) || joystick.Vertical <= -.2f)
+            verticalMove = -moveSpeed;
+        else
+            verticalMove = 0;
+
+        if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
+        {
+            if (facingRight) //If moving left while facing right...
+                flipPlayer();
+            horizontalMove = -moveSpeed;
+        }
+        else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
+        {
+            if (!facingRight) //If moving right while facing left...
+                flipPlayer();
+            horizontalMove = moveSpeed;
+        }
+        else
+            horizontalMove = 0;
+
+        if (Input.GetKey(KeyCode.J))
+            CmdPickUpOnClick();
+        if (Input.GetKey(KeyCode.K))
+            CmdDropOnClick();
+        if (Input.GetKey(KeyCode.I))
+            CmdInteractOnClick();
     }
 
+    void FixedUpdate()
+    {
+        // Don't move other player's models
+        if (!isLocalPlayer)
+            return;
+
+        movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
+        transform.position += movement * Time.fixedDeltaTime * moveSpeed;
+
+        playerPos = transform.position;
+
+        CmdRun();
+
+        if (pickUpActive)
+        {
+            //pickup.transform.position = holdPoint.position;
+            CmdPickUp();
+        }
+
+        if (canDeposit && !pickUpActive)
+        {
+            if(pickup.GetComponent<MoneyScript>().itemType == "Money")
+            {
+                float value = pickup.GetComponent<MoneyScript>().value;
+                //CmdUpdateMoney();
+                //CmdAddMoney();
+                CmdUpdateMoney(value);
+            } 
+            CmdDestroy(pickup);
+        }
+        //Debug.Log(teamWallet.ToString());
+        
+            
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        //Don't check collision of other player's models
+        if (!isLocalPlayer)
+            return;
+
+        if (collision.IsTouching(playerTrigger)) {
+            if (collision.gameObject.CompareTag("Pickup") && !pickUpActive)
+            {
+                pickup = collision.gameObject;
+                CmdTriggerStayPickup(pickup);
+            }
+            else if (collision.gameObject.CompareTag("Interactable"))
+            {
+                interactable = collision.gameObject;
+                CmdTriggerStayInteractable(interactable);
+            }
+            else if (collision.gameObject.CompareTag("Deleter"))
+                canDeposit = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        //Don't check collision of other player's models
+        if (!isLocalPlayer)
+            return;
+
+        if (!collision.IsTouching(playerTrigger))
+        {
+            if (collision.gameObject.CompareTag("Pickup") & !pickUpActive){
+                pickup = null;
+                CmdTriggerExitPickup();
+            }
+            else if (collision.gameObject.CompareTag("Interactable"))
+                CmdTriggerExitInteractable();
+            else if (collision.gameObject.CompareTag("Deleter"))
+                canDeposit = false;
+        }
+    }
+
+    #region Actions
     [Command]
     void CmdPickUpOnClick()
     {
@@ -218,83 +311,48 @@ public class PlayerScript : NetworkBehaviour
     {
         interactButton.interactable = false;
     }
+    #endregion
 
-    //[Command]
-    //void CmdUpdateMoney()
-    //{
-    //    value = pickup.GetComponent<MoneyScript>().value;
-    //    teamWallet += value;
-    //    moneyText.text = teamWallet.ToString();
-    //    RpcUpdateMoney();
-    //}
+    #region Movement
+    private void flipPlayer()
+    {
+        Vector3 temp = gameName.transform.localScale; //transform.GetChild(2).GetChild(0).gameObject.transform.localScale;
+        Vector3 theScale = transform.localScale;
 
-    //[ClientRpc]
-    //void RpcUpdateMoney()
-    //{
-    //    //value = pickup.GetComponent<MoneyScript>().value;
-    //    //teamWallet += value;
-    //    //Debug.Log(value);
-    //    //Debug.Log(teamWallet);
-    //    //teamWallet += value;
-    //    //money.text = teamWallet.ToString();
-    //}
+        theScale.x *= -1;
+        transform.localScale = theScale;
+        facingRight = !facingRight;
 
-    ////define the event
-    //public delegate void MoneyChangedDelegate(float currentMoney);
-    //[SyncEvent]
-    //public event MoneyChangedDelegate EventMoneyChanged;
+        if (theScale.x < 0)
+        {
+            //facing left
+            temp.x *= -1;
+            gameName.transform.localScale = temp;
+        }
+        else
+        {
+            temp.x = Mathf.Abs(temp.x);
+            gameName.transform.localScale = temp;
+        }
+    }
 
-    //[Server]
-    //private void SetMoney(float value)
-    //{
-    //    currentMoney = value;
-    //    EventMoneyChanged?.Invoke(currentMoney);
-    //}
+    [Command]
+    void CmdRun()
+    {
+        RpcRun();
+    }
 
-    //[Server]
-    //private void AddMoney(float value)
-    //{
-    //    currentMoney += value;
-    //    EventMoneyChanged?.Invoke(currentMoney); //updating the money will raise this event
-    //}
-
-    //[Command]
-    //private void CmdAddMoney() {
-    //    value = pickup.GetComponent<MoneyScript>().value;
-    //    AddMoney(value);
-    //} 
-
-    // Start is called before the first frame update
-    void Start()
+    [ClientRpc]
+    void RpcRun()
     {
         if (!isLocalPlayer)
             return;
 
-        holdPoint.gameObject.SetActive(true);
-        dropPoint.gameObject.SetActive(true);
-
-        pickUpButton.onClick.AddListener(CmdPickUpOnClick);
-        dropButton.onClick.AddListener(CmdDropOnClick);
-        interactButton.onClick.AddListener(CmdInteractOnClick);
-
-
-        playerId = ClientScene.localPlayer.netId.ToString();
+        animator.SetBool("Running", !(Mathf.Abs(horizontalMove) < 0.01 && Mathf.Abs(verticalMove) < 0.01));
     }
+    #endregion
 
-    public override void OnStartAuthority()
-    {
-        moneyUI.SetActive(true);
-
-        OnMoneyChange += HandleMoneyChange; //subcribe to the event
-    }
-
-    [ClientCallback]
-    public void OnDestroy()
-    {
-        if (!hasAuthority) { return; } //do nothing if we don't have authority
-        OnMoneyChange -= HandleMoneyChange;
-    }
-
+    #region Money
     private void HandleMoneyChange(float value)
     {
         currentMoney += value;
@@ -312,130 +370,5 @@ public class PlayerScript : NetworkBehaviour
     {
         OnMoneyChange?.Invoke(value);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // Don't control other player's models
-        if (!isLocalPlayer)
-            return;
-
-        //Controls
-        if (Input.GetKey(KeyCode.W) || joystick.Vertical >= .2f)
-            verticalMove = moveSpeed;
-        else if (Input.GetKey(KeyCode.S) || joystick.Vertical <= -.2f)
-            verticalMove = -moveSpeed;
-        else
-            verticalMove = 0;
-
-        if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
-        {
-            if (facingRight) //If moving left while facing right...
-                flipPlayer();
-            horizontalMove = -moveSpeed;
-        }
-        else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
-        {
-            if (!facingRight) //If moving right while facing left...
-                flipPlayer();
-            horizontalMove = moveSpeed;
-        }
-        else
-            horizontalMove = 0;
-
-        if (Input.GetKey(KeyCode.J))
-            CmdPickUpOnClick();
-        if (Input.GetKey(KeyCode.K))
-            CmdDropOnClick();
-        if (Input.GetKey(KeyCode.I))
-            CmdInteractOnClick();
-    }
-
-    void FixedUpdate()
-    {
-        // Don't move other player's models
-        if (!isLocalPlayer)
-            return;
-
-        movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
-        transform.position += movement * Time.fixedDeltaTime * moveSpeed;
-
-        playerPos = transform.position;
-
-        CmdRun();
-
-        if (pickUpActive)
-        {
-            //pickup.transform.position = holdPoint.position;
-            CmdPickUp();
-        }
-
-        if (canDeposit && !pickUpActive)
-        {
-            if(pickup.GetComponent<MoneyScript>().itemType == "Money")
-            {
-                float value = pickup.GetComponent<MoneyScript>().value;
-                //CmdUpdateMoney();
-                //CmdAddMoney();
-                CmdUpdateMoney(value);
-            } 
-            CmdDestroy(pickup);
-        }
-        //Debug.Log(teamWallet.ToString());
-        
-            
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        //Don't check collision of other player's models
-        if (!isLocalPlayer)
-            return;
-
-        if (collision.gameObject.CompareTag("Pickup") && collision.IsTouching(playerTrigger))
-        {
-            if (!pickUpActive)
-            {
-                pickup = collision.gameObject;
-                CmdTriggerStayPickup(pickup);
-            }
-        }
-        else if (collision.gameObject.CompareTag("Interactable") && collision.IsTouching(playerTrigger))
-        {
-            interactable = collision.gameObject;
-            CmdTriggerStayInteractable(interactable);
-        }
-        else if (collision.gameObject.CompareTag("Deleter") && collision.IsTouching(playerTrigger))
-        {
-            //deleter = collision.gameObject;
-            //CmdTriggerStayDeleter(deleter);
-            canDeposit = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        //Don't check collision of other player's models
-        if (!isLocalPlayer)
-            return;
-
-        if (collision.gameObject.CompareTag("Pickup") && !collision.IsTouching(playerTrigger))
-        {
-            if (!pickUpActive)
-            {
-                pickup = null;
-                CmdTriggerExitPickup();
-            }
-        }
-        else if (collision.gameObject.CompareTag("Interactable") && !collision.IsTouching(playerTrigger))
-        {
-            CmdTriggerExitInteractable();
-        }
-        else if (collision.gameObject.CompareTag("Deleter") && !collision.IsTouching(playerTrigger))
-        {
-            //deleter = collision.gameObject;
-            //CmdTriggerStayDeleter(deleter);
-            canDeposit = false;
-        }
-    }
+    #endregion
 }
