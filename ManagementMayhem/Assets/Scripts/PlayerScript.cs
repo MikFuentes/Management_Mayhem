@@ -42,7 +42,7 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Items")]
     public GameObject itemPrefab;
-    public GameObject[] spawnablePrefabs;
+    public List<GameObject> spawnablePrefabs;
 
     [Header("Debug Info")]
     [SyncVar]
@@ -60,9 +60,22 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     public bool canDeposit;
 
+
+    private NetworkManagerLobby room;
+    private NetworkManagerLobby Room
+    {
+        get
+        {
+            if (room != null) { return room; }
+            return room = NetworkManager.singleton as NetworkManagerLobby;
+        }
+    }
+
     public void Start()
     {
-        spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+        //spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+
+        spawnablePrefabs = Room.getServerSpawnPrefabs();
     }
     public override void OnStartAuthority()
     {
@@ -160,8 +173,8 @@ public class PlayerScript : NetworkBehaviour
                 {
                     CmdUpdateMoney(-cost);
                     //spawn corresponding item
-                    //Debug.Log(itemPrefab.name);
-                    CmdSpawn(itemPrefab);
+                    Debug.Log(itemPrefab.name);
+                    CmdSpawn();
                     CmdDestroy(pickup);
                 }
                 else
@@ -221,10 +234,11 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [Command]
-    void CmdSpawn(GameObject itemPrefab)
+    void CmdSpawn()
     {
         Debug.Log("Instantiating " + itemPrefab.name);
-        GameObject item = Instantiate(itemPrefab, pickup.transform);
+
+        GameObject item = Instantiate(itemPrefab);
 
         Debug.Log("Spawning " + item.name);
         NetworkServer.Spawn(item);

@@ -1063,6 +1063,7 @@ MonoBehaviour:
   syncInterval: 0.1
   joystick: {fileID: 594301614454633044}
   animator: {fileID: 5425747955083965241}
+  netManager: {fileID: 0}
   interactButton: {fileID: 1882400849100517650}
   pickUpButton: {fileID: 7063700831196355923}
   dropButton: {fileID: 3309211552575968738}
@@ -1074,6 +1075,8 @@ MonoBehaviour:
   moneyUI: {fileID: 3847905101789368524}
   moneyText: {fileID: 5628230729841163362}
   currentMoney: 0
+  itemPrefab: {fileID: 0}
+  spawnablePrefabs: []
   playerId: 
   playerPos: {x: 0, y: 0, z: 0}
   pickup: {fileID: 0}

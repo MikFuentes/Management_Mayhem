@@ -32,6 +32,12 @@ public class NetworkManagerLobby : NetworkManager
         }
 
     }
+
+    public List<GameObject> getServerSpawnPrefabs()
+    {
+        return spawnPrefabs;
+    } 
+
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
     public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby>();
 
