@@ -2426,7 +2426,26 @@ MonoBehaviour:
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 3048587456452445835, guid: e017ffcd47aade14cad67395b7d2be0c, type: 3}
+  - {fileID: 6317010682376684983, guid: 71e25878b853c464bb8ffb351b1b5018, type: 3}
+  - {fileID: 7387350062473087694, guid: a8c26ef3930572a4e9bd98c127ad1b8d, type: 3}
+  - {fileID: 7444369022186658912, guid: 449b3bc2a8e5cc642a237709333a7d79, type: 3}
+  - {fileID: 6225948732863176069, guid: d69914476eca4ba448e5c04bdbe65107, type: 3}
+  - {fileID: 2125543592562024030, guid: 83c279764e494db45a181c54ac52f19b, type: 3}
+  - {fileID: 3057470057928363829, guid: cabb7aa7945c09d45b478057863a0716, type: 3}
+  - {fileID: 841121034837473376, guid: e8da3d1a8e0a38b4aafe8dd4074c369c, type: 3}
+  - {fileID: 4788537222144068490, guid: 9b69a71576b9aba46bc3dfb432bfefff, type: 3}
+  - {fileID: 7513019427629638149, guid: 7223bba202abd2d40a21ef8b1baf131c, type: 3}
+  - {fileID: 6786152337526188686, guid: b82e4ccf071dba04a8c0e3a75ad3c009, type: 3}
+  - {fileID: 4354978883182448244, guid: 891d27a9054d96f429e8fd64ade5ed3d, type: 3}
+  - {fileID: 1880820012715491040, guid: f8ca6e515781c744091245577e454647, type: 3}
+  - {fileID: 7272612647059405766, guid: dd95d8c00c128314f945c7985b586b73, type: 3}
+  - {fileID: 4443868190616707208, guid: 158a1a6832de0ac43b3d3c536015457d, type: 3}
+  - {fileID: 7452007967275807989, guid: e52294dc63aee384697407ae863fc2ba, type: 3}
+  - {fileID: 5043691990583168842, guid: 229270462700af1498b082a9a69138a8, type: 3}
+  - {fileID: 5194235690431591957, guid: a8736b8edcb84c148ae6445d363b4200, type: 3}
+  - {fileID: 5046823782818229899, guid: d9e5bff907f6d284fb2f3a372d6ce88b, type: 3}
   minPlayers: 2
   menuScene: Assets/Scenes/Main Menu.unity
   roomPlayerPrefab: {fileID: 2956085797749125336, guid: a8736b8edcb84c148ae6445d363b4200,

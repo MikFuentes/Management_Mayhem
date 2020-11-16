@@ -42,7 +42,8 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Items")]
     public GameObject itemPrefab;
-    public List<GameObject> spawnablePrefabs;
+    public GameObject[] clientPrefabs;
+    public List<GameObject> serverPrefabs;
 
     [Header("Debug Info")]
     [SyncVar]
@@ -61,8 +62,8 @@ public class PlayerScript : NetworkBehaviour
     public bool canDeposit;
 
 
-    private NetworkManagerLobby room;
-    private NetworkManagerLobby Room
+    public NetworkManagerLobby room;
+    public NetworkManagerLobby Room
     {
         get
         {
@@ -73,9 +74,8 @@ public class PlayerScript : NetworkBehaviour
 
     public void Start()
     {
-        //spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
-
-        spawnablePrefabs = Room.getServerSpawnPrefabs();
+        clientPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+        serverPrefabs = Room.spawnPrefabs;
     }
     public override void OnStartAuthority()
     {
@@ -91,6 +91,9 @@ public class PlayerScript : NetworkBehaviour
         playerId = ClientScene.localPlayer.netId.ToString();
 
         OnMoneyChange += HandleMoneyChange; //subcribe to the money event
+
+        //spawnablePrefabs = Room.spawnPrefabs;
+
     }
 
     [ClientCallback]
@@ -155,7 +158,7 @@ public class PlayerScript : NetworkBehaviour
             CmdPickUp();
         }
 
-        if (canDeposit && !pickUpActive && pickup != null)
+        if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor with the item on the floor
         {
             if(pickup.GetComponent<PickupProperties>().itemType == "Money")
             {
@@ -168,12 +171,14 @@ public class PlayerScript : NetworkBehaviour
                 float cost = pickup.GetComponent<PickupProperties>().value;
                 string itemName = pickup.GetComponent<PickupProperties>().itemName;
                 itemPrefab = FindItem(itemName);
+                Debug.Log(itemPrefab.name);
 
                 if(currentMoney - cost >= 0 && itemPrefab != null)
                 {
                     CmdUpdateMoney(-cost);
-                    //spawn corresponding item
-                    Debug.Log(itemPrefab.name);
+
+                    //change color based on boolean (isBought) instead of spawning a new object?
+                    //red = default, green = isBought;
                     CmdSpawn();
                     CmdDestroy(pickup);
                 }
@@ -248,16 +253,15 @@ public class PlayerScript : NetworkBehaviour
     private GameObject FindItem(string name)
     {
         string temp = "Item (" + name + ")";
-        //Debug.Log(temp);
-        foreach (var prefab in spawnablePrefabs)
+        foreach (var prefab in serverPrefabs)
         {
             if (temp == prefab.name)
             {
-                //Debug.Log("Prefab " + prefab.name + " found!");
                 return prefab;
             }
         }
 
+        Debug.Log("Item not found");
         return null;
     }
     #endregion
