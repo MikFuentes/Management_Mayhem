@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2379311832773416044}
   - component: {fileID: 7575591708419182060}
   - component: {fileID: 1056181598058716828}
+  - component: {fileID: 4988839820528429519}
   m_Layer: 9
   m_Name: Item
   m_TagString: Pickup
@@ -116,7 +117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 0.1
+  syncInterval: 0
   clientAuthority: 1
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
@@ -150,6 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99329936cf6d1624c8d1f605acd18010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   itemType: Item
   itemName: 
   value: 0
@@ -195,3 +198,24 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -3}
   m_Size: {x: 10.24, y: 5.41}
   m_Direction: 1
+--- !u!50 &4988839820528429519
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7513019427629638149}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 10
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4

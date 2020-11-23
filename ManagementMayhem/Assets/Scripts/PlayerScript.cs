@@ -176,16 +176,11 @@ public class PlayerScript : NetworkBehaviour
             {
                 float cost = pickup.GetComponent<PickupProperties>().value;
                 string itemName = pickup.GetComponent<PickupProperties>().itemName;
-                //itemPrefab = FindItem(itemName);
-                //Debug.Log(itemPrefab);
 
-                if(currentMoney - cost >= 0) //&& itemPrefab != null
+                if(currentMoney - cost >= 0 && itemName != null) //&& itemPrefab != null
                 {
-                    Debug.Log("Purchasing " + itemPrefab);
+                    Debug.Log("Purchasing...");
                     CmdUpdateMoney(-cost);
-
-                    //change color based on boolean (isBought) instead of spawning a new object?
-                    //red = default, green = isBought;
                     CmdSpawn(itemName);
                     CmdDestroy(pickup);
                 }
@@ -247,7 +242,7 @@ public class PlayerScript : NetworkBehaviour
         {
             if (temp == prefab.name)
             {
-                Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId) ;
+                //Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId) ;
                 return prefab; //return the gameObject
             }
         }
@@ -259,10 +254,10 @@ public class PlayerScript : NetworkBehaviour
     {
         itemPrefab = FindItem(itemName);
 
-        Debug.Log("Instantiating " + itemPrefab.name);
-        GameObject item = (GameObject) Instantiate(itemPrefab);
+        //Debug.Log("Instantiating " + itemPrefab.name);
+        GameObject item = (GameObject) Instantiate(itemPrefab, dropPoint.transform.position, Quaternion.identity);
 
-        Debug.Log("Spawning " + item.name);
+        //Debug.Log("Spawning " + item.name);
         NetworkServer.Spawn(item);
     }
 
@@ -334,7 +329,7 @@ public class PlayerScript : NetworkBehaviour
     public void RpcPickUp()
     {
         //pickup.transform.position = playerPosition;
-        //pickup.transform.position = holdPoint.position;
+        pickup.transform.position = holdPoint.position;
     }
 
     [Command]
