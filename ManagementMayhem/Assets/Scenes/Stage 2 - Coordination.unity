@@ -669,8 +669,8 @@ GameObject:
   - component: {fileID: 531007621}
   m_Layer: 0
   m_Name: SpawnPoint (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_TagString: Respawn
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1067,7 +1067,7 @@ PrefabInstance:
     - target: {fileID: 4788537222144068490, guid: 9b69a71576b9aba46bc3dfb432bfefff,
         type: 3}
       propertyPath: m_TagString
-      value: Deleter
+      value: Depositor
       objectReference: {fileID: 0}
     - target: {fileID: 8137762329655443553, guid: 9b69a71576b9aba46bc3dfb432bfefff,
         type: 3}
@@ -1539,8 +1539,8 @@ GameObject:
   - component: {fileID: 1339778013}
   m_Layer: 0
   m_Name: SpawnPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_TagString: Respawn
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -2014,8 +2014,8 @@ GameObject:
   - component: {fileID: 2008028193}
   m_Layer: 0
   m_Name: SpawnPoint (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_TagString: Respawn
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

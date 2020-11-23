@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEditor;
-using System.Security.Policy;
+//using System.Security.Policy;
 /*
 * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
 */
@@ -56,10 +56,12 @@ public class PlayerScript : NetworkBehaviour
     public bool pickUpActive = false;
     [SyncVar]
     public GameObject interactable;
-    [SyncVar]
-    public GameObject deleter;
+    //[SyncVar]
+    //public GameObject deleter;
     [SyncVar]
     public bool canDeposit;
+    [SyncVar]
+    public bool canDelete;
 
     [SerializeField]
     private NetworkManagerLobby room;
@@ -191,6 +193,17 @@ public class PlayerScript : NetworkBehaviour
                 }
             }
         }
+
+        if (canDelete && !pickUpActive && pickup != null) 
+        { 
+            if(pickup.GetComponent<PickupProperties>().itemType != "Money" && pickup.GetComponent<PickupProperties>().itemType != "Box")
+            {
+                string itemName = pickup.GetComponent<PickupProperties>().itemName;
+
+                Debug.Log(itemName + " deposited.");
+                CmdDestroy(pickup);
+            }
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -210,8 +223,11 @@ public class PlayerScript : NetworkBehaviour
                 interactable = collision.gameObject;
                 CmdTriggerStayInteractable(interactable);
             }
-            else if (collision.gameObject.CompareTag("Deleter"))
+            else if (collision.gameObject.CompareTag("Depositor"))
                 canDeposit = true;
+            else if (collision.gameObject.CompareTag("Deleter"))
+                canDelete = true;
+                
         }
     }
 
@@ -229,8 +245,10 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("Interactable"))
                 CmdTriggerExitInteractable();
-            else if (collision.gameObject.CompareTag("Deleter"))
+            else if (collision.gameObject.CompareTag("Depositor"))
                 canDeposit = false;
+            else if (collision.gameObject.CompareTag("Deleter"))
+                canDelete = false;
         }
     }
     #region Items
@@ -329,7 +347,7 @@ public class PlayerScript : NetworkBehaviour
     public void RpcPickUp()
     {
         //pickup.transform.position = playerPosition;
-        pickup.transform.position = holdPoint.position;
+        //pickup.transform.position = holdPoint.position;
     }
 
     [Command]

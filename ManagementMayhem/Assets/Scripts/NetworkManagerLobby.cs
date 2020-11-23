@@ -141,7 +141,7 @@ public class NetworkManagerLobby : NetworkManager
             for(int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
                 var conn = RoomPlayers[i].connectionToClient;
-                var gameplayerInstance = Instantiate(gamePlayerPrefab); //,NetworkManager.startPositions
+                var gameplayerInstance = Instantiate(gamePlayerPrefab); //, NetworkManager.startPositions[i]
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
 
                 NetworkServer.Destroy(conn.identity.gameObject); //get rid of room player

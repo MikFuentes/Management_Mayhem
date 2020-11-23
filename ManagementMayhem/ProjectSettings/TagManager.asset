@@ -8,7 +8,7 @@ TagManager:
   - Interactable
   - Deleter
   - Menu
-  - Cashier
+  - Depositor
   layers:
   - Default
   - TransparentFX
