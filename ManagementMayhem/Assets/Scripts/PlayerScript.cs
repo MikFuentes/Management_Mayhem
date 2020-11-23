@@ -61,13 +61,18 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     public bool canDeposit;
 
-
-    public NetworkManagerLobby room;
-    public NetworkManagerLobby Room
+    [SerializeField]
+    private NetworkManagerLobby room;
+    [SerializeField]
+    private NetworkManagerLobby Room
     {
         get
         {
-            if (room != null) { return room; }
+            if (room != null) {
+                Debug.Log("Room is not null!");
+                return room;
+            }
+            Debug.Log("Room is null!");
             return room = NetworkManager.singleton as NetworkManagerLobby;
         }
     }
@@ -76,6 +81,7 @@ public class PlayerScript : NetworkBehaviour
     {
         clientPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
         serverPrefabs = Room.spawnPrefabs;
+        
     }
     public override void OnStartAuthority()
     {
@@ -170,20 +176,22 @@ public class PlayerScript : NetworkBehaviour
             {
                 float cost = pickup.GetComponent<PickupProperties>().value;
                 string itemName = pickup.GetComponent<PickupProperties>().itemName;
-                itemPrefab = FindItem(itemName);
-                Debug.Log(itemPrefab.name);
+                //itemPrefab = FindItem(itemName);
+                //Debug.Log(itemPrefab);
 
-                if(currentMoney - cost >= 0 && itemPrefab != null)
+                if(currentMoney - cost >= 0) //&& itemPrefab != null
                 {
+                    Debug.Log("Purchasing " + itemPrefab);
                     CmdUpdateMoney(-cost);
 
                     //change color based on boolean (isBought) instead of spawning a new object?
                     //red = default, green = isBought;
-                    CmdSpawn();
+                    CmdSpawn(itemName);
                     CmdDestroy(pickup);
                 }
                 else
                 {
+                    Debug.Log("Not enough funds.");
                     //not enough funds
                 }
             }
@@ -231,38 +239,37 @@ public class PlayerScript : NetworkBehaviour
         }
     }
     #region Items
+    private GameObject FindItem(string name)
+    {
+        string temp = "Item (" + name + ")";
+
+        foreach (var prefab in Room.spawnPrefabs)
+        {
+            if (temp == prefab.name)
+            {
+                Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId) ;
+                return prefab; //return the gameObject
+            }
+        }
+        return null;
+    }
+
+    [Command]
+    void CmdSpawn(string itemName)
+    {
+        itemPrefab = FindItem(itemName);
+
+        Debug.Log("Instantiating " + itemPrefab.name);
+        GameObject item = (GameObject) Instantiate(itemPrefab);
+
+        Debug.Log("Spawning " + item.name);
+        NetworkServer.Spawn(item);
+    }
 
     [Command]
     void CmdDestroy(GameObject gameObject)
     {
         NetworkServer.Destroy(gameObject);
-    }
-
-    [Command]
-    void CmdSpawn()
-    {
-        Debug.Log("Instantiating " + itemPrefab.name);
-
-        GameObject item = Instantiate(itemPrefab);
-
-        Debug.Log("Spawning " + item.name);
-        NetworkServer.Spawn(item);
-        
-    }
-
-    private GameObject FindItem(string name)
-    {
-        string temp = "Item (" + name + ")";
-        foreach (var prefab in serverPrefabs)
-        {
-            if (temp == prefab.name)
-            {
-                return prefab;
-            }
-        }
-
-        Debug.Log("Item not found");
-        return null;
     }
     #endregion
 
