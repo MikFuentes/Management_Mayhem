@@ -10,7 +10,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 
 
     [SyncVar]
-    [SerializeField] private string displayName = "Loading...";
+    [SerializeField] public string displayName = "Loading...";
     [SerializeField] private TMP_Text playerName = null;
 
 

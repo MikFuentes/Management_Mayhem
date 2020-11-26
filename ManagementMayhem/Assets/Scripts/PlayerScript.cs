@@ -42,8 +42,8 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Items")]
     public GameObject itemPrefab;
-    public GameObject[] clientPrefabs;
-    public List<GameObject> serverPrefabs;
+    //public GameObject[] clientPrefabs;
+    //public List<GameObject> serverPrefabs;
 
     [Header("Debug Info")]
     [SyncVar]
@@ -63,26 +63,23 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     public bool canDelete;
 
-    [SerializeField]
+
     private NetworkManagerLobby room;
-    [SerializeField]
     private NetworkManagerLobby Room
     {
         get
         {
             if (room != null) {
-                Debug.Log("Room is not null!");
                 return room;
             }
-            Debug.Log("Room is null!");
             return room = NetworkManager.singleton as NetworkManagerLobby;
         }
     }
 
     public void Start()
     {
-        clientPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
-        serverPrefabs = Room.spawnPrefabs;
+        //clientPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+        //serverPrefabs = Room.spawnPrefabs;
         
     }
     public override void OnStartAuthority()
@@ -166,25 +163,29 @@ public class PlayerScript : NetworkBehaviour
             CmdPickUp();
         }
 
-        if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor with the item on the floor
+        //Debug.Log(Time.fixedDeltaTime);
+
+        if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor empty-handed with the item on the floor
         {
             if(pickup.GetComponent<PickupProperties>().itemType == "Money")
             {
                 float value = pickup.GetComponent<PickupProperties>().value;
+                CmdDestroy(pickup); //better for lag?
                 CmdUpdateMoney(value);
-                CmdDestroy(pickup);
+                
             }
             else if(pickup.GetComponent<PickupProperties>().itemType == "Box")
             {
                 float cost = pickup.GetComponent<PickupProperties>().value;
                 string itemName = pickup.GetComponent<PickupProperties>().itemName;
 
-                if(currentMoney - cost >= 0 && itemName != null) //&& itemPrefab != null
+                if(currentMoney != 0 && currentMoney - cost >= 0 && itemName != null) //&& itemPrefab != null
                 {
                     Debug.Log("Purchasing...");
+                    CmdDestroy(pickup); //better for lag?
                     CmdUpdateMoney(-cost);
                     CmdSpawn(itemName);
-                    CmdDestroy(pickup);
+                    
                 }
                 else
                 {
@@ -260,7 +261,7 @@ public class PlayerScript : NetworkBehaviour
         {
             if (temp == prefab.name)
             {
-                //Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId) ;
+                Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId) ;
                 return prefab; //return the gameObject
             }
         }

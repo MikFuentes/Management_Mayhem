@@ -4,7 +4,7 @@ Major:
 - https://forum.unity.com/threads/nullreferenceexception-when-passing-local-gameobjects-through-command-and-clientrpc-solved.509002/
 - Box moves on it's own when player is holding box near conveyer belt on client side (not server side). Probably related to how the player is holding the box.
 - Box sometimes doesn't get picked up on client?
-- Money sometimes doubles when CLIENT deposits
+- Money sometimes doubles when CLIENT deposits **
 - If the Host dc's, player's should be brought back to the main menu (after an error message)
 - if the client dc's player's should be able to rejoin?
 
@@ -12,3 +12,4 @@ Minor:
 - Client PlayerID is not synced onto the server when interacting with objects.
 - UI elements anchoring is a lil weird when resizing
 - No message for if host dc's
+- Player sometimes walks backwards

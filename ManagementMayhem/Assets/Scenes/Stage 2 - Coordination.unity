@@ -667,8 +667,9 @@ GameObject:
   m_Component:
   - component: {fileID: 531007620}
   - component: {fileID: 531007621}
+  - component: {fileID: 531007622}
   m_Layer: 0
-  m_Name: SpawnPoint (1)
+  m_Name: SpawnPoint_1
   m_TagString: Respawn
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -698,6 +699,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41f84591ce72545258ea98cb7518d8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &531007622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531007619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfd8c03efb13394388cfe231bb89bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &566430673
@@ -1537,8 +1550,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1339778012}
   - component: {fileID: 1339778013}
+  - component: {fileID: 1339778014}
   m_Layer: 0
-  m_Name: SpawnPoint
+  m_Name: SpawnPoint_0
   m_TagString: Respawn
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -1568,6 +1582,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41f84591ce72545258ea98cb7518d8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1339778014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339778011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfd8c03efb13394388cfe231bb89bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1379578418
@@ -2012,8 +2038,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2008028192}
   - component: {fileID: 2008028193}
+  - component: {fileID: 2008028194}
   m_Layer: 0
-  m_Name: SpawnPoint (2)
+  m_Name: SpawnPoint_2
   m_TagString: Respawn
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -2043,6 +2070,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41f84591ce72545258ea98cb7518d8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2008028194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008028191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfd8c03efb13394388cfe231bb89bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &2042199932
