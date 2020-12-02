@@ -26,6 +26,10 @@ public class PlayerScript : NetworkBehaviour
     public Transform dropPoint;
     public CapsuleCollider2D playerTrigger;
     [SerializeField] private GameObject gameName;
+    [SerializeField] private TMP_Text ui_Timer = null;
+    private static event Action<float> OnTimeChange;
+    [SyncVar]
+    private float currentTime;
 
     [Header("Movement")]
     public float moveSpeed;
@@ -39,6 +43,7 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     [SerializeField] private float currentMoney;
     private static event Action<float> OnMoneyChange;
+    private bool Cooldown = false;
 
     [Header("Items")]
     public GameObject itemPrefab;
@@ -80,7 +85,7 @@ public class PlayerScript : NetworkBehaviour
     {
         //clientPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
         //serverPrefabs = Room.spawnPrefabs;
-        
+
     }
     public override void OnStartAuthority()
     {
@@ -96,6 +101,7 @@ public class PlayerScript : NetworkBehaviour
         playerId = ClientScene.localPlayer.netId.ToString();
 
         OnMoneyChange += HandleMoneyChange; //subcribe to the money event
+        OnTimeChange += HandleTimeChange;
 
         //spawnablePrefabs = Room.spawnPrefabs;
 
@@ -106,6 +112,7 @@ public class PlayerScript : NetworkBehaviour
     {
         if (!hasAuthority) { return; } //do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
+        OnTimeChange -= HandleTimeChange;
     }
 
     void Update()
@@ -157,6 +164,8 @@ public class PlayerScript : NetworkBehaviour
         playerPos = transform.position;
 
         CmdRun();
+        StartCoroutine(Timer(1));
+        CmdUpdateTime();
 
         if (pickUpActive)
         {
@@ -164,47 +173,57 @@ public class PlayerScript : NetworkBehaviour
         }
 
         //Debug.Log(Time.fixedDeltaTime);
-
-        if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor empty-handed with the item on the floor
+        if (!Cooldown)
         {
-            if(pickup.GetComponent<PickupProperties>().itemType == "Money")
+            if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor empty-handed with the item on the floor
             {
-                float value = pickup.GetComponent<PickupProperties>().value;
-                CmdDestroy(pickup); //better for lag?
-                CmdUpdateMoney(value);
-                
-            }
-            else if(pickup.GetComponent<PickupProperties>().itemType == "Box")
-            {
-                float cost = pickup.GetComponent<PickupProperties>().value;
-                string itemName = pickup.GetComponent<PickupProperties>().itemName;
-
-                if(currentMoney != 0 && currentMoney - cost >= 0 && itemName != null) //&& itemPrefab != null
+                if (pickup.GetComponent<PickupProperties>().itemType == "Money")
                 {
-                    Debug.Log("Purchasing...");
+                    float value = pickup.GetComponent<PickupProperties>().value;
                     CmdDestroy(pickup); //better for lag?
-                    CmdUpdateMoney(-cost);
-                    CmdSpawn(itemName);
-                    
+                    CmdUpdateMoney(value);
+
                 }
-                else
+                else if (pickup.GetComponent<PickupProperties>().itemType == "Box")
                 {
-                    Debug.Log("Not enough funds.");
-                    //not enough funds
+                    float cost = pickup.GetComponent<PickupProperties>().value;
+                    string itemName = pickup.GetComponent<PickupProperties>().itemName;
+
+                    if (currentMoney != 0 && currentMoney - cost >= 0 && itemName != null) //&& itemPrefab != null
+                    {
+                        Debug.Log("Purchasing...");
+                        CmdDestroy(pickup); //better for lag?
+                        CmdUpdateMoney(-cost);
+                        CmdSpawn(itemName);
+
+                    }
+                    else
+                    {
+                        Debug.Log("Not enough funds.");
+                        //not enough funds
+                    }
                 }
+                Cooldown = true;
+                StartCoroutine(CooldownTimer(0.5f));
             }
-        }
 
-        if (canDelete && !pickUpActive && pickup != null) 
-        { 
-            if(pickup.GetComponent<PickupProperties>().itemType != "Money" && pickup.GetComponent<PickupProperties>().itemType != "Box")
+            if (canDelete && !pickUpActive && pickup != null)
             {
-                string itemName = pickup.GetComponent<PickupProperties>().itemName;
+                if (pickup.GetComponent<PickupProperties>().itemType != "Money" && pickup.GetComponent<PickupProperties>().itemType != "Box")
+                {
+                    string itemName = pickup.GetComponent<PickupProperties>().itemName;
 
-                Debug.Log(itemName + " deposited.");
-                CmdDestroy(pickup);
+                    Debug.Log(itemName + " deposited.");
+                    CmdDestroy(pickup);
+                }
+                Cooldown = true;
+                StartCoroutine(CooldownTimer(0.5f));
             }
         }
+        else
+            Debug.Log("On Cooldown!");
+
+
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -228,7 +247,7 @@ public class PlayerScript : NetworkBehaviour
                 canDeposit = true;
             else if (collision.gameObject.CompareTag("Deleter"))
                 canDelete = true;
-                
+
         }
     }
 
@@ -240,7 +259,7 @@ public class PlayerScript : NetworkBehaviour
 
         if (!collision.IsTouching(playerTrigger))
         {
-            if (collision.gameObject.CompareTag("Pickup") & !pickUpActive){
+            if (collision.gameObject.CompareTag("Pickup") & !pickUpActive) {
                 pickup = null;
                 CmdTriggerExitPickup();
             }
@@ -261,7 +280,7 @@ public class PlayerScript : NetworkBehaviour
         {
             if (temp == prefab.name)
             {
-                Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId) ;
+                Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId);
                 return prefab; //return the gameObject
             }
         }
@@ -274,7 +293,7 @@ public class PlayerScript : NetworkBehaviour
         itemPrefab = FindItem(itemName);
 
         //Debug.Log("Instantiating " + itemPrefab.name);
-        GameObject item = (GameObject) Instantiate(itemPrefab, dropPoint.transform.position, Quaternion.identity);
+        GameObject item = (GameObject)Instantiate(itemPrefab, dropPoint.transform.position, Quaternion.identity);
 
         //Debug.Log("Spawning " + item.name);
         NetworkServer.Spawn(item);
@@ -462,4 +481,40 @@ public class PlayerScript : NetworkBehaviour
         OnMoneyChange?.Invoke(value);
     }
     #endregion
+
+    #region Time
+    private void HandleTimeChange(float currentMatchTime)
+    {
+        float minutes = Mathf.FloorToInt(currentMatchTime / 60);
+        float seconds = Mathf.FloorToInt(currentMatchTime % 60);
+
+        ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+    [Command]
+    private void CmdUpdateTime()
+    {
+        currentTime = Room.GetTime();
+        RpcUpdateTime(currentTime);
+    }
+    
+    [ClientRpc]
+    private void RpcUpdateTime(float value)
+    {
+        OnTimeChange?.Invoke(value);
+    }
+
+    private IEnumerator CooldownTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        Cooldown = false;
+    }
+
+    private IEnumerator Timer(float time)
+    {
+        yield return new WaitForSeconds(time);
+    }
+    #endregion
 }
+
+    

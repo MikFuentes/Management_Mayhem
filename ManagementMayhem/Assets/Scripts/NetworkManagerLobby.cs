@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using Mirror;
 using System;
 using System.Linq;
+using TMPro;
 
 public class NetworkManagerLobby : NetworkManager
 {
@@ -19,10 +20,15 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private GameObject playerSpawnSystem = null;
     //[SerializeField] private GameObject roundSystem = null;
 
+    private float matchLength = 180;
+    public float currentMatchTime;
+    private Coroutine timerCoroutine;
+
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
     public static event Action<NetworkConnection> OnServerReadied;
     public static event Action OnServerStopped;
+    public static event Action OnTimerCountdown;
 
     //public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
@@ -138,8 +144,52 @@ public class NetworkManagerLobby : NetworkManager
             if (!IsReadyToStart()) { return; }
 
             ServerChangeScene("Stage 2 - Coordination");
+            //initializeCountdown();
+            InitializeTimer();
         }
     }
+
+    private void InitializeTimer()
+    {
+        currentMatchTime = matchLength;
+
+        timerCoroutine = StartCoroutine(Timer());
+    }
+
+    public float GetTime()
+    {
+        return currentMatchTime;
+    }
+
+
+    private IEnumerator Timer()
+    {
+        yield return new WaitForSeconds(1f);
+
+        currentMatchTime--;
+
+        if(currentMatchTime <= 0)
+        {
+            timerCoroutine = null;
+            Debug.Log("Time's up!");
+        }
+        else
+        {
+            //Debug.Log(currentMatchTime);
+            timerCoroutine = StartCoroutine(Timer());
+        }
+    }
+    private void EndGame()
+    {
+        //set game state to ending
+
+        //set timer to 0
+        if (timerCoroutine != null) StopCoroutine(timerCoroutine);
+        currentMatchTime = 0;
+
+        //show end game UI;
+    }
+
 
     public override void ServerChangeScene(string newSceneName)
     {
@@ -151,6 +201,9 @@ public class NetworkManagerLobby : NetworkManager
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
+
+                bool isLeader = i == 0;
+                gameplayerInstance.IsLeader = isLeader;
 
                 NetworkServer.Destroy(conn.identity.gameObject); //get rid of room player
 
@@ -168,15 +221,15 @@ public class NetworkManagerLobby : NetworkManager
         OnServerReadied?.Invoke(conn);
     }
 
-    public override void OnServerSceneChanged(string sceneName)
-    {
-        if (sceneName.StartsWith("Stage"))
-        {
-            GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
-            NetworkServer.Spawn(playerSpawnSystemInstance);
+    //public override void OnServerSceneChanged(string sceneName)
+    //{
+    //    if (sceneName.StartsWith("Stage"))
+    //    {
+    //        GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+    //        NetworkServer.Spawn(playerSpawnSystemInstance);
 
-            //GameObject roundSystemInstance = Instantiate(roundSystem);
-            //NetworkServer.Spawn(roundSystemInstance);
-        }
-    }
+    //        //GameObject roundSystemInstance = Instantiate(roundSystem);
+    //        //NetworkServer.Spawn(roundSystemInstance);
+    //    }
+    //}
 }

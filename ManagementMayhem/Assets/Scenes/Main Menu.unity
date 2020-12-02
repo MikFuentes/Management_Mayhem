@@ -2455,6 +2455,7 @@ MonoBehaviour:
     type: 3}
   playerSpawnSystem: {fileID: 2739164877689454984, guid: c50b4ae2263c3284ca523faaf49ee473,
     type: 3}
+  ui_Timer: {fileID: 0}
 --- !u!4 &1122674849
 Transform:
   m_ObjectHideFlags: 0
@@ -4501,6 +4502,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Landing Page
+      objectReference: {fileID: 0}
+    - target: {fileID: 3999401959936358996, guid: 5f212d0720e2ca6498434c50f57d7ad8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3999401959936359002, guid: 5f212d0720e2ca6498434c50f57d7ad8,
         type: 3}

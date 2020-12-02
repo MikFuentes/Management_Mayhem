@@ -25,6 +25,15 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         }
     }
 
+    private bool isLeader;
+    public bool IsLeader
+    {
+        set
+        {
+            isLeader = value;
+        }
+    }
+
     public override void OnStartClient()
     {
         DontDestroyOnLoad(gameObject); //don't wanna destory the player between levels ?
