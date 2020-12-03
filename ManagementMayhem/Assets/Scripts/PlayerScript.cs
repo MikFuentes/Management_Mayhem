@@ -187,8 +187,8 @@ public class PlayerScript : NetworkBehaviour
                 {
                     float value = pickup.GetComponent<PickupProperties>().value;
                     CmdDestroy(pickup); //better for lag?
+                    CmdTriggerExitPickup();
                     CmdUpdateMoney(value);
-
                 }
                 else if (pickup.GetComponent<PickupProperties>().itemType == "Box")
                 {
@@ -199,9 +199,9 @@ public class PlayerScript : NetworkBehaviour
                     {
                         Debug.Log("Purchasing...");
                         CmdDestroy(pickup); //better for lag?
+                        CmdTriggerExitPickup();
                         CmdUpdateMoney(-cost);
                         CmdSpawn(itemName);
-
                     }
                     else
                     {
@@ -221,6 +221,7 @@ public class PlayerScript : NetworkBehaviour
 
                     Debug.Log(itemName + " deposited.");
                     CmdDestroy(pickup);
+                    CmdTriggerExitPickup();
                 }
                 Cooldown = true;
                 StartCoroutine(CooldownTimer(0.5f));
@@ -228,8 +229,6 @@ public class PlayerScript : NetworkBehaviour
         }
         else
             Debug.Log("On Cooldown!");
-
-
     }
 
     private void OnTriggerStay2D(Collider2D collision)
