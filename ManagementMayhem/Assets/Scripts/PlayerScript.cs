@@ -25,6 +25,9 @@ public class PlayerScript : NetworkBehaviour
     public Transform holdPoint;
     public Transform dropPoint;
     public CapsuleCollider2D playerTrigger;
+    public GameObject Game_UI;
+    public GameObject Current_Interactable_UI;
+    public GameObject Faded_Background;
     [SerializeField] private GameObject gameName;
     [SerializeField] private TMP_Text ui_Timer = null;
     private static event Action<float> OnTimeChange;
@@ -59,7 +62,6 @@ public class PlayerScript : NetworkBehaviour
     public GameObject pickup;
     [SyncVar]
     public bool pickUpActive = false;
-    [SyncVar]
     public GameObject interactable;
     //[SyncVar]
     //public GameObject deleter;
@@ -67,6 +69,7 @@ public class PlayerScript : NetworkBehaviour
     public bool canDeposit;
     [SyncVar]
     public bool canDelete;
+    public bool UI_Active;
 
 
     private NetworkManagerLobby room;
@@ -89,6 +92,7 @@ public class PlayerScript : NetworkBehaviour
     }
     public override void OnStartAuthority()
     {
+
         moneyUI.SetActive(true);
 
         holdPoint.gameObject.SetActive(true);
@@ -96,7 +100,7 @@ public class PlayerScript : NetworkBehaviour
 
         pickUpButton.onClick.AddListener(CmdPickUpOnClick);
         dropButton.onClick.AddListener(CmdDropOnClick);
-        interactButton.onClick.AddListener(CmdInteractOnClick);
+        interactButton.onClick.AddListener(delegate {Activate_Interactable_UI(interactable);});
 
         playerId = ClientScene.localPlayer.netId.ToString();
 
@@ -144,12 +148,15 @@ public class PlayerScript : NetworkBehaviour
         else
             horizontalMove = 0;
 
-        if (Input.GetKey(KeyCode.J))
+        if (Input.GetKey(KeyCode.J) && pickup != null)
             CmdPickUpOnClick();
-        if (Input.GetKey(KeyCode.K))
+        if (Input.GetKey(KeyCode.K) && pickup != null)
             CmdDropOnClick();
-        if (Input.GetKey(KeyCode.I))
-            CmdInteractOnClick();
+        if (Input.GetKey(KeyCode.I) && interactable != null)
+        {
+            Activate_Interactable_UI(interactable);
+        }
+            
     }
 
     void FixedUpdate()
@@ -164,7 +171,7 @@ public class PlayerScript : NetworkBehaviour
         playerPos = transform.position;
 
         CmdRun();
-        StartCoroutine(Timer(1));
+        StartCoroutine(Timer(1)); //
         CmdUpdateTime();
 
         if (pickUpActive)
@@ -172,7 +179,6 @@ public class PlayerScript : NetworkBehaviour
             CmdPickUp();
         }
 
-        //Debug.Log(Time.fixedDeltaTime);
         if (!Cooldown)
         {
             if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor empty-handed with the item on the floor
@@ -241,7 +247,7 @@ public class PlayerScript : NetworkBehaviour
             else if (collision.gameObject.CompareTag("Interactable"))
             {
                 interactable = collision.gameObject;
-                CmdTriggerStayInteractable(interactable);
+                interactButton.interactable = true;
             }
             else if (collision.gameObject.CompareTag("Depositor"))
                 canDeposit = true;
@@ -264,7 +270,12 @@ public class PlayerScript : NetworkBehaviour
                 CmdTriggerExitPickup();
             }
             else if (collision.gameObject.CompareTag("Interactable"))
-                CmdTriggerExitInteractable();
+            {
+                Deactivate_Interactable_UI();
+                interactable = null;
+                interactButton.interactable = false;
+            }
+                
             else if (collision.gameObject.CompareTag("Depositor"))
                 canDeposit = false;
             else if (collision.gameObject.CompareTag("Deleter"))
@@ -307,6 +318,43 @@ public class PlayerScript : NetworkBehaviour
     #endregion
 
     #region Actions
+
+    void Activate_Interactable_UI(GameObject obj)
+    {
+        //get name of interactable 
+        string name = obj.name;
+
+        //look for coressponding UI in UI_array using name
+        Current_Interactable_UI = gameObject.transform.Find("CameraPlayer/HUD/" + name + "_UI").gameObject;
+
+        //activate UI
+        Current_Interactable_UI.SetActive(true);
+        Faded_Background.SetActive(true);
+
+        //set bool
+        UI_Active = true; 
+
+        //deactivate game_UI
+        Game_UI.SetActive(false);
+    }
+
+    void Deactivate_Interactable_UI()
+    {
+        //if UI is active
+        if (UI_Active)
+        {
+            //deactivate UI
+            Current_Interactable_UI.SetActive(false);
+            Faded_Background.SetActive(false);
+
+            //set bool
+            UI_Active = false;
+        }
+
+        //activate game_UI
+        Game_UI.SetActive(true);
+    }
+
     [Command]
     void CmdPickUpOnClick()
     {
@@ -338,19 +386,6 @@ public class PlayerScript : NetworkBehaviour
         dropButton.gameObject.SetActive(false);
     }
 
-    [Command]
-    void CmdInteractOnClick()
-    {
-        //Debug.Log(playerId + " interacted with " + interactable.gameObject.name);
-        RpcInteractOnClick();
-    }
-
-    [ClientRpc]
-    void RpcInteractOnClick()
-    {
-        Debug.Log(playerId + " interacted with " + interactable.gameObject.name);
-        //Debug.Log("I interacted with " + interactable.gameObject.name);
-    }
 
     [Command]
     public void CmdPickUp()
@@ -394,32 +429,6 @@ public class PlayerScript : NetworkBehaviour
     void RpcTriggerExitPickup()
     {
         pickUpButton.interactable = false;
-    }
-
-    [Command]
-    void CmdTriggerStayInteractable(GameObject temp)
-    {
-        interactable = temp;
-        RpcTriggerStayInteractable();
-    }
-
-    [ClientRpc]
-    void RpcTriggerStayInteractable()
-    {
-        interactButton.interactable = true;
-    }
-
-    [Command]
-    void CmdTriggerExitInteractable()
-    {
-        interactable = null;
-        RpcTriggerExitInteractable();
-    }
-
-    [ClientRpc]
-    void RpcTriggerExitInteractable()
-    {
-        interactButton.interactable = false;
     }
     #endregion
 

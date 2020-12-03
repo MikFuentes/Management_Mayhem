@@ -2371,7 +2371,7 @@ PrefabInstance:
     - target: {fileID: 5046823782818229899, guid: d9e5bff907f6d284fb2f3a372d6ce88b,
         type: 3}
       propertyPath: m_Name
-      value: Telephone
+      value: Phone
       objectReference: {fileID: 0}
     - target: {fileID: 5046823782818229899, guid: d9e5bff907f6d284fb2f3a372d6ce88b,
         type: 3}
@@ -2812,6 +2812,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ATM
+      objectReference: {fileID: 0}
+    - target: {fileID: 5451715911471067895, guid: e017ffcd47aade14cad67395b7d2be0c,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: -0.43931344
+      objectReference: {fileID: 0}
+    - target: {fileID: 5451715911471067895, guid: e017ffcd47aade14cad67395b7d2be0c,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.27086657
       objectReference: {fileID: 0}
     - target: {fileID: 7735560404554836979, guid: e017ffcd47aade14cad67395b7d2be0c,
         type: 3}
