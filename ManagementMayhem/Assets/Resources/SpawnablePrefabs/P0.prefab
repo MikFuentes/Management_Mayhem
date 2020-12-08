@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6786152337526188675}
   - component: {fileID: 6786152337526188684}
   - component: {fileID: 5634854603962430243}
-  - component: {fileID: 6786152337526188685}
   - component: {fileID: 1960385919725730412}
   - component: {fileID: 6786152337526188673}
   - component: {fileID: 6786152337526188674}
@@ -32,8 +31,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6786152337526188686}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.47, y: 2.53, z: 0}
-  m_LocalScale: {x: 0.09892444, y: 0.107926555, z: 0.08993131}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -77,12 +76,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 6b18adcd2ed924f42a97532910aeabca, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2961adb982961a343a11e5b4a5d132b4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 10, y: 4.04}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -109,32 +108,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!61 &6786152337526188685
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6786152337526188686}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 10, y: 4.05}
-    newSize: {x: 10, y: 4.04}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 10, y: 4.04}
-  m_EdgeRadius: 0
 --- !u!70 &1960385919725730412
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -149,8 +122,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 10, y: 4.0500007}
-  m_Direction: 1
+  m_Size: {x: 0.8, y: 0.8}
+  m_Direction: 0
 --- !u!114 &6786152337526188673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +174,7 @@ MonoBehaviour:
   syncInterval: 0.1
   itemType: Money
   itemName: 
-  value: 0
+  value: 50
   playerName: {fileID: 0}
 --- !u!114 &-4367027736419517926
 MonoBehaviour:
@@ -217,6 +190,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  box: {fileID: 6786152337526188685}
-  trigger: {fileID: 1960385919725730412}
+  pickup_collider: {fileID: 1960385919725730412}
   triggered: 0
+  position: {x: 0, y: 0, z: 0}

@@ -9,9 +9,11 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEditor;
 //using System.Security.Policy;
+
 /*
 * https://answers.unity.com/questions/1271861/how-to-destroy-an-object-on-all-the-network.html
 */
+
 public class PlayerScript : NetworkBehaviour
 {
     [Header("Components")]
@@ -31,10 +33,10 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private GameObject gameName;
     [SerializeField] private TMP_Text ui_Timer = null;
     private static event Action<float> OnTimeChange;
-    [SyncVar]
-    private float currentTime;
+    [SyncVar] private float currentTime;
 
     [Header("Movement")]
+    [SyncVar] public Vector3 playerPos;
     public float moveSpeed;
     private float horizontalMove, verticalMove;
     private bool facingRight = true;
@@ -43,34 +45,22 @@ public class PlayerScript : NetworkBehaviour
     [Header("Money")]
     [SerializeField] private GameObject moneyUI = null;
     [SerializeField] private TMP_Text moneyText = null;
-    [SyncVar]
-    [SerializeField] private float currentMoney;
+    [SyncVar] [SerializeField] private float currentMoney;
     private static event Action<float> OnMoneyChange;
     private bool Cooldown = false;
 
     [Header("Items")]
     public GameObject itemPrefab;
-    //public GameObject[] clientPrefabs;
-    //public List<GameObject> serverPrefabs;
+    [SyncVar] [SerializeField] private int rand = 0;
 
     [Header("Debug Info")]
-    [SyncVar]
-    public string playerId;
-    [SyncVar]
-    public Vector3 playerPos;
-    [SyncVar]
-    public GameObject pickup;
-    [SyncVar]
-    public bool pickUpActive = false;
+    [SyncVar] public GameObject pickup;
+    [SyncVar] public bool pickUpActive = false;
     public GameObject interactable;
-    //[SyncVar]
-    //public GameObject deleter;
-    [SyncVar]
-    public bool canDeposit;
-    [SyncVar]
-    public bool canDelete;
+    [SyncVar] public GameObject NPC;
+    [SyncVar] public bool canDeposit;
+    [SyncVar] public bool canDelete;
     public bool UI_Active;
-
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -83,49 +73,38 @@ public class PlayerScript : NetworkBehaviour
             return room = NetworkManager.singleton as NetworkManagerLobby;
         }
     }
-
-    public void Start()
-    {
-        //clientPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
-        //serverPrefabs = Room.spawnPrefabs;
-
-    }
     public override void OnStartAuthority()
     {
-
+        // ui elements
         moneyUI.SetActive(true);
-
         holdPoint.gameObject.SetActive(true);
         dropPoint.gameObject.SetActive(true);
 
+        // buttons
         pickUpButton.onClick.AddListener(CmdPickUpOnClick);
         dropButton.onClick.AddListener(CmdDropOnClick);
-        interactButton.onClick.AddListener(delegate {Activate_Interactable_UI(interactable);});
-
-        playerId = ClientScene.localPlayer.netId.ToString();
-
-        OnMoneyChange += HandleMoneyChange; //subcribe to the money event
+        interactButton.onClick.AddListener(delegate{Activate_Interactable_UI(interactable);});
+        
+        // subscribe to events
+        OnMoneyChange += HandleMoneyChange;
         OnTimeChange += HandleTimeChange;
-
-        //spawnablePrefabs = Room.spawnPrefabs;
-
     }
 
     [ClientCallback]
     public void OnDestroy()
     {
-        if (!hasAuthority) { return; } //do nothing if we don't have authority
+        if (!hasAuthority) { return; } // do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
         OnTimeChange -= HandleTimeChange;
     }
 
     void Update()
     {
-        // Don't control other player's models
+        // don't get input from other player's
         if (!isLocalPlayer)
             return;
 
-        //Controls
+        // up and down
         if (Input.GetKey(KeyCode.W) || joystick.Vertical >= .2f)
             verticalMove = moveSpeed;
         else if (Input.GetKey(KeyCode.S) || joystick.Vertical <= -.2f)
@@ -133,60 +112,63 @@ public class PlayerScript : NetworkBehaviour
         else
             verticalMove = 0;
 
+        // left and right
         if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
         {
-            if (facingRight) //If moving left while facing right...
-                flipPlayer();
+            if (facingRight) { flipPlayer(); } // if moving left while facing right...
             horizontalMove = -moveSpeed;
         }
         else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
         {
-            if (!facingRight) //If moving right while facing left...
-                flipPlayer();
+            if (!facingRight) { flipPlayer(); } // if moving right while facing left...
             horizontalMove = moveSpeed;
         }
         else
             horizontalMove = 0;
 
-        if (Input.GetKey(KeyCode.J) && pickup != null)
+        if (Input.GetKey(KeyCode.J) && pickup != null) // pick up
             CmdPickUpOnClick();
-        if (Input.GetKey(KeyCode.K) && pickup != null)
+        if (Input.GetKey(KeyCode.K) && pickup != null) // drop
             CmdDropOnClick();
-        if (Input.GetKey(KeyCode.I) && interactable != null)
-        {
+        if (Input.GetKey(KeyCode.I) && interactable != null) // interact
             Activate_Interactable_UI(interactable);
-        }
-            
     }
 
     void FixedUpdate()
     {
-        // Don't move other player's models
+        // don't affect other players
         if (!isLocalPlayer)
             return;
 
-        movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
-        transform.position += movement * Time.fixedDeltaTime * moveSpeed;
-
-        playerPos = transform.position;
-
-        CmdRun();
-        StartCoroutine(Timer(1)); //
+        // update match time
         CmdUpdateTime();
 
+        // update movement
+        movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
+        transform.position += movement * Time.fixedDeltaTime * moveSpeed;
+        playerPos = transform.position;
+        CmdRun();
+
+        // update pickup position
         if (pickUpActive)
         {
-            CmdPickUp();
+            pickup.transform.position = holdPoint.position;
+            CmdHold();
         }
+        //else if (pickup != null && !pickup.GetComponent<PickupScript>().triggered)
+        //{
+        //    Debug.Log(1);
+        //}
 
+        // 
         if (!Cooldown)
         {
-            if (canDeposit && !pickUpActive && pickup != null) //if you're standing next to a depositor empty-handed with the item on the floor
+            if (canDeposit && !pickUpActive && pickup != null) // if you're standing next to a depositor empty-handed with the item on the floor
             {
                 if (pickup.GetComponent<PickupProperties>().itemType == "Money")
                 {
                     float value = pickup.GetComponent<PickupProperties>().value;
-                    CmdDestroy(pickup); //better for lag?
+                    CmdDestroy(pickup);
                     CmdTriggerExitPickup();
                     CmdUpdateMoney(value);
                 }
@@ -195,18 +177,18 @@ public class PlayerScript : NetworkBehaviour
                     float cost = pickup.GetComponent<PickupProperties>().value;
                     string itemName = pickup.GetComponent<PickupProperties>().itemName;
 
-                    if (currentMoney != 0 && currentMoney - cost >= 0 && itemName != null) //&& itemPrefab != null
+                    if (currentMoney != 0 && currentMoney - cost >= 0 && itemName != null)
                     {
                         Debug.Log("Purchasing...");
-                        CmdDestroy(pickup); //better for lag?
+                        CmdDestroy(pickup);
                         CmdTriggerExitPickup();
                         CmdUpdateMoney(-cost);
                         CmdSpawn(itemName);
                     }
                     else
                     {
+                        // not enough funds
                         Debug.Log("Not enough funds.");
-                        //not enough funds
                     }
                 }
                 Cooldown = true;
@@ -231,17 +213,23 @@ public class PlayerScript : NetworkBehaviour
             Debug.Log("On Cooldown!");
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Don't check collision of other player's models
         if (!isLocalPlayer)
-            return;
+            return; // don't check collision of other player's models
 
-        if (collision.IsTouching(playerTrigger)) {
+        if (collision.IsTouching(playerTrigger))
+        {
             if (collision.gameObject.CompareTag("Pickup") && !pickUpActive)
             {
+                Debug.Log("enter");
                 pickup = collision.gameObject;
-                CmdTriggerStayPickup(pickup);
+                CmdTriggerEnterPickup(pickup);
+            }
+            else if (collision.gameObject.CompareTag("NPC"))
+            {
+                NPC = collision.gameObject;
+                CmdChangeSprite(NPC);
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -252,29 +240,47 @@ public class PlayerScript : NetworkBehaviour
                 canDeposit = true;
             else if (collision.gameObject.CompareTag("Deleter"))
                 canDelete = true;
+        }
+    }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!isLocalPlayer)
+            return; // don't check collision of other player's models
+
+        if (collision.IsTouching(playerTrigger))
+        {
+            if (collision.gameObject.CompareTag("Pickup") && !pickUpActive)
+            {
+                Debug.Log("enter");
+                pickup = collision.gameObject;
+                CmdTriggerEnterPickup(pickup);
+            }
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        //Don't check collision of other player's models
         if (!isLocalPlayer)
-            return;
+            return; // don't check collision of other player's models
 
         if (!collision.IsTouching(playerTrigger))
         {
-            if (collision.gameObject.CompareTag("Pickup") & !pickUpActive) {
+            if (collision.gameObject.CompareTag("Pickup") && !pickUpActive) {
+                Debug.Log("exited");
                 pickup = null;
                 CmdTriggerExitPickup();
             }
+            else if (collision.gameObject.CompareTag("NPC"))
+            {
+                //To-do
+            }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
-                Deactivate_Interactable_UI();
                 interactable = null;
                 interactButton.interactable = false;
+                Deactivate_Interactable_UI();
             }
-                
             else if (collision.gameObject.CompareTag("Depositor"))
                 canDeposit = false;
             else if (collision.gameObject.CompareTag("Deleter"))
@@ -285,13 +291,12 @@ public class PlayerScript : NetworkBehaviour
     private GameObject FindItem(string name)
     {
         string temp = "Item (" + name + ")";
-
         foreach (var prefab in Room.spawnPrefabs)
         {
             if (temp == prefab.name)
             {
                 Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId);
-                return prefab; //return the gameObject
+                return prefab; // return the gameObject
             }
         }
         return null;
@@ -301,11 +306,7 @@ public class PlayerScript : NetworkBehaviour
     void CmdSpawn(string itemName)
     {
         itemPrefab = FindItem(itemName);
-
-        //Debug.Log("Instantiating " + itemPrefab.name);
         GameObject item = (GameObject)Instantiate(itemPrefab, dropPoint.transform.position, Quaternion.identity);
-
-        //Debug.Log("Spawning " + item.name);
         NetworkServer.Spawn(item);
     }
 
@@ -314,44 +315,31 @@ public class PlayerScript : NetworkBehaviour
     {
         NetworkServer.Destroy(gameObject);
     }
+
     #endregion
 
     #region Actions
 
     void Activate_Interactable_UI(GameObject obj)
     {
-        //get name of interactable 
-        string name = obj.name;
+        string name = obj.name; // get name of interactable 
+        Current_Interactable_UI = gameObject.transform.Find("CameraPlayer/HUD/" + name + "_UI").gameObject; // look for coressponding UI using name
 
-        //look for coressponding UI in UI_array using name
-        Current_Interactable_UI = gameObject.transform.Find("CameraPlayer/HUD/" + name + "_UI").gameObject;
-
-        //activate UI
-        Current_Interactable_UI.SetActive(true);
+        Current_Interactable_UI.SetActive(true); // activate UI
         Faded_Background.SetActive(true);
-
-        //set bool
-        UI_Active = true; 
-
-        //deactivate game_UI
-        Game_UI.SetActive(false);
+        UI_Active = true; // set bool
+        Game_UI.SetActive(false); // deactivate game_UI
     }
 
     void Deactivate_Interactable_UI()
     {
-        //if UI is active
         if (UI_Active)
         {
-            //deactivate UI
-            Current_Interactable_UI.SetActive(false);
+            Current_Interactable_UI.SetActive(false); // deactivate UI
             Faded_Background.SetActive(false);
-
-            //set bool
-            UI_Active = false;
+            UI_Active = false; // set bool
         }
-
-        //activate game_UI
-        Game_UI.SetActive(true);
+        Game_UI.SetActive(true); // activate game_UI
     }
 
     [Command]
@@ -368,46 +356,48 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.gameObject.SetActive(false);
         dropButton.gameObject.SetActive(true);
     }
+    [Command]
+    public void CmdHold()
+    {
+        pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive); // BUG: exit trigger is triggered when it's not supposed to | WORKAROUND: place here instead of OnClick (but terrible for performance)
+        pickup.transform.position = holdPoint.position;
+    }
 
     [Command]
     void CmdDropOnClick()
     {
         pickUpActive = false;
-        pickup.transform.position = dropPoint.position; //doesn't always drop at the drop point
-
+        pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive);
+        pickup.transform.position = dropPoint.position; // BUG: doesn't always drop at the drop point...
         RpcDropOnClick();
+
+        pickup = null; // (1/2) BUG: exit trigger doesn't always trigger | WORKAROUND: force the exit trigger every time by making pickup null
     }
 
     [ClientRpc]
     void RpcDropOnClick()
     {
+        pickUpButton.interactable = false; // (2/2) and making pickUpButton non-interactable
         pickUpButton.gameObject.SetActive(true);
         dropButton.gameObject.SetActive(false);
     }
 
-
     [Command]
-    public void CmdPickUp()
+    void CmdChangeSprite(GameObject go)
     {
-        //playerPosition.x += 0.1f;
-        //playerPosition.y += 0.1f;
-        //RpcPickUp(playerPosition);
-        //pickup.transform.position = playerPosition;
-        RpcPickUp();
-        pickup.transform.position = holdPoint.position;
+        NPC = go;
+        rand = UnityEngine.Random.Range(0, NPC.GetComponent<NPC_Script>().item_sprite_array.Length);
+        NPC.GetComponent<NPC_Script>().RpcChangeSprite(rand);
     }
 
-    [ClientRpc]
-    public void RpcPickUp()
-    {
-        //pickup.transform.position = playerPosition;
-        //pickup.transform.position = holdPoint.position;
-    }
+    #endregion
+
+    #region Triggers
 
     [Command]
-    void CmdTriggerStayPickup(GameObject temp)
+    void CmdTriggerEnterPickup(GameObject go)
     {
-        pickup = temp;
+        pickup = go;
         RpcTriggerStayPickup();
     }
 
@@ -434,7 +424,7 @@ public class PlayerScript : NetworkBehaviour
     #region Movement
     private void flipPlayer()
     {
-        Vector3 temp = gameName.transform.localScale; //transform.GetChild(2).GetChild(0).gameObject.transform.localScale;
+        Vector3 temp = gameName.transform.localScale;
         Vector3 theScale = transform.localScale;
 
         theScale.x *= -1;
@@ -443,8 +433,7 @@ public class PlayerScript : NetworkBehaviour
 
         if (theScale.x < 0)
         {
-            //facing left
-            temp.x *= -1;
+            temp.x *= -1; // facing left
             gameName.transform.localScale = temp;
         }
         else
@@ -468,6 +457,7 @@ public class PlayerScript : NetworkBehaviour
 
         animator.SetBool("Running", !(Mathf.Abs(horizontalMove) < 0.01 && Mathf.Abs(verticalMove) < 0.01));
     }
+
     #endregion
 
     #region Money
@@ -488,6 +478,7 @@ public class PlayerScript : NetworkBehaviour
     {
         OnMoneyChange?.Invoke(value);
     }
+
     #endregion
 
     #region Time
@@ -495,16 +486,16 @@ public class PlayerScript : NetworkBehaviour
     {
         float minutes = Mathf.FloorToInt(currentMatchTime / 60);
         float seconds = Mathf.FloorToInt(currentMatchTime % 60);
-
         ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
+
     [Command]
     private void CmdUpdateTime()
     {
         currentTime = Room.GetTime();
         RpcUpdateTime(currentTime);
     }
-    
+
     [ClientRpc]
     private void RpcUpdateTime(float value)
     {
@@ -514,15 +505,8 @@ public class PlayerScript : NetworkBehaviour
     private IEnumerator CooldownTimer(float time)
     {
         yield return new WaitForSeconds(time);
-
         Cooldown = false;
     }
 
-    private IEnumerator Timer(float time)
-    {
-        yield return new WaitForSeconds(time);
-    }
     #endregion
 }
-
-    

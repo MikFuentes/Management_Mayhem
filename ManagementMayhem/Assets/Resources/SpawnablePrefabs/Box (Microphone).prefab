@@ -1,33 +1,12 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &3523276778790623703
+--- !u!1001 &6737126451165289716
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 513739125511575759, guid: 449b3bc2a8e5cc642a237709333a7d79,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 2397341041769620542, guid: 449b3bc2a8e5cc642a237709333a7d79,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2414193800630754965, guid: 449b3bc2a8e5cc642a237709333a7d79,
-        type: 3}
-      propertyPath: clientAuthority
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4117123579243857214, guid: 449b3bc2a8e5cc642a237709333a7d79,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: e637a71f105c272418b347e4fd153840,
-        type: 3}
     - target: {fileID: 4970412247556179142, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: sceneId
@@ -40,23 +19,29 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5446338394444979035, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
-      propertyPath: itemType
-      value: Box
-      objectReference: {fileID: 0}
-    - target: {fileID: 5446338394444979035, guid: 449b3bc2a8e5cc642a237709333a7d79,
-        type: 3}
-      propertyPath: cost
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5446338394444979035, guid: 449b3bc2a8e5cc642a237709333a7d79,
-        type: 3}
       propertyPath: itemName
       value: Microphone
       objectReference: {fileID: 0}
     - target: {fileID: 5446338394444979035, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: value
-      value: 1000
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6846500446499941112, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c1418620a74cb1246a14e67be8b44a9e,
+        type: 3}
+    - target: {fileID: 6846500446499941112, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.95410156
+      objectReference: {fileID: 0}
+    - target: {fileID: 6846500446499941112, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7444369022186658912, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
@@ -66,12 +51,12 @@ PrefabInstance:
     - target: {fileID: 7444369022186658923, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 21.49
+      value: 17.078611
       objectReference: {fileID: 0}
     - target: {fileID: 7444369022186658923, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.42
+      value: 10.925396
       objectReference: {fileID: 0}
     - target: {fileID: 7444369022186658923, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}

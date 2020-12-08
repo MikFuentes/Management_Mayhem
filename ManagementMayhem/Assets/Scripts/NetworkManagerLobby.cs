@@ -30,18 +30,18 @@ public class NetworkManagerLobby : NetworkManager
     public static event Action OnServerStopped;
     public static event Action OnTimerCountdown;
 
-    //public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
-    //public override void OnStartClient()
-    //{
-    //    var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+    public override void OnStartClient()
+    {
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
 
-    //    foreach (var prefab in spawnablePrefabs)
-    //    {
-    //        ClientScene.RegisterPrefab(prefab);
-    //    }
+        foreach (var prefab in spawnablePrefabs)
+        {
+            ClientScene.RegisterPrefab(prefab);
+        }
 
-    //}
+    }
 
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
 

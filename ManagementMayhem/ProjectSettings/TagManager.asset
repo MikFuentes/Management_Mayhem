@@ -9,6 +9,7 @@ TagManager:
   - Deleter
   - Menu
   - Depositor
+  - NPC
   layers:
   - Default
   - TransparentFX

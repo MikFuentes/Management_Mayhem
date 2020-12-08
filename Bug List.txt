@@ -7,9 +7,10 @@ Major:
 - Box doesn't always return to drop point ***
 - If the Host dc's, player's should be brought back to the main menu (after an error message)
 - if the client dc's player's should be able to rejoin?
+- Pickup colliders are messed up. Try disabling pickupscript first (as its main purpose is for the conveyer belt).
 
 Minor:
-- Client PlayerID is not synced onto the server when interacting with objects.
+- Jittery movement of pickups when being held --> Leads to hitbox/collision problems (e.g. exit trigger not working)
 - UI elements anchoring is a lil weird when resizing
 - No message for if host dc's
 - Player sometimes walks backwards

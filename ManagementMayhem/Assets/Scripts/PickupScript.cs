@@ -5,41 +5,38 @@ using Mirror;
 
 public class PickupScript : NetworkBehaviour
 {
-    public Collider2D box;
-    public CapsuleCollider2D trigger;
-    public bool triggered;
+    public CapsuleCollider2D pickup_collider;
+    public bool triggered = false;
+    public Vector3 position;
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-        //If a player touches the trigger collider, disable box collider 
-        if (triggered)
-        {
-            box.enabled = false; 
-        }
-        else
-        {
-            box.enabled = true;
-        }
+        //if (!triggered)
+        //    pickup_collider.enabled = true;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    if (collision.CompareTag("Player") && collision.IsTouching(pickup_collider))
+    //    {
+    //        triggered = true;
+    //    }
+    //}
+
+    //private void OnTriggerExit2D(Collider2D collision)
+    //{
+    //    if (collision.CompareTag("Player") && !collision.IsTouching(pickup_collider) && !collision.gameObject.GetComponent<PlayerScript>().pickUpActive)
+    //    {
+    //        triggered = false;
+    //    }
+    //}
+
+    [ClientRpc]
+    public void RpcEnableTrigger(bool b)
     {
-        if (collision.CompareTag("Player") && collision.IsTouching(trigger))
-            triggered = true;
+        triggered = !b;
+        pickup_collider.enabled = b;
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player") && collision.IsTouching(trigger))
-            triggered = true;
-    }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player") && !collision.IsTouching(trigger))
-        {
-            triggered = false;
-        }
-    }
 }
