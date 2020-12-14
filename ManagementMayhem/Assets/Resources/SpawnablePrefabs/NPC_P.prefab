@@ -312,6 +312,7 @@ MonoBehaviour:
   syncInterval: 0.1
   item_sprite_array: []
   sprite_go: {fileID: 6395227257061697959}
+  blank_sprite: {fileID: 21300000, guid: 7f89f287ce5b0424fb8902f5575c25d6, type: 3}
 --- !u!70 &5508833920049937781
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

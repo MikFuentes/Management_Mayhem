@@ -209,8 +209,8 @@ public class PlayerScript : NetworkBehaviour
                 StartCoroutine(CooldownTimer(0.5f));
             }
         }
-        else
-            Debug.Log("On Cooldown!");
+        //else
+        //    Debug.Log("On Cooldown!");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -222,14 +222,72 @@ public class PlayerScript : NetworkBehaviour
         {
             if (collision.gameObject.CompareTag("Pickup") && !pickUpActive)
             {
-                Debug.Log("enter");
                 pickup = collision.gameObject;
                 CmdTriggerEnterPickup(pickup);
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
                 NPC = collision.gameObject;
-                CmdChangeSprite(NPC);
+                Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
+
+                if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite)
+                {
+                    Debug.Log("There is no sprite");
+                    CmdChangeSprite(NPC, null);
+                }
+                else
+                {
+                    Debug.Log("There is a sprite");
+
+                    switch (Item_Sprite.name)
+                    {
+                        case "Chair":
+                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Chair")
+                            {
+                                Debug.Log("You have what I want!");
+                                CmdChangeSprite(NPC, "Chair");
+                            }
+                            else
+                                Debug.Log("I want a Chair.");
+                            break;
+                        case "Drinks":
+                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Drinks")
+                            {
+                                Debug.Log("You have what I want!");
+                                CmdChangeSprite(NPC, "Drinks");
+                            }
+                            else
+                                Debug.Log("I want Drinks.");
+                            break;
+                        case "Food":
+                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Food")
+                            {
+                                Debug.Log("You have what I want!");
+                                CmdChangeSprite(NPC, "Food");
+                            }
+                            else
+                                Debug.Log("I want Food.");
+                            break;
+                        case "Microphone":
+                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item"&& pickup.GetComponent<PickupProperties>().itemName == "Microphone")
+                            {
+                                Debug.Log("You have what I want!");
+                                CmdChangeSprite(NPC, "Microphone");
+                            }
+                            else
+                                Debug.Log("I want a Microphone.");
+                            break;
+                        case "Speaker":
+                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Speaker")
+                            {
+                                Debug.Log("You have what I want!");
+                                CmdChangeSprite(NPC, "Speaker");
+                            }
+                            else
+                                Debug.Log("I want a Speaker.");
+                            break;
+                    }
+                }
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -252,7 +310,6 @@ public class PlayerScript : NetworkBehaviour
         {
             if (collision.gameObject.CompareTag("Pickup") && !pickUpActive)
             {
-                Debug.Log("enter");
                 pickup = collision.gameObject;
                 CmdTriggerEnterPickup(pickup);
             }
@@ -267,7 +324,6 @@ public class PlayerScript : NetworkBehaviour
         if (!collision.IsTouching(playerTrigger))
         {
             if (collision.gameObject.CompareTag("Pickup") && !pickUpActive) {
-                Debug.Log("exited");
                 pickup = null;
                 CmdTriggerExitPickup();
             }
@@ -383,11 +439,28 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [Command]
-    void CmdChangeSprite(GameObject go)
+    void CmdChangeSprite(GameObject go, string Item)
     {
         NPC = go;
-        rand = UnityEngine.Random.Range(0, NPC.GetComponent<NPC_Script>().item_sprite_array.Length);
-        NPC.GetComponent<NPC_Script>().RpcChangeSprite(rand);
+        int count = NPC.GetComponent<NPC_Script>().item_sprite_array.Count;
+        if (Item != null)
+        {
+            Debug.Log("Removing Sprite");
+            NPC.GetComponent<NPC_Script>().RpcRemoveFromArray(Item);
+            count--;
+        }
+        Debug.Log(count);
+
+        Debug.Log("Changing Sprite");
+        if(count == 0)
+        {
+            NPC.GetComponent<NPC_Script>().RpcChangeSprite(999);
+        }
+        else
+        {
+            rand = UnityEngine.Random.Range(0, count);
+            NPC.GetComponent<NPC_Script>().RpcChangeSprite(rand);
+        }
     }
 
     #endregion
