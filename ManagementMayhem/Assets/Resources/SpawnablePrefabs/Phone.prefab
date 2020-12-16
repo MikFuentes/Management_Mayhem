@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8399923586484577632}
   - component: {fileID: 6438658484324639655}
   m_Layer: 0
-  m_Name: Telephone
+  m_Name: Phone
   m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1126267147
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 441a2d89600064d4d9ced045b19d0ae6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!61 &2877602124534061815
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -97,10 +97,10 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.13692683, y: -0.28087837}
+  m_Offset: {x: 0.13692683, y: 0.05}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0.1}
     oldSize: {x: 1, y: 0.72727275}
     newSize: {x: 0.22, y: 0.16}
     adaptiveTilingThreshold: 0.5
@@ -123,7 +123,7 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.12, y: -0.25}
+  m_Offset: {x: 0.12, y: 0}
   m_Size: {x: 1.45, y: 0.47}
   m_Direction: 1
 --- !u!114 &6438658484324639655

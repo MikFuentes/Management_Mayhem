@@ -228,7 +228,10 @@ public class PlayerScript : NetworkBehaviour
             else if (collision.gameObject.CompareTag("NPC"))
             {
                 NPC = collision.gameObject;
+                NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
+                NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
+                
 
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite)
                 {
@@ -269,7 +272,7 @@ public class PlayerScript : NetworkBehaviour
                                 Debug.Log("I want Food.");
                             break;
                         case "Microphone":
-                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item"&& pickup.GetComponent<PickupProperties>().itemName == "Microphone")
+                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Microphone")
                             {
                                 Debug.Log("You have what I want!");
                                 CmdChangeSprite(NPC, "Microphone");
@@ -329,7 +332,8 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
-                //To-do
+                NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
+                NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -454,7 +458,7 @@ public class PlayerScript : NetworkBehaviour
         Debug.Log("Changing Sprite");
         if(count == 0)
         {
-            NPC.GetComponent<NPC_Script>().RpcChangeSprite(999);
+            NPC.GetComponent<NPC_Script>().RpcChangeSprite(-1);
         }
         else
         {
