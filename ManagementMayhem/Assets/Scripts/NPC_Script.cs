@@ -31,7 +31,6 @@ public class NPC_Script : NetworkBehaviour
             if(item_sprite_array[i].name == sprite_name)
                 item_sprite_array.RemoveAt(i);
         }
-        Debug.Log(item_sprite_array.Count);
     }
 
     [ClientRpc]
