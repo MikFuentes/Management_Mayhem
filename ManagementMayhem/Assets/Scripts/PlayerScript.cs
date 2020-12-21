@@ -31,9 +31,14 @@ public class PlayerScript : NetworkBehaviour
     public GameObject Current_Interactable_UI;
     public GameObject Faded_Background;
     [SerializeField] private GameObject gameName;
+
+
+    [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
     private static event Action<float> OnTimeChange;
     [SyncVar] private float currentTime;
+    private static event Action<float> OnWaitChange;
+    [SyncVar] public float wait_time;
 
     [Header("Movement")]
     [SyncVar] public Vector3 playerPos;
@@ -45,15 +50,15 @@ public class PlayerScript : NetworkBehaviour
     [Header("Money")]
     [SerializeField] private GameObject moneyUI = null;
     [SerializeField] private TMP_Text moneyText = null;
-    [SyncVar] [SerializeField] private float currentMoney;
+    [SyncVar] [SerializeField] public float currentMoney;
     private static event Action<float> OnMoneyChange;
-    private bool Cooldown = false;
 
     [Header("Items")]
     public GameObject itemPrefab;
-    [SyncVar] [SerializeField] private int rand = 0;
+    [SyncVar] private int rand = 0;
     private String tempName = null;
-    public bool NPCitemMatch = false;
+    private bool NPC_item_match = false;
+    private bool Cooldown = false;
 
     [Header("Debug Info")]
     [SyncVar] public GameObject pickup;
@@ -63,6 +68,7 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] public bool canDeposit;
     [SyncVar] public bool canDelete;
     public bool UI_Active;
+
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -90,6 +96,7 @@ public class PlayerScript : NetworkBehaviour
         // subscribe to events
         OnMoneyChange += HandleMoneyChange;
         OnTimeChange += HandleTimeChange;
+        OnWaitChange += HandleWaitChange;
     }
 
     [ClientCallback]
@@ -98,6 +105,7 @@ public class PlayerScript : NetworkBehaviour
         if (!hasAuthority) { return; } // do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
         OnTimeChange -= HandleTimeChange;
+        OnWaitChange -= HandleWaitChange;
     }
 
     void Update()
@@ -201,11 +209,15 @@ public class PlayerScript : NetworkBehaviour
             {
                 if (pickup.GetComponent<PickupProperties>().itemType != "Money" && pickup.GetComponent<PickupProperties>().itemType != "Box")
                 {
-                    if (NPCitemMatch)
+                    if (NPC_item_match)
                     {
                         Debug.Log("Thank you for " + tempName + "!");
+
                         CmdChangeSprite(NPC, tempName);
-                        NPCitemMatch = false;
+                        NPC_item_match = false;
+
+                        //restart wait timer
+                        CmdUpdateWaitTime(1f);
                     }
 
                     string itemName = pickup.GetComponent<PickupProperties>().itemName;
@@ -237,17 +249,26 @@ public class PlayerScript : NetworkBehaviour
             else if (collision.gameObject.CompareTag("NPC"))
             {
                 NPC = collision.gameObject;
+                NPC.transform.Find("Health_Bar").gameObject.SetActive(true);
                 NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
                 NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
+
+                GameObject Health_Bar = NPC.transform.Find("Health_Bar").gameObject;
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
                 tempName = null;
-                
+
+                //CmdReduceSize(NPC, 0.1f);
+
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite)
                 {
                     CmdChangeSprite(NPC, null);
+
+                    //restart wait timer
+                    CmdUpdateWaitTime(1f);
                 }
                 else
                 {
+                    CmdUpdateWaitTime(-0.1f);
                     switch (Item_Sprite.name)
                     {
                         case "Chair":
@@ -271,11 +292,13 @@ public class PlayerScript : NetworkBehaviour
                     {
                         Debug.Log("You have what I want!");
                         canDelete = true;
-                        NPCitemMatch = true;
+                        NPC_item_match = true;
                     }
                     else
                         Debug.Log("I want " + tempName);
                 }
+
+                CmdUpdateWaitTime(-0.1f);
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -317,6 +340,7 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
+                NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
                 NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
                 NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
                 canDelete = false;
@@ -432,6 +456,7 @@ public class PlayerScript : NetworkBehaviour
     {
         NPC = go;
         int count = NPC.GetComponent<NPC_Script>().item_sprite_array.Count;
+
         if (Item != null)
         {
             NPC.GetComponent<NPC_Script>().RpcRemoveFromArray(Item);
@@ -446,7 +471,17 @@ public class PlayerScript : NetworkBehaviour
         {
             rand = UnityEngine.Random.Range(0, count);
             NPC.GetComponent<NPC_Script>().RpcChangeSprite(rand);
+            //wait_time = 1f;
+            //NPC.transform.Find("Health_Bar").gameObject.GetComponent<HealthBar>().RpcSetSize(wait_time); //restart wait timer
         }
+    }
+
+    [Command]
+    void CmdReduceSize(GameObject go, float f)
+    {
+        NPC = go;
+        wait_time -= f;
+        NPC.transform.Find("Health_Bar").gameObject.GetComponent<HealthBar>().RpcSetSize(wait_time);
     }
 
     #endregion
@@ -560,6 +595,35 @@ public class PlayerScript : NetworkBehaviour
     {
         OnTimeChange?.Invoke(value);
     }
+
+    private void HandleWaitChange(float value)
+    {
+        if ((wait_time + value) >= 1)
+        {
+            wait_time = 1;
+        }
+        else if((wait_time + value) <= 0)
+        {
+            wait_time = 0;
+        }
+        else
+        {
+            wait_time += value;
+        }
+    }
+
+    [Command]
+    private void CmdUpdateWaitTime(float value)
+    {
+        RpcUpdateWaitTime(value);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateWaitTime(float value)
+    {
+        OnWaitChange?.Invoke(value);
+    }
+
 
     private IEnumerator CooldownTimer(float time)
     {
