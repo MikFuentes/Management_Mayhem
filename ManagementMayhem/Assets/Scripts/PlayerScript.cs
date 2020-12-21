@@ -52,6 +52,8 @@ public class PlayerScript : NetworkBehaviour
     [Header("Items")]
     public GameObject itemPrefab;
     [SyncVar] [SerializeField] private int rand = 0;
+    private String tempName = null;
+    public bool NPCitemMatch = false;
 
     [Header("Debug Info")]
     [SyncVar] public GameObject pickup;
@@ -199,6 +201,13 @@ public class PlayerScript : NetworkBehaviour
             {
                 if (pickup.GetComponent<PickupProperties>().itemType != "Money" && pickup.GetComponent<PickupProperties>().itemType != "Box")
                 {
+                    if (NPCitemMatch)
+                    {
+                        Debug.Log("Thank you for " + tempName + "!");
+                        CmdChangeSprite(NPC, tempName);
+                        NPCitemMatch = false;
+                    }
+
                     string itemName = pickup.GetComponent<PickupProperties>().itemName;
 
                     Debug.Log(itemName + " deposited.");
@@ -231,65 +240,41 @@ public class PlayerScript : NetworkBehaviour
                 NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
                 NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
+                tempName = null;
                 
-
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite)
                 {
-                    Debug.Log("There is no sprite");
                     CmdChangeSprite(NPC, null);
                 }
                 else
                 {
-                    Debug.Log("There is a sprite");
-
                     switch (Item_Sprite.name)
                     {
                         case "Chair":
-                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Chair")
-                            {
-                                Debug.Log("You have what I want!");
-                                CmdChangeSprite(NPC, "Chair");
-                            }
-                            else
-                                Debug.Log("I want a Chair.");
+                            tempName = "Chair";
                             break;
                         case "Drinks":
-                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Drinks")
-                            {
-                                Debug.Log("You have what I want!");
-                                CmdChangeSprite(NPC, "Drinks");
-                            }
-                            else
-                                Debug.Log("I want Drinks.");
+                            tempName = "Drinks";
                             break;
                         case "Food":
-                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Food")
-                            {
-                                Debug.Log("You have what I want!");
-                                CmdChangeSprite(NPC, "Food");
-                            }
-                            else
-                                Debug.Log("I want Food.");
+                            tempName = "Food";
                             break;
                         case "Microphone":
-                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Microphone")
-                            {
-                                Debug.Log("You have what I want!");
-                                CmdChangeSprite(NPC, "Microphone");
-                            }
-                            else
-                                Debug.Log("I want a Microphone.");
+                            tempName = "Microphone";
                             break;
                         case "Speaker":
-                            if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == "Speaker")
-                            {
-                                Debug.Log("You have what I want!");
-                                CmdChangeSprite(NPC, "Speaker");
-                            }
-                            else
-                                Debug.Log("I want a Speaker.");
+                            tempName = "Speaker";
                             break;
                     }
+
+                    if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == tempName)
+                    {
+                        Debug.Log("You have what I want!");
+                        canDelete = true;
+                        NPCitemMatch = true;
+                    }
+                    else
+                        Debug.Log("I want " + tempName);
                 }
             }
             else if (collision.gameObject.CompareTag("Interactable"))
@@ -334,6 +319,7 @@ public class PlayerScript : NetworkBehaviour
             {
                 NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
                 NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
+                canDelete = false;
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -355,7 +341,6 @@ public class PlayerScript : NetworkBehaviour
         {
             if (temp == prefab.name)
             {
-                Debug.Log(temp + " found with netId " + prefab.GetComponent<NetworkIdentity>().netId);
                 return prefab; // return the gameObject
             }
         }
@@ -449,13 +434,10 @@ public class PlayerScript : NetworkBehaviour
         int count = NPC.GetComponent<NPC_Script>().item_sprite_array.Count;
         if (Item != null)
         {
-            Debug.Log("Removing Sprite");
             NPC.GetComponent<NPC_Script>().RpcRemoveFromArray(Item);
             count--;
         }
-        Debug.Log(count);
 
-        Debug.Log("Changing Sprite");
         if(count == 0)
         {
             NPC.GetComponent<NPC_Script>().RpcChangeSprite(-1);

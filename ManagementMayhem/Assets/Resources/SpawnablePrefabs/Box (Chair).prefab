@@ -51,7 +51,7 @@ PrefabInstance:
     - target: {fileID: 7444369022186658912, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: m_Name
-      value: Box (1)
+      value: Box (Chair)
       objectReference: {fileID: 0}
     - target: {fileID: 7444369022186658923, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}

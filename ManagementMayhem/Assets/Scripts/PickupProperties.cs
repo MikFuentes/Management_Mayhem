@@ -15,6 +15,6 @@ public class PickupProperties : NetworkBehaviour
     public void Start()
     {
         if(itemType == "Box")
-            playerName.text = "₱" + value.ToString();
+            playerName.text = value.ToString();
     }
 }
