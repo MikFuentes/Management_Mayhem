@@ -38,7 +38,7 @@ public class PlayerScript : NetworkBehaviour
     private static event Action<float> OnTimeChange;
     [SyncVar] private float currentTime;
     private static event Action<float> OnWaitChange;
-    [SyncVar] public float wait_time;
+    [SyncVar] public float current_wait_time;
 
     [Header("Movement")]
     [SyncVar] public Vector3 playerPos;
@@ -97,6 +97,8 @@ public class PlayerScript : NetworkBehaviour
         OnMoneyChange += HandleMoneyChange;
         OnTimeChange += HandleTimeChange;
         OnWaitChange += HandleWaitChange;
+
+        NPC = GameObject.Find("NPC_P (1)");
     }
 
     [ClientCallback]
@@ -214,6 +216,8 @@ public class PlayerScript : NetworkBehaviour
                         Debug.Log("Thank you for " + tempName + "!");
 
                         CmdChangeSprite(NPC, tempName);
+
+
                         NPC_item_match = false;
 
                         //restart wait timer
@@ -253,11 +257,9 @@ public class PlayerScript : NetworkBehaviour
                 NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
                 NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
 
-                GameObject Health_Bar = NPC.transform.Find("Health_Bar").gameObject;
+                //GameObject Health_Bar = NPC.transform.Find("Health_Bar").gameObject;
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
                 tempName = null;
-
-                //CmdReduceSize(NPC, 0.1f);
 
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite)
                 {
@@ -295,10 +297,11 @@ public class PlayerScript : NetworkBehaviour
                         NPC_item_match = true;
                     }
                     else
+                    {
                         Debug.Log("I want " + tempName);
+                    }
                 }
-
-                CmdUpdateWaitTime(-0.1f);
+                
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -476,14 +479,6 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
-    [Command]
-    void CmdReduceSize(GameObject go, float f)
-    {
-        NPC = go;
-        wait_time -= f;
-        NPC.transform.Find("Health_Bar").gameObject.GetComponent<HealthBar>().RpcSetSize(wait_time);
-    }
-
     #endregion
 
     #region Triggers
@@ -598,18 +593,21 @@ public class PlayerScript : NetworkBehaviour
 
     private void HandleWaitChange(float value)
     {
-        if ((wait_time + value) >= 1)
+        if ((current_wait_time + value) >= 1)
         {
-            wait_time = 1;
+            current_wait_time = 1;
         }
-        else if((wait_time + value) <= 0)
+        else if((current_wait_time + value) <= 0)
         {
-            wait_time = 0;
+            current_wait_time = 0;
         }
         else
         {
-            wait_time += value;
+            current_wait_time += value;
         }
+
+        CmdSetSize(NPC, current_wait_time);
+        //NPC.GetComponent<NPC_Script>().RpcSetSize(current_wait_time);
     }
 
     [Command]
@@ -622,6 +620,14 @@ public class PlayerScript : NetworkBehaviour
     private void RpcUpdateWaitTime(float value)
     {
         OnWaitChange?.Invoke(value);
+    }
+
+    [Command]
+    void CmdSetSize(GameObject go, float f)
+    {
+        NPC = go;
+        float size = f;
+        NPC.GetComponent<NPC_Script>().RpcSetSize(size);
     }
 
 

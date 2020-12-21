@@ -1444,17 +1444,17 @@ MonoBehaviour:
   Faded_Background: {fileID: 3603665896180428739}
   gameName: {fileID: 4456678193710744960}
   ui_Timer: {fileID: 179430321623164998}
+  current_wait_time: 0
   playerPos: {x: 0, y: 0, z: 0}
   moveSpeed: 6
   moneyUI: {fileID: 3847905101789368524}
   moneyText: {fileID: 5628230729841163362}
   currentMoney: 0
   itemPrefab: {fileID: 0}
-  rand: 0
   pickup: {fileID: 0}
   pickUpActive: 0
   interactable: {fileID: 0}
-  NPC: {fileID: 0}
+  NPC: {fileID: 5934964285671695091, guid: 7c669c43396e878458f8e6aece460a16, type: 3}
   canDeposit: 0
   canDelete: 0
   UI_Active: 0
@@ -1641,7 +1641,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5043691991780758642}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0.5, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5043691990957705742}

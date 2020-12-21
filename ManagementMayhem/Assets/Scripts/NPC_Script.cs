@@ -10,12 +10,15 @@ public class NPC_Script : NetworkBehaviour
     public List<Sprite> item_sprite_array = null;
     public GameObject sprite_go;
     public Sprite blank_sprite;
+    private Transform bar;
 
     private void Start()
     {
         //RpcResetSprite();
         sprite_go.GetComponent<SpriteRenderer>().sprite = blank_sprite;
         item_sprite_array = Resources.LoadAll<Sprite>("Val's_Lovely_Art/Pickups/Items").ToList();
+
+        bar = transform.Find("Health_Bar/Bar");
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -46,5 +49,11 @@ public class NPC_Script : NetworkBehaviour
     public void RpcResetSprite()
     {
         sprite_go.GetComponent<SpriteRenderer>().sprite = blank_sprite;
+    }
+
+    [ClientRpc]
+    public void RpcSetSize(float size_normalized)
+    {
+        bar.localScale = new Vector3(size_normalized, 1f);
     }
 }

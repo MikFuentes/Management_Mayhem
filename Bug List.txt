@@ -2,7 +2,6 @@ Bugs:
 
 Major:
 - https://forum.unity.com/threads/nullreferenceexception-when-passing-local-gameobjects-through-command-and-clientrpc-solved.509002/
-- Box moves on it's own when player is holding box near conveyer belt on client side (not server side). Probably related to how the player is holding the box.
 - Box sometimes doesn't get picked up on client?
 - Box doesn't always return to drop point ***
 - If the Host dc's, player's should be brought back to the main menu (after an error message)
@@ -14,3 +13,4 @@ Minor:
 - UI elements anchoring is a lil weird when resizing
 - No message for if host dc's
 - Player sometimes walks backwards
+- NPC gameObject not finding the correct guy at player start
