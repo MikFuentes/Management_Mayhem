@@ -56,4 +56,14 @@ public class NPC_Script : NetworkBehaviour
     {
         bar.localScale = new Vector3(size_normalized, 1f);
     }
+    public void SetSize(float size_normalized)
+    {
+        bar.localScale = new Vector3(size_normalized, 1f);
+    }
+
+    public void SetColor(Color color)
+    {
+        bar.transform.Find("Bar_Sprite").GetComponent<SpriteRenderer>().color = color;
+    }
+
 }

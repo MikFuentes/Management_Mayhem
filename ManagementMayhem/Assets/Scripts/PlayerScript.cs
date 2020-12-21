@@ -56,6 +56,7 @@ public class PlayerScript : NetworkBehaviour
     [Header("Items")]
     public GameObject itemPrefab;
     [SyncVar] private int rand = 0;
+    [SyncVar] private int prev_rand = -1;
     private String tempName = null;
     private bool NPC_item_match = false;
     private bool Cooldown = false;
@@ -338,6 +339,7 @@ public class PlayerScript : NetworkBehaviour
         if (!collision.IsTouching(playerTrigger))
         {
             if (collision.gameObject.CompareTag("Pickup") && !pickUpActive) {
+                Debug.Log("exited");
                 pickup = null;
                 CmdTriggerExitPickup();
             }
@@ -443,7 +445,8 @@ public class PlayerScript : NetworkBehaviour
         pickup.transform.position = dropPoint.position; // BUG: doesn't always drop at the drop point...
         RpcDropOnClick();
 
-        pickup = null; // (1/2) BUG: exit trigger doesn't always trigger | WORKAROUND: force the exit trigger every time by making pickup null
+        //pickup = null; // (1/2) BUG: exit trigger doesn't always trigger | WORKAROUND: force the exit trigger every time by making pickup null 
+        //commented the above due to null error message when dropping items
     }
 
     [ClientRpc]
@@ -473,9 +476,16 @@ public class PlayerScript : NetworkBehaviour
         else
         {
             rand = UnityEngine.Random.Range(0, count);
+
+            while (rand == prev_rand)
+            {
+                rand = UnityEngine.Random.Range(0, count);
+            }
+
             NPC.GetComponent<NPC_Script>().RpcChangeSprite(rand);
-            //wait_time = 1f;
-            //NPC.transform.Find("Health_Bar").gameObject.GetComponent<HealthBar>().RpcSetSize(wait_time); //restart wait timer
+
+            prev_rand = rand;
+
         }
     }
 
@@ -594,20 +604,28 @@ public class PlayerScript : NetworkBehaviour
     private void HandleWaitChange(float value)
     {
         if ((current_wait_time + value) >= 1)
-        {
             current_wait_time = 1;
-        }
         else if((current_wait_time + value) <= 0)
-        {
             current_wait_time = 0;
-        }
         else
-        {
             current_wait_time += value;
+
+        NPC.GetComponent<NPC_Script>().SetSize(current_wait_time);
+        
+        if(current_wait_time >= 0.5)
+            NPC.GetComponent<NPC_Script>().SetColor(Color.green);
+        else if (current_wait_time >= 0.2) 
+            NPC.GetComponent<NPC_Script>().SetColor(Color.yellow);
+        else
+            NPC.GetComponent<NPC_Script>().SetColor(Color.red);
+
+        if (current_wait_time == 0)
+        {
+            CmdUpdateWaitTime(1);
+            CmdChangeSprite(NPC, null);
         }
 
-        CmdSetSize(NPC, current_wait_time);
-        //NPC.GetComponent<NPC_Script>().RpcSetSize(current_wait_time);
+        //CmdSetSize(NPC, current_wait_time);
     }
 
     [Command]
