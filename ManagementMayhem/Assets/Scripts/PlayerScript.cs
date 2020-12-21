@@ -339,15 +339,14 @@ public class PlayerScript : NetworkBehaviour
         if (!collision.IsTouching(playerTrigger))
         {
             if (collision.gameObject.CompareTag("Pickup") && !pickUpActive) {
-                Debug.Log("exited");
                 pickup = null;
                 CmdTriggerExitPickup();
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
-                NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
-                NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
-                NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
+                //NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
+                //NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
+                //NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
                 canDelete = false;
             }
             else if (collision.gameObject.CompareTag("Interactable"))

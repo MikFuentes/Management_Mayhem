@@ -40,6 +40,9 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         Room.GamePlayers.Add(this);
 
         playerName.text = displayName;
+
+        FindObjectOfType<AudioManager>().Play("MenuMusic", false);
+        FindObjectOfType<AudioManager>().Play("GameMusic", true);
     }
 
     public override void OnNetworkDestroy()
