@@ -2741,6 +2741,11 @@ PrefabInstance:
       propertyPath: serverOnly
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2008029408670938827, guid: e017ffcd47aade14cad67395b7d2be0c,
+        type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3048587456452445835, guid: e017ffcd47aade14cad67395b7d2be0c,
         type: 3}
       propertyPath: m_Name
