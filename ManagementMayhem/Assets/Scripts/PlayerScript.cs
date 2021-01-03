@@ -53,6 +53,12 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] [SerializeField] public float currentMoney;
     private static event Action<float> OnMoneyChange;
 
+    [Header("ATM_Balance")]
+    [SerializeField] private GameObject balanceUI = null;
+    [SerializeField] private TMP_Text balanceText = null;
+    [SyncVar] [SerializeField] public float currentBalance = 1000;
+    private static event Action<float> OnBalanceChange;
+
     [Header("Items")]
     public GameObject itemPrefab;
     [SyncVar] private int rand = 0;
@@ -96,6 +102,7 @@ public class PlayerScript : NetworkBehaviour
         
         // subscribe to events
         OnMoneyChange += HandleMoneyChange;
+        OnBalanceChange += HandleBalanceChange;
         OnTimeChange += HandleTimeChange;
         OnWaitChange += HandleWaitChange;
 
@@ -107,6 +114,7 @@ public class PlayerScript : NetworkBehaviour
     {
         if (!hasAuthority) { return; } // do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
+        OnBalanceChange -= HandleBalanceChange;
         OnTimeChange -= HandleTimeChange;
         OnWaitChange -= HandleWaitChange;
     }
@@ -168,14 +176,11 @@ public class PlayerScript : NetworkBehaviour
             pickup.transform.position = holdPoint.position;
             CmdHold();
         }
-        //else if (pickup != null && !pickup.GetComponent<PickupScript>().triggered)
-        //{
-        //    Debug.Log(1);
-        //}
 
-        // 
+       
         if (!Cooldown)
-        {
+        { 
+            // depositing money, buying items
             if (canDeposit && !pickUpActive && pickup != null) // if you're standing next to a depositor empty-handed with the item on the floor
             {
                 if (pickup.GetComponent<PickupProperties>().itemType == "Money")
@@ -208,7 +213,7 @@ public class PlayerScript : NetworkBehaviour
                 StartCoroutine(CooldownTimer(0.5f));
             }
 
-            if (canDelete && !pickUpActive && pickup != null)
+            if (canDelete && !pickUpActive && pickup != null) // if you're standing next to a deleter empty-handed with the item on the floor
             {
                 if (pickup.GetComponent<PickupProperties>().itemType != "Money" && pickup.GetComponent<PickupProperties>().itemType != "Box")
                 {
@@ -217,7 +222,6 @@ public class PlayerScript : NetworkBehaviour
                         Debug.Log("Thank you for " + tempName + "!");
 
                         CmdChangeSprite(NPC, tempName);
-
 
                         NPC_item_match = false;
 
@@ -396,7 +400,7 @@ public class PlayerScript : NetworkBehaviour
     void Activate_Interactable_UI(GameObject obj)
     {
         string name = obj.name; // get name of interactable 
-        Current_Interactable_UI = gameObject.transform.Find("CameraPlayer/HUD/" + name + "_UI").gameObject; // look for coressponding UI using name
+        Current_Interactable_UI = gameObject.transform.Find("CameraPlayer/HUD_Canvas/" + name + "_UI").gameObject; // look for coressponding UI using name
 
         Current_Interactable_UI.SetActive(true); // activate UI
         Faded_Background.SetActive(true);
@@ -575,6 +579,27 @@ public class PlayerScript : NetworkBehaviour
     private void RpcUpdateMoney(float value)
     {
         OnMoneyChange?.Invoke(value);
+    }
+
+    #endregion
+
+    #region ATM_Balance
+    private void HandleBalanceChange(float value)
+    {
+        currentBalance += value;
+        balanceText.text = currentBalance.ToString();
+    }
+
+    [Command]
+    private void CmdUpdateBalance(float value)
+    {
+        RpcUpdateBalance(value);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateBalance(float value)
+    {
+        OnBalanceChange?.Invoke(value);
     }
 
     #endregion
