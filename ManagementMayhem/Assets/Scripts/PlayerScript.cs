@@ -59,6 +59,11 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] [SerializeField] public float currentBalance = 1000;
     private static event Action<float> OnBalanceChange;
 
+    [Header("ATM_Withdraw")]
+    [SerializeField] private GameObject withdrawUI = null;
+    [SerializeField] private TMP_Text withdrawText = null;
+    private string codeSequence = "0";
+
     [Header("Items")]
     public GameObject itemPrefab;
     [SyncVar] private int rand = 0;
@@ -107,6 +112,8 @@ public class PlayerScript : NetworkBehaviour
         OnWaitChange += HandleWaitChange;
 
         NPC = GameObject.Find("NPC_P (1)");
+
+        PushTheButton.ButtonPressed += AddDigitToSequence;
     }
 
     [ClientCallback]
@@ -306,12 +313,17 @@ public class PlayerScript : NetworkBehaviour
                         Debug.Log("I want " + tempName);
                     }
                 }
-                
+
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
                 interactable = collision.gameObject;
                 interactButton.interactable = true;
+
+                if (interactable.name == "ATM")
+                {
+                    CmdUpdateBalance(0); // show the most recent balance
+                }
             }
             else if (collision.gameObject.CompareTag("Depositor"))
                 canDeposit = true;
@@ -600,6 +612,29 @@ public class PlayerScript : NetworkBehaviour
     private void RpcUpdateBalance(float value)
     {
         OnBalanceChange?.Invoke(value);
+    }
+
+    private void AddDigitToSequence(string digitEntered)
+    {
+        if (digitEntered != "Clear")
+        {
+            if (codeSequence.Length < 4)
+            {
+                if (codeSequence == "0" && digitEntered != "0")
+                {
+                    codeSequence = digitEntered;
+                }
+                else
+                {
+                    codeSequence += digitEntered;
+                }
+            }
+        }
+        else
+        {
+            codeSequence = "0";
+        }
+        withdrawText.text = codeSequence;
     }
 
     #endregion
