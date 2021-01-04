@@ -63,6 +63,7 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private GameObject withdrawUI = null;
     [SerializeField] private TMP_Text withdrawText = null;
     private string codeSequence = "0";
+    public Button withdrawButton = null;
 
     [Header("Items")]
     public GameObject itemPrefab;
@@ -103,8 +104,9 @@ public class PlayerScript : NetworkBehaviour
         // buttons
         pickUpButton.onClick.AddListener(CmdPickUpOnClick);
         dropButton.onClick.AddListener(CmdDropOnClick);
-        interactButton.onClick.AddListener(delegate{Activate_Interactable_UI(interactable);});
-        
+        interactButton.onClick.AddListener(delegate { Activate_Interactable_UI(interactable); });
+        withdrawButton.onClick.AddListener(delegate { ConfirmWithdrawal(); });
+
         // subscribe to events
         OnMoneyChange += HandleMoneyChange;
         OnBalanceChange += HandleBalanceChange;
@@ -184,9 +186,9 @@ public class PlayerScript : NetworkBehaviour
             CmdHold();
         }
 
-       
+
         if (!Cooldown)
-        { 
+        {
             // depositing money, buying items
             if (canDeposit && !pickUpActive && pickup != null) // if you're standing next to a depositor empty-handed with the item on the floor
             {
@@ -484,7 +486,7 @@ public class PlayerScript : NetworkBehaviour
             count--;
         }
 
-        if(count == 0)
+        if (count == 0)
         {
             NPC.GetComponent<NPC_Script>().RpcChangeSprite(-1);
         }
@@ -616,7 +618,11 @@ public class PlayerScript : NetworkBehaviour
 
     private void AddDigitToSequence(string digitEntered)
     {
-        if (digitEntered != "Clear")
+        if (digitEntered == "Clear")
+        {
+            codeSequence = "0";
+        }
+        else
         {
             if (codeSequence.Length < 4)
             {
@@ -630,12 +636,62 @@ public class PlayerScript : NetworkBehaviour
                 }
             }
         }
-        else
-        {
-            codeSequence = "0";
-        }
         withdrawText.text = codeSequence;
     }
+
+    private void ConfirmWithdrawal()
+    {
+        int amount = Convert.ToInt32(codeSequence);
+
+        if (IsValidWithdrawAmount(amount))
+        {
+            DispenseCoins(amount);
+        }
+        else
+        {
+            Debug.Log("Invalid withdrawal amount. Please input a valid amount.");
+            codeSequence = "0";
+            withdrawText.text = "ERROR";
+        }
+    }
+
+    private bool IsValidWithdrawAmount(int amount)
+    {
+        if (amount > currentBalance || amount < 25 || amount % 25 != 0) //max, min, divisible by 25 (smallest denomination)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private void DispenseCoins(int amount)
+    {
+        int hundredcoins = 0;
+        int fiftycoins = 0;
+        int twofivecoins = 0;
+
+        while(amount >= 100)
+        {
+            amount -= 100;
+            hundredcoins++;
+        }
+        while(amount >= 50)
+        {
+            amount -= 50;
+            fiftycoins++;
+        }
+        while(amount >= 25)
+        {
+            amount -= 25;
+            twofivecoins++;
+        }
+
+        Debug.Log(hundredcoins + ", " + fiftycoins + ", " + twofivecoins);
+    }
+
 
     #endregion
 

@@ -1221,7 +1221,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -3759,6 +3759,7 @@ MonoBehaviour:
   currentBalance: 1000
   withdrawUI: {fileID: 8052687623997736225}
   withdrawText: {fileID: 8031501813657957573}
+  withdrawButton: {fileID: 5535135930640537106}
   itemPrefab: {fileID: 0}
   pickup: {fileID: 0}
   pickUpActive: 0
@@ -4267,18 +4268,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1980350342688452153}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: holdObject
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &5533546494789511229
 GameObject:
   m_ObjectHideFlags: 0
@@ -6907,7 +6897,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
