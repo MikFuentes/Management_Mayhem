@@ -54,14 +54,17 @@ public class PlayerScript : NetworkBehaviour
     private static event Action<float> OnMoneyChange;
 
     [Header("ATM_Balance")]
+    [SerializeField] private GameObject homePanel = null;
     [SerializeField] private GameObject balanceUI = null;
     [SerializeField] private TMP_Text balanceText = null;
     [SyncVar] [SerializeField] public float currentBalance = 1000;
     private static event Action<float> OnBalanceChange;
 
     [Header("ATM_Withdraw")]
+    [SerializeField] private GameObject withdrawPanel = null;
     [SerializeField] private GameObject withdrawUI = null;
     [SerializeField] private TMP_Text withdrawText = null;
+    [SerializeField] private TMP_Text errorText = null;
     private string codeSequence = "0";
     public Button withdrawButton = null;
 
@@ -325,6 +328,13 @@ public class PlayerScript : NetworkBehaviour
                 if (interactable.name == "ATM")
                 {
                     CmdUpdateBalance(0); // show the most recent balance
+
+                    //reset the ATM
+                    codeSequence = "0";
+                    withdrawText.text = codeSequence;
+                    errorText.gameObject.SetActive(false);
+                    homePanel.SetActive(true);
+                    withdrawPanel.SetActive(false);
                 }
             }
             else if (collision.gameObject.CompareTag("Depositor"))
@@ -618,7 +628,7 @@ public class PlayerScript : NetworkBehaviour
 
     private void AddDigitToSequence(string digitEntered)
     {
-        if (digitEntered == "Clear")
+        if (digitEntered == "Clear" || digitEntered == "Back")
         {
             codeSequence = "0";
         }
@@ -646,12 +656,16 @@ public class PlayerScript : NetworkBehaviour
         if (IsValidWithdrawAmount(amount))
         {
             DispenseCoins(amount);
+
+            errorText.gameObject.SetActive(false);
         }
         else
         {
             Debug.Log("Invalid withdrawal amount. Please input a valid amount.");
             codeSequence = "0";
             withdrawText.text = "ERROR";
+
+            errorText.gameObject.SetActive(true);
         }
     }
 

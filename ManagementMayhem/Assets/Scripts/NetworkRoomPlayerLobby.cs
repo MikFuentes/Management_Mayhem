@@ -12,6 +12,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerNameTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
     [SerializeField] private Button startGameButton = null;
+    [SerializeField] private Button readyUpButton = null;
 
     [SyncVar(hook = nameof(HandleDisplayNameChanged))]
     public string DisplayName = "Loading...";
@@ -26,7 +27,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             isLeader = value;
             startGameButton.gameObject.SetActive(value);
-            startGameButton.interactable = false;
+            startGameButton.interactable = false;   
         }
     }
 
@@ -115,6 +116,21 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         IsReady = !IsReady;
 
         Room.NotifyPlayersOfReadyState();
+    }
+
+    public void ReadyUp()
+    {
+        if (IsReady)
+        {
+            readyUpButton.gameObject.GetComponent<Image>().color = Color.red;
+            readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Cancel";
+        }
+        else
+        {
+            readyUpButton.gameObject.GetComponent<Image>().color = new Color32(255, 230, 13, 255);
+            readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Ready Up";
+        }
+
     }
 
     [Command]
