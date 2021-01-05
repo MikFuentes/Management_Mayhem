@@ -68,6 +68,11 @@ public class PlayerScript : NetworkBehaviour
     private string codeSequence = "0";
     public Button withdrawButton = null;
 
+    [Header("ATM_Processing")]
+    [SerializeField] private GameObject processingPanel = null;
+    [SerializeField] private TMP_Text processingText = null;
+
+
     [Header("Items")]
     public GameObject itemPrefab;
     [SyncVar] private int rand = 0;
@@ -403,8 +408,6 @@ public class PlayerScript : NetworkBehaviour
             temp = "Item (" + name + ")";
         }
 
-        Debug.Log(temp);
-
         foreach (var prefab in Room.spawnPrefabs)
         {
             if (temp == prefab.name)
@@ -624,6 +627,8 @@ public class PlayerScript : NetworkBehaviour
     {
         currentBalance += value;
         balanceText.text = currentBalance.ToString();
+
+        codeSequence = "0";
     }
 
     [Command]
@@ -667,6 +672,9 @@ public class PlayerScript : NetworkBehaviour
 
         if (IsValidWithdrawAmount(amount))
         {
+
+            StartCoroutine(ActivateATMLoadScreen());
+
             DispenseCoins(amount);
 
             errorText.gameObject.SetActive(false);
@@ -675,7 +683,6 @@ public class PlayerScript : NetworkBehaviour
         }
         else
         {
-            Debug.Log("Invalid withdrawal amount. Please input a valid amount.");
             codeSequence = "0";
             withdrawText.text = "ERROR";
 
@@ -719,11 +726,33 @@ public class PlayerScript : NetworkBehaviour
             twofivecoins++;
             CmdSpawn("P25");
         }
-
-        Debug.Log(hundredcoins + ", " + fiftycoins + ", " + twofivecoins);
-
     }
 
+    private IEnumerator ActivateATMLoadScreen()
+    {
+        processingText.text = "Withdrawing";
+        processingPanel.SetActive(true);
+        withdrawPanel.SetActive(false);
+        yield return new WaitForSeconds(1);
+        
+        //wait some time
+        processingText.text += ".";
+        yield return new WaitForSeconds(1);
+       
+        processingText.text += ".";
+        yield return new WaitForSeconds(1);
+
+        processingText.text += ".";
+        yield return new WaitForSeconds(1);
+
+        processingText.text = "Withdrawal Complete!";
+        yield return new WaitForSeconds(1);
+
+        processingPanel.SetActive(false);
+        homePanel.SetActive(true);
+        codeSequence = "0";
+        withdrawText.text = codeSequence;
+    }
 
     #endregion
 
