@@ -392,7 +392,19 @@ public class PlayerScript : NetworkBehaviour
     #region Items
     private GameObject FindItem(string name)
     {
-        string temp = "Item (" + name + ")";
+        string temp = "";
+
+        if (name.StartsWith("P"))
+        {
+            temp = name;
+        }
+        else
+        {
+            temp = "Item (" + name + ")";
+        }
+
+        Debug.Log(temp);
+
         foreach (var prefab in Room.spawnPrefabs)
         {
             if (temp == prefab.name)
@@ -658,6 +670,8 @@ public class PlayerScript : NetworkBehaviour
             DispenseCoins(amount);
 
             errorText.gameObject.SetActive(false);
+
+            CmdUpdateBalance(-amount);
         }
         else
         {
@@ -691,19 +705,23 @@ public class PlayerScript : NetworkBehaviour
         {
             amount -= 100;
             hundredcoins++;
+            CmdSpawn("P100");
         }
         while(amount >= 50)
         {
             amount -= 50;
             fiftycoins++;
+            CmdSpawn("P50");
         }
         while(amount >= 25)
         {
             amount -= 25;
             twofivecoins++;
+            CmdSpawn("P25");
         }
 
         Debug.Log(hundredcoins + ", " + fiftycoins + ", " + twofivecoins);
+
     }
 
 
