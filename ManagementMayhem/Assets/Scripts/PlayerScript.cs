@@ -35,6 +35,7 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Terrain")]
     public List<GameObject> frontWalls;
+    public bool Indoors = false;
 
     [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
@@ -278,6 +279,8 @@ public class PlayerScript : NetworkBehaviour
             else if (collision.gameObject.CompareTag("NPC"))
             {
                 NPC = collision.gameObject;
+
+                gameObject.GetComponent<BoxCollider2D>().enabled = false;
                 //NPC.transform.Find("Health_Bar").gameObject.SetActive(true);
                 //NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
                 //NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
@@ -347,13 +350,22 @@ public class PlayerScript : NetworkBehaviour
                 canDelete = true;
             else if (collision.gameObject.CompareTag("Indoor"))
             {
-                StartCoroutine(FadeOut());
+                if (!Indoors)
+                {
+                    StartCoroutine(FadeOut());
+                    Indoors = true;
+                }
+
             }
             else if (collision.gameObject.CompareTag("Hidable"))
             {
-                if(frontWalls.Count < 2)
-                    frontWalls.Add(collision.gameObject);
-
+                if(frontWalls.Count < 8)
+                {
+                    if (!frontWalls.Contains(collision.gameObject))
+                    {
+                        frontWalls.Add(collision.gameObject);
+                    }
+                }
                 gameObject.GetComponent<BoxCollider2D>().enabled = false;
             }
         }
@@ -391,6 +403,8 @@ public class PlayerScript : NetworkBehaviour
                 //NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
                 //NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
                 canDelete = false;
+
+                gameObject.GetComponent<BoxCollider2D>().enabled = true;
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -405,10 +419,14 @@ public class PlayerScript : NetworkBehaviour
             else if (collision.gameObject.CompareTag("Indoor"))
             {
                 StartCoroutine(FadeIn());
+                Indoors = false;
             }
             else if (collision.gameObject.CompareTag("Hidable"))
             {
-                frontWalls.Clear();
+                //frontWalls.Clear();
+
+                
+                //StartCoroutine(DelayedClear());
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
             }
         }
@@ -590,16 +608,15 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.interactable = false;
     }
 
-
     private IEnumerator FadeOut()
     {
-        float opacity = 1f;
+        int opacity = 10;
         while(opacity > 0)
         {
-            opacity -= 0.1f;
+            opacity--;
             foreach (GameObject go in frontWalls)
             {
-                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity);
+                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity/10f);
             }
             yield return new WaitForSeconds(0.01f);
         }
@@ -607,17 +624,16 @@ public class PlayerScript : NetworkBehaviour
 
     private IEnumerator FadeIn()
     {
-        float opacity = 0;
-        while (opacity < 1f)
+        int opacity = 0;
+        while (opacity < 10f)
         {
-            opacity += 0.1f;
+            opacity++;
             foreach (GameObject go in frontWalls)
             {
-                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity);
+                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity/10f);
             }
             yield return new WaitForSeconds(0.01f);
         }
-
     }
     #endregion
 
