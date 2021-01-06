@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7079303826269357723}
   - component: {fileID: 7079303826269357722}
   - component: {fileID: 7079303826269357721}
+  - component: {fileID: 1881838394244392440}
   m_Layer: 0
   m_Name: Conveyer_Left
   m_TagString: Untagged
@@ -72,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 5928792724151071827, guid: b9fe41935953b7c4daf2d5864e65af21,
+  m_Sprite: {fileID: -6746613831365522390, guid: b9fe41935953b7c4daf2d5864e65af21,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -130,3 +131,22 @@ AreaEffector2D:
   m_ForceTarget: 0
   m_Drag: 0
   m_AngularDrag: 0
+--- !u!95 &1881838394244392440
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7079303826269357720}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 095634c36477bd24188e47fe81c17b25, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

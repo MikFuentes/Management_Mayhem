@@ -48,6 +48,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Box (Microphone)
       objectReference: {fileID: 0}
+    - target: {fileID: 7444369022186658916, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 7616711153819495923, guid: d39c0719eeef73248810247aec30dd3a,
+        type: 3}
+    - target: {fileID: 7444369022186658916, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7444369022186658916, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7444369022186658923, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: m_LocalPosition.x

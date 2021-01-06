@@ -53,6 +53,21 @@ PrefabInstance:
       propertyPath: itemName
       value: Speaker
       objectReference: {fileID: 0}
+    - target: {fileID: 2699754351681183893, guid: 7223bba202abd2d40a21ef8b1baf131c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.805
+      objectReference: {fileID: 0}
+    - target: {fileID: 2699754351681183893, guid: 7223bba202abd2d40a21ef8b1baf131c,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 2699754351681183893, guid: 7223bba202abd2d40a21ef8b1baf131c,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.78
+      objectReference: {fileID: 0}
     - target: {fileID: 7513019427629638149, guid: 7223bba202abd2d40a21ef8b1baf131c,
         type: 3}
       propertyPath: m_Name
@@ -81,12 +96,12 @@ PrefabInstance:
     - target: {fileID: 8310687558245644113, guid: 7223bba202abd2d40a21ef8b1baf131c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.2751923
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8310687558245644113, guid: 7223bba202abd2d40a21ef8b1baf131c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.71
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8310687558245644113, guid: 7223bba202abd2d40a21ef8b1baf131c,
         type: 3}
@@ -132,6 +147,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8310687558245644113, guid: 7223bba202abd2d40a21ef8b1baf131c,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8310687558245644113, guid: 7223bba202abd2d40a21ef8b1baf131c,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7223bba202abd2d40a21ef8b1baf131c, type: 3}

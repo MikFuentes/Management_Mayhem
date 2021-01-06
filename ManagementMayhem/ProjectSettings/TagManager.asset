@@ -10,6 +10,8 @@ TagManager:
   - Menu
   - Depositor
   - NPC
+  - Indoor
+  - Hidable
   layers:
   - Default
   - TransparentFX

@@ -14,6 +14,54 @@ TextureImporter:
   - first:
       213: 5928792724151071827
     second: Conveyer_Belt_3
+  - first:
+      213: -8277747478292775172
+    second: Conveyer_Belt_0
+  - first:
+      213: 3151861373635117360
+    second: Conveyer_Belt_1
+  - first:
+      213: 9168831691030240895
+    second: Conveyer_Belt_2
+  - first:
+      213: -1309321279000860380
+    second: Conveyer_Belt_3
+  - first:
+      213: -3656415142984764909
+    second: Conveyer_Belt_4
+  - first:
+      213: -4124076064453005424
+    second: Conveyer_Belt_5
+  - first:
+      213: 692352309340003446
+    second: Conveyer_Belt_6
+  - first:
+      213: 1201491377661357242
+    second: Conveyer_Belt_7
+  - first:
+      213: -1471213608404778649
+    second: Conveyer_Belt_8
+  - first:
+      213: -4435630983972960337
+    second: Conveyer_Belt_9
+  - first:
+      213: 5027030300444569728
+    second: Conveyer_Belt_10
+  - first:
+      213: -5042004785175532701
+    second: Conveyer_Belt_11
+  - first:
+      213: -6746613831365522390
+    second: Conveyer_Belt_12
+  - first:
+      213: 3064820846722161316
+    second: Conveyer_Belt_13
+  - first:
+      213: 2500632702364469255
+    second: Conveyer_Belt_14
+  - first:
+      213: -7991062963997122538
+    second: Conveyer_Belt_15
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -127,6 +175,258 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfe39ff96888f1d80800000000000000
+      internalID: -8277747478292775172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 031cbc45839adbb20800000000000000
+      internalID: 3151861373635117360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7e933d28db3e3f70800000000000000
+      internalID: 9168831691030240895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_3
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4292b4cdb3b54dde0800000000000000
+      internalID: -1309321279000860380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 312b80bcccdc14dc0800000000000000
+      internalID: -3656415142984764909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_5
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 64
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09f669f6ba654c6c0800000000000000
+      internalID: -4124076064453005424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_6
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 64
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 67cd1a1d1cabb9900800000000000000
+      internalID: 692352309340003446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_7
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 64
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abc233eca0e8ca010800000000000000
+      internalID: 1201491377661357242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 761005a9403359be0800000000000000
+      internalID: -1471213608404778649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_9
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa7439dfe197172c0800000000000000
+      internalID: -4435630983972960337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_10
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 080bf158c6993c540800000000000000
+      internalID: 5027030300444569728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_11
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36beacf8c53370ab0800000000000000
+      internalID: -5042004785175532701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Conveyer_Belt_12
+      rect:
+        serializedVersion: 2
+        x: 0
         y: 0
         width: 32
         height: 32
@@ -137,14 +437,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9b168d75e5449f250800000000000000
-      internalID: 5978885152302457273
+      spriteID: a2c88b827763f52a0800000000000000
+      internalID: -6746613831365522390
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Conveyer_Belt_1
+      name: Conveyer_Belt_13
       rect:
         serializedVersion: 2
         x: 32
@@ -158,14 +458,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 88bec6771d377bf50800000000000000
-      internalID: 6897108697830189960
+      spriteID: 4aa161d625e688a20800000000000000
+      internalID: 3064820846722161316
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Conveyer_Belt_2
+      name: Conveyer_Belt_14
       rect:
         serializedVersion: 2
         x: 64
@@ -179,14 +479,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 380a945901ceadba0800000000000000
-      internalID: -6063274392332689277
+      spriteID: 708c822a13804b220800000000000000
+      internalID: 2500632702364469255
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Conveyer_Belt_3
+      name: Conveyer_Belt_15
       rect:
         serializedVersion: 2
         x: 96
@@ -200,8 +500,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 354f1fd029d474250800000000000000
-      internalID: 5928792724151071827
+      spriteID: 610eb2d929a0a1190800000000000000
+      internalID: -7991062963997122538
       vertices: []
       indices: 
       edges: []

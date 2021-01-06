@@ -122,12 +122,12 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         if (IsReady)
         {
-            readyUpButton.gameObject.GetComponent<Image>().color = Color.red;
+            readyUpButton.gameObject.GetComponent<Image>().color = new Color32(214, 36, 17, 255);
             readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Cancel";
         }
         else
         {
-            readyUpButton.gameObject.GetComponent<Image>().color = new Color32(255, 230, 13, 255);
+            readyUpButton.gameObject.GetComponent<Image>().color = new Color32(16, 210, 117, 255);
             readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Ready Up";
         }
 

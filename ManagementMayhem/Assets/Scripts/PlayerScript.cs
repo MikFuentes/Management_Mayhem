@@ -33,6 +33,8 @@ public class PlayerScript : NetworkBehaviour
     public GameObject Faded_Background;
     [SerializeField] private GameObject gameName;
 
+    [Header("Terrain")]
+    public List<GameObject> frontWalls;
 
     [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
@@ -343,6 +345,17 @@ public class PlayerScript : NetworkBehaviour
                 canDeposit = true;
             else if (collision.gameObject.CompareTag("Deleter"))
                 canDelete = true;
+            else if (collision.gameObject.CompareTag("Indoor"))
+            {
+                StartCoroutine(FadeOut());
+            }
+            else if (collision.gameObject.CompareTag("Hidable"))
+            {
+                if(frontWalls.Count < 2)
+                    frontWalls.Add(collision.gameObject);
+
+                gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            }
         }
     }
 
@@ -389,6 +402,15 @@ public class PlayerScript : NetworkBehaviour
                 canDeposit = false;
             else if (collision.gameObject.CompareTag("Deleter"))
                 canDelete = false;
+            else if (collision.gameObject.CompareTag("Indoor"))
+            {
+                StartCoroutine(FadeIn());
+            }
+            else if (collision.gameObject.CompareTag("Hidable"))
+            {
+                frontWalls.Clear();
+                gameObject.GetComponent<BoxCollider2D>().enabled = true;
+            }
         }
     }
     #region Items
@@ -460,6 +482,7 @@ public class PlayerScript : NetworkBehaviour
     {
         pickUpActive = true;
         pickup.transform.position = holdPoint.position;
+
         RpcPickUpOnClick();
     }
 
@@ -468,6 +491,7 @@ public class PlayerScript : NetworkBehaviour
     {
         pickUpButton.gameObject.SetActive(false);
         dropButton.gameObject.SetActive(true);
+        pickup.transform.Find("Shadow").gameObject.SetActive(false); //disable shadow when picking up
     }
     [Command]
     public void CmdHold()
@@ -482,7 +506,11 @@ public class PlayerScript : NetworkBehaviour
         pickUpActive = false;
         pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive);
         pickup.transform.position = dropPoint.position; // BUG: doesn't always drop at the drop point...
+
+
         RpcDropOnClick();
+
+
 
         //pickup = null; // (1/2) BUG: exit trigger doesn't always trigger | WORKAROUND: force the exit trigger every time by making pickup null 
         //commented the above due to null error message when dropping items
@@ -494,6 +522,7 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.interactable = false; // (2/2) and making pickUpButton non-interactable
         pickUpButton.gameObject.SetActive(true);
         dropButton.gameObject.SetActive(false);
+        pickup.transform.Find("Shadow").gameObject.SetActive(true); //enable shadow when picking up
     }
 
     [Command]
@@ -559,6 +588,36 @@ public class PlayerScript : NetworkBehaviour
     void RpcTriggerExitPickup()
     {
         pickUpButton.interactable = false;
+    }
+
+
+    private IEnumerator FadeOut()
+    {
+        float opacity = 1f;
+        while(opacity > 0)
+        {
+            opacity -= 0.1f;
+            foreach (GameObject go in frontWalls)
+            {
+                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity);
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
+    }
+
+    private IEnumerator FadeIn()
+    {
+        float opacity = 0;
+        while (opacity < 1f)
+        {
+            opacity += 0.1f;
+            foreach (GameObject go in frontWalls)
+            {
+                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity);
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
+
     }
     #endregion
 
@@ -653,7 +712,7 @@ public class PlayerScript : NetworkBehaviour
         {
             if (codeSequence.Length < 4)
             {
-                if (codeSequence == "0" && digitEntered != "0")
+                if (codeSequence == "0")
                 {
                     codeSequence = digitEntered;
                 }
