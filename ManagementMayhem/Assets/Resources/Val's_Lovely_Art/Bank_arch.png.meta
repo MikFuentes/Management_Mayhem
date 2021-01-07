@@ -1,19 +1,7 @@
 fileFormatVersion: 2
-guid: aedbd0f2c736a414e9977fc63e1c9ee4
+guid: 054f4c9294c404d44b92567f89f8c042
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -7301445184318068010
-    second: Catshier_0
-  - first:
-      213: -982809772799914465
-    second: Catshier_1
-  - first:
-      213: -8854263393792270941
-    second: Catshier_2
-  - first:
-      213: 5873846068583391483
-    second: Catshier_3
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -52,11 +40,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 9
-  spritePivot: {x: 0.5, y: 0.05}
+  spritePivot: {x: 0.5, y: 0.1}
   spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -121,91 +109,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: Catshier_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.05}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6da2cb12a4e0caa90800000000000000
-      internalID: -7301445184318068010
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Catshier_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.05}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f1e8a7208bb5c52f0800000000000000
-      internalID: -982809772799914465
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Catshier_2
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.05}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3ad5441fa565f1580800000000000000
-      internalID: -8854263393792270941
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Catshier_3
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.05}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bf0ec3fd0e7148150800000000000000
-      internalID: 5873846068583391483
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     physicsShape: []
     bones: []
