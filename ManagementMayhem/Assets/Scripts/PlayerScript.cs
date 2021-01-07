@@ -868,6 +868,11 @@ public class PlayerScript : NetworkBehaviour
 
         for (int i = timeToWait; i >= 0; --i)
         {
+            if (NPC_item_match)
+            {
+                i = timeToWait;
+            }
+
             current_wait_time = i;
 
             CmdSetSize(NPC, current_wait_time / timeToWait); //0.0 - 1.0

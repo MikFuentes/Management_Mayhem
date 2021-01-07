@@ -6267,8 +6267,8 @@ GameObject:
   - component: {fileID: -8942951857659244711}
   - component: {fileID: 8316145310307626241}
   - component: {fileID: 2407092844300902506}
-  - component: {fileID: 7683990943109430950}
   - component: {fileID: 4242435723134503912}
+  - component: {fileID: 7683990943109430950}
   - component: {fileID: 740951527728588880}
   - component: {fileID: 5149456549430114938}
   - component: {fileID: 8862570484847647591}
@@ -6483,22 +6483,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.60427225, y: 0.087519646}
   m_EdgeRadius: 0.03
---- !u!114 &7683990943109430950
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043691990583168842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95db56bf0d9d60842a5cc402b029a93c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  playerTransform: {fileID: 5043691990583168841}
-  virtualCamera: {fileID: 5043691991780758604}
 --- !u!114 &4242435723134503912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6526,6 +6510,7 @@ MonoBehaviour:
   Faded_Background: {fileID: 3603665896180428739}
   gameName: {fileID: 4456678193710744960}
   frontWalls: []
+  Indoors: 0
   ui_Timer: {fileID: 179430321623164998}
   current_wait_time: 0
   timerNotStarted: 1
@@ -6554,6 +6539,22 @@ MonoBehaviour:
   canDelete: 0
   UI_Active: 0
   sceneObjects: []
+--- !u!114 &7683990943109430950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043691990583168842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95db56bf0d9d60842a5cc402b029a93c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  playerTransform: {fileID: 5043691990583168841}
+  virtualCamera: {fileID: 5043691991780758604}
 --- !u!114 &740951527728588880
 MonoBehaviour:
   m_ObjectHideFlags: 0
