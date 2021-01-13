@@ -38,6 +38,7 @@ public class NetworkManagerLobby : NetworkManager
         animations = new RuntimeAnimatorController[3];
         animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
         animations[1] = Resources.Load<RuntimeAnimatorController>("Animation/Logistics");
+        animations[2] = Resources.Load<RuntimeAnimatorController>("Animation/Finance");
     } 
 
     public override void OnStartClient()
@@ -52,6 +53,7 @@ public class NetworkManagerLobby : NetworkManager
         animations = new RuntimeAnimatorController[3];
         animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
         animations[1] = Resources.Load<RuntimeAnimatorController>("Animation/Logistics");
+        animations[2] = Resources.Load<RuntimeAnimatorController>("Animation/Finance");
 
     }
 
@@ -229,7 +231,7 @@ public class NetworkManagerLobby : NetworkManager
             {
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
-                gameplayerInstance.SetCharacter(i);
+                gameplayerInstance.SetCharacter(RoomPlayers[i].CharacterIndex);
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
 
                 bool isLeader = i == 0;

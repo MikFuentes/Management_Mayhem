@@ -158,12 +158,31 @@ public class PlayerScript : NetworkBehaviour
         // left and right
         if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
         {
-            if (facingRight) { flipPlayer(); } // if moving left while facing right...
+            //face left
+            Vector3 theScale = transform.localScale;
+            theScale.x = Math.Abs(theScale.x) * -1;
+            transform.localScale = theScale;
+
+            Vector3 theNameScale = gameName.transform.localScale;
+            theNameScale.x = Math.Abs(theNameScale.x) * -1;
+            gameName.transform.localScale = theNameScale;
+
+            //if (facingRight) { flipPlayer(); } // if moving left while facing right...
             horizontalMove = -moveSpeed;
         }
         else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
         {
-            if (!facingRight) { flipPlayer(); } // if moving right while facing left...
+            //face right
+            Vector3 theScale = transform.localScale;
+            theScale.x = Math.Abs(theScale.x);
+            transform.localScale = theScale;
+
+            Vector3 theNameScale = gameName.transform.localScale;
+            theNameScale.x = Math.Abs(theNameScale.x);
+            gameName.transform.localScale = theNameScale;
+
+
+            //if (!facingRight) { flipPlayer(); } // if moving right while facing left...
             horizontalMove = moveSpeed;
         }
         else
@@ -642,26 +661,26 @@ public class PlayerScript : NetworkBehaviour
     #endregion
 
     #region Movement
-    private void flipPlayer()
-    {
-        Vector3 temp = gameName.transform.localScale;
-        Vector3 theScale = transform.localScale;
+    //private void flipPlayer()
+    //{
+    //    Vector3 temp = gameName.transform.localScale;
+    //    Vector3 theScale = transform.localScale;
 
-        theScale.x *= -1;
-        transform.localScale = theScale;
-        facingRight = !facingRight;
+    //    theScale.x *= -1;
+    //    transform.localScale = theScale;
+    //    facingRight = !facingRight;
 
-        if (theScale.x < 0)
-        {
-            temp.x *= -1; // facing left
-            gameName.transform.localScale = temp;
-        }
-        else
-        {
-            temp.x = Mathf.Abs(temp.x);
-            gameName.transform.localScale = temp;
-        }
-    }
+    //    if (theScale.x < 0)
+    //    {
+    //        temp.x *= -1; // facing left
+    //        gameName.transform.localScale = temp;
+    //    }
+    //    else
+    //    {
+    //        temp.x = Mathf.Abs(temp.x);
+    //        gameName.transform.localScale = temp;
+    //    }
+    //}
 
     [Command]
     void CmdRun()

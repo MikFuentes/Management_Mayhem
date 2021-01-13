@@ -11,6 +11,9 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private GameObject lobbyUI = null;
     [SerializeField] private TMP_Text[] playerNameTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
+    [SerializeField] private TMP_Text[] playerCharacters = new TMP_Text[3];
+    [SerializeField] private Button[] leftPlayerButtons = new Button[3];
+    [SerializeField] private Button[] rightPlayerButtons = new Button[3];
     [SerializeField] private Button startGameButton = null;
     [SerializeField] private Button readyUpButton = null;
 
@@ -18,7 +21,9 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public string DisplayName = "Loading...";
     [SyncVar(hook = nameof(HandleReadyStatusChanged))]
     public bool IsReady = false;
-    public bool onlyHost;
+    //public bool onlyHost;
+    [SyncVar(hook = nameof(HandleCharacterChanged))]
+    public int CharacterIndex = 0;
 
     private bool isLeader;
     public bool IsLeader
@@ -45,13 +50,30 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         CmdSetDisplayName(PlayerNameInput.DisplayName);
 
+        foreach (Button b in leftPlayerButtons)
+        {
+            b.onClick.AddListener(CmdCharacterLeft);
+        }
+        foreach (Button b in rightPlayerButtons)
+        {
+            b.onClick.AddListener(CmdSetCharacterRight);
+        }
+
         lobbyUI.SetActive(true);
 
     }
-
     public override void OnStartClient()
     {
         Room.RoomPlayers.Add(this);
+
+        for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
+        {
+            if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
+            {
+                leftPlayerButtons[i].gameObject.SetActive(true);
+                rightPlayerButtons[i].gameObject.SetActive(true);
+            }
+        }
 
         UpdateDisplay();
     }
@@ -65,6 +87,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay(); //call the method without using the parameters (they are not needed)
     public void HandleDisplayNameChanged(string oldValue, string newValue) => UpdateDisplay();
+    public void HandleCharacterChanged(int oldValue, int newValue) => UpdateDisplay();
 
     private void UpdateDisplay()
     {
@@ -87,6 +110,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             playerNameTexts[i].text = "Waiting For Player...";
             playerReadyTexts[i].text = string.Empty;
+            playerCharacters[i].text = string.Empty;
         }
 
         //set it all back
@@ -96,6 +120,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             playerReadyTexts[i].text = Room.RoomPlayers[i].IsReady ?
                 "<color=green>Ready</color>" :
                 "<color=red>Not Ready</color>";
+            playerCharacters[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
         }
     }
 
@@ -118,6 +143,24 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         IsReady = !IsReady; //syncvar is changed on the server
 
         Room.NotifyPlayersOfReadyState();
+    }
+
+    [Command]
+    public void CmdSetCharacter(int charIndex)
+    {
+        CharacterIndex = charIndex;
+    }
+
+    [Command]
+    public void CmdCharacterLeft()
+    {
+        CharacterIndex = (CharacterIndex - 1 + 3) % 3;
+    }
+
+    [Command]
+    public void CmdSetCharacterRight()
+    {
+        CharacterIndex = (CharacterIndex + 1 + 3) % 3;
     }
 
     public void ReadyUp()
