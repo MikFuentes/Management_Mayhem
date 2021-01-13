@@ -291,7 +291,11 @@ public class PlayerScript : NetworkBehaviour
 
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && timerNotStarted)
                 {
+                    gameObject.GetComponent<NetworkIdentity>().AssignClientAuthority(this.GetComponent<NetworkIdentity>().connectionToClient);
+
                     CmdStartWaitTimer(10);
+
+                    //gameObject.GetComponent<NetworkIdentity>().RemoveClientAuthority();
                 }
                 else
                 {
@@ -852,8 +856,10 @@ public class PlayerScript : NetworkBehaviour
         OnTimeChange?.Invoke(value);
     }
 
+    [Server]
     private void HandleWaitChange(int value)
     {
+        Debug.Log("HandleWaitChange");
         //if not active already
         if (timerNotStarted)
         {
@@ -862,6 +868,7 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
+    [Server]
     private IEnumerator StartWaiting(int timeToWait)
     {
         CmdChangeSprite(NPC, null);
@@ -895,14 +902,14 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdStartWaitTimer(int value)
     {
-
-        RpcStartWaitTimer(value);
+        HandleWaitChange(value);
+        //RpcStartWaitTimer(value);
     }
 
     [ClientRpc]
     private void RpcStartWaitTimer(int value)
     {
-        Debug.Log("New timer started");
+        Debug.Log("RpcStartWaitTimer");
         OnWaitChange?.Invoke(value);
     }
 

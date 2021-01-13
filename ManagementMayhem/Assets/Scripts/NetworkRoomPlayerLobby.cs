@@ -63,18 +63,18 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         UpdateDisplay();
     }
 
-    public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay();
+    public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay(); //call the method without using the parameters (they are not needed)
     public void HandleDisplayNameChanged(string oldValue, string newValue) => UpdateDisplay();
 
     private void UpdateDisplay()
     {
-        if (!hasAuthority) //hasAuthority is better than islocalPlayer
+        if (!hasAuthority) //hasAuthority is better than islocalPlayer because isLocalPlayer ONLY refers to the player object, if this doesn't belong to us
         {
             foreach(var player in Room.RoomPlayers)
             {
-                if (player.hasAuthority)
+                if (player.hasAuthority) //find the one that belongs to us
                 {
-                    player.UpdateDisplay();
+                    player.UpdateDisplay(); //call this method again
                     break;
                 }
             }
@@ -82,12 +82,14 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             return;
         }
 
+        //clear everything
         for(int i = 0; i < playerNameTexts.Length; i++)
         {
             playerNameTexts[i].text = "Waiting For Player...";
             playerReadyTexts[i].text = string.Empty;
         }
 
+        //set it all back
         for(int i = 0; i < Room.RoomPlayers.Count; i++)
         {
             playerNameTexts[i].text = Room.RoomPlayers[i].DisplayName;
@@ -107,13 +109,13 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [Command]
     private void CmdSetDisplayName(string displayName)
     {
-        DisplayName = displayName;
+        DisplayName = displayName; //syncvar is changed on the server
     }
 
     [Command]
     public void CmdReadyUp()
     {
-        IsReady = !IsReady;
+        IsReady = !IsReady; //syncvar is changed on the server
 
         Room.NotifyPlayersOfReadyState();
     }

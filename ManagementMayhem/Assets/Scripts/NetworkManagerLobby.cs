@@ -10,6 +10,7 @@ using TMPro;
 public class NetworkManagerLobby : NetworkManager
 {
     [SerializeField] private int minPlayers = 2;
+    [Scene] [SerializeField] private string countdownScene = string.Empty;
     [Scene] [SerializeField] private string menuScene = string.Empty;
 
     [Header("Room")]
@@ -23,6 +24,7 @@ public class NetworkManagerLobby : NetworkManager
     private float matchLength = 180;
     public float currentMatchTime;
     private Coroutine timerCoroutine;
+    public RuntimeAnimatorController[] animations;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
@@ -30,7 +32,13 @@ public class NetworkManagerLobby : NetworkManager
     public static event Action OnServerStopped;
     public static event Action OnTimerCountdown;
 
-    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+    public override void OnStartServer()
+    { 
+        spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+        animations = new RuntimeAnimatorController[3];
+        animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
+        animations[1] = Resources.Load<RuntimeAnimatorController>("Animation/Logistics");
+    } 
 
     public override void OnStartClient()
     {
@@ -40,6 +48,10 @@ public class NetworkManagerLobby : NetworkManager
         {
             ClientScene.RegisterPrefab(prefab);
         }
+
+        animations = new RuntimeAnimatorController[3];
+        animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
+        animations[1] = Resources.Load<RuntimeAnimatorController>("Animation/Logistics");
 
     }
 
@@ -149,6 +161,18 @@ public class NetworkManagerLobby : NetworkManager
         }
     }
 
+    public void StartGameCountdown()
+    {
+        if (SceneManager.GetActiveScene().path == menuScene)
+        {
+            if (!IsReadyToStart()) { return; }
+
+            ServerChangeScene("Countdown");
+            //initializeCountdown();
+            //InitializeTimer();
+        }
+    }
+
     private void InitializeTimer()
     {
         currentMatchTime = matchLength;
@@ -193,13 +217,19 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void ServerChangeScene(string newSceneName)
     {
+        //From menu to countdown
+        if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Countdown"))
+        {
+
+        }
         //From menu to game
-        if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Stage"))
+        else if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Stage"))
         {
             for(int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
+                gameplayerInstance.SetCharacter(i);
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
 
                 bool isLeader = i == 0;

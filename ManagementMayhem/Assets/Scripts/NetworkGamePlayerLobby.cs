@@ -9,9 +9,9 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 {
 
 
-    [SyncVar]
-    [SerializeField] public string displayName = "Loading...";
+    [SyncVar] [SerializeField] public string displayName = "Loading...";
     [SerializeField] private TMP_Text playerName = null;
+    [SyncVar] [SerializeField] public int animatorIndex = 0;
 
 
 
@@ -39,6 +39,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         DontDestroyOnLoad(gameObject); //don't wanna destory the player between levels ?
         Room.GamePlayers.Add(this);
 
+        gameObject.GetComponent<Animator>().runtimeAnimatorController = Room.animations[animatorIndex];
         playerName.text = displayName;
 
         FindObjectOfType<AudioManager>().Play("MenuMusic", false);
@@ -54,5 +55,13 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     public void SetDisplayName(string displayName)
     {
         this.displayName = displayName;
+    }
+
+    [Server]
+    public void SetCharacter(int index)
+    {
+        this.animatorIndex = index;
+        //gameObject.GetComponent<Animator>().runtimeAnimatorController = Room.animations[1];
+        //this.gameObject.GetComponent<Animator>().runtimeAnimatorController = Resources.Load("Animation/Logistics") as RuntimeAnimatorController;
     }
 }

@@ -1,16 +1,15 @@
 Bugs:
 
 Major:
-- https://forum.unity.com/threads/nullreferenceexception-when-passing-local-gameobjects-through-command-and-clientrpc-solved.509002/
 - Box sometimes doesn't get picked up on client?
 - Box doesn't always return to drop point ***
 - If the Host dc's, player's should be brought back to the main menu (after an error message)
 - if the client dc's player's should be able to rejoin?
-- Pickup colliders are messed up. Try disabling pickupscript first (as its main purpose is for the conveyer belt).
+- Player sometimes walks backwards (maybe caused if the host doesn't move first?)
 
 Minor:
 - Jittery movement of pickups when being held --> Leads to hitbox/collision problems (e.g. exit trigger not working)
 - UI elements anchoring is a lil weird when resizing
 - No message for if host dc's
-- Player sometimes walks backwards
+- Player sometimes walks backwards (maybe caused if the host doesn't move first?)
 - NPC gameObject not finding the correct guy at player start
