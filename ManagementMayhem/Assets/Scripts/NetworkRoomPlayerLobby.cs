@@ -11,7 +11,9 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private GameObject lobbyUI = null;
     [SerializeField] private TMP_Text[] playerNameTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
-    [SerializeField] private TMP_Text[] playerCharacters = new TMP_Text[3];
+    [SerializeField] private TMP_Text[] playerCharacterIndexes = new TMP_Text[3];
+    [SerializeField] private GameObject[] playerCharacterSprites = new GameObject[3];
+    [SerializeField] private Sprite[] CharacterSprites = new Sprite[3];
     [SerializeField] private Button[] leftPlayerButtons = new Button[3];
     [SerializeField] private Button[] rightPlayerButtons = new Button[3];
     [SerializeField] private Button startGameButton = null;
@@ -110,7 +112,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             playerNameTexts[i].text = "Waiting For Player...";
             playerReadyTexts[i].text = string.Empty;
-            playerCharacters[i].text = string.Empty;
+            playerCharacterIndexes[i].text = string.Empty;
         }
 
         //set it all back
@@ -120,7 +122,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             playerReadyTexts[i].text = Room.RoomPlayers[i].IsReady ?
                 "<color=green>Ready</color>" :
                 "<color=red>Not Ready</color>";
-            playerCharacters[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
+            playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
+            playerCharacterSprites[i].GetComponent<SpriteRenderer>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
         }
     }
 
