@@ -13,7 +13,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerCharacterIndexes = new TMP_Text[3];
     [SerializeField] private GameObject[] playerCharacterSprites = new GameObject[3];
-    [SerializeField] private Sprite[] CharacterSprites = new Sprite[3];
+    [SerializeField] private Sprite[] CharacterSprites = new Sprite[3]; //Canvas only renders Images, not Sprites
     [SerializeField] private Button[] leftPlayerButtons = new Button[3];
     [SerializeField] private Button[] rightPlayerButtons = new Button[3];
     [SerializeField] private Button startGameButton = null;
@@ -123,7 +123,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
                 "<color=green>Ready</color>" :
                 "<color=red>Not Ready</color>";
             playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
-            playerCharacterSprites[i].GetComponent<SpriteRenderer>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
+            playerCharacterSprites[i].GetComponent<Image>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
         }
     }
 

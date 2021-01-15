@@ -2551,6 +2551,7 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs: []
   minPlayers: 2
+  countdownScene: 
   menuScene: Assets/Scenes/Main Menu.unity
   roomPlayerPrefab: {fileID: 2956085797749125336, guid: a8736b8edcb84c148ae6445d363b4200,
     type: 3}
@@ -2559,6 +2560,7 @@ MonoBehaviour:
   playerSpawnSystem: {fileID: 2739164877689454984, guid: c50b4ae2263c3284ca523faaf49ee473,
     type: 3}
   currentMatchTime: 0
+  animations: []
 --- !u!4 &1122674849
 Transform:
   m_ObjectHideFlags: 0
