@@ -25,6 +25,7 @@ public class NetworkManagerLobby : NetworkManager
     public float currentMatchTime;
     private Coroutine timerCoroutine;
     public RuntimeAnimatorController[] animations;
+    public int[] selectedCharacterIndexes;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
@@ -36,9 +37,13 @@ public class NetworkManagerLobby : NetworkManager
     { 
         spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
         animations = new RuntimeAnimatorController[3];
-        animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
+        animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Finance");
         animations[1] = Resources.Load<RuntimeAnimatorController>("Animation/Logistics");
-        animations[2] = Resources.Load<RuntimeAnimatorController>("Animation/Finance");
+        animations[2] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
+        selectedCharacterIndexes = new int[3];
+        selectedCharacterIndexes[0] = -1;
+        selectedCharacterIndexes[1] = -1;
+        selectedCharacterIndexes[2] = -1;
     } 
 
     public override void OnStartClient()
@@ -51,9 +56,13 @@ public class NetworkManagerLobby : NetworkManager
         }
 
         animations = new RuntimeAnimatorController[3];
-        animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
+        animations[0] = Resources.Load<RuntimeAnimatorController>("Animation/Finance");
         animations[1] = Resources.Load<RuntimeAnimatorController>("Animation/Logistics");
-        animations[2] = Resources.Load<RuntimeAnimatorController>("Animation/Finance");
+        animations[2] = Resources.Load<RuntimeAnimatorController>("Animation/Programs");
+        selectedCharacterIndexes = new int[3];
+        selectedCharacterIndexes[0] = -1;
+        selectedCharacterIndexes[1] = -1;
+        selectedCharacterIndexes[2] = -1;
 
     }
 

@@ -13,7 +13,10 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerCharacterIndexes = new TMP_Text[3];
     [SerializeField] private GameObject[] playerCharacterSprites = new GameObject[3];
+
+    [SerializeField] private Sprite DefaultSprite;
     [SerializeField] private Sprite[] CharacterSprites = new Sprite[3]; //Canvas only renders Images, not Sprites
+    [SerializeField] private Sprite[] OpaqueSprites = new Sprite[3]; //Canvas only renders Images, not Sprites
     [SerializeField] private Button[] leftPlayerButtons = new Button[3];
     [SerializeField] private Button[] rightPlayerButtons = new Button[3];
     [SerializeField] private Button startGameButton = null;
@@ -23,9 +26,12 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public string DisplayName = "Loading...";
     [SyncVar(hook = nameof(HandleReadyStatusChanged))]
     public bool IsReady = false;
+    public bool Ready = false;
     //public bool onlyHost;
     [SyncVar(hook = nameof(HandleCharacterChanged))]
     public int CharacterIndex = 0;
+    [SyncVar(hook = nameof(HandleCharacterLocked))]
+    public int CharacterSelectedIndex = -1;
 
     private bool isLeader;
     public bool IsLeader
@@ -91,6 +97,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public void HandleDisplayNameChanged(string oldValue, string newValue) => UpdateDisplay();
     public void HandleCharacterChanged(int oldValue, int newValue) => UpdateDisplay();
 
+    public void HandleCharacterLocked(int oldValue, int newValue) => UpdateAvailableSprites();
+
     private void UpdateDisplay()
     {
         if (!hasAuthority) //hasAuthority is better than islocalPlayer because isLocalPlayer ONLY refers to the player object, if this doesn't belong to us
@@ -113,6 +121,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             playerNameTexts[i].text = "Waiting For Player...";
             playerReadyTexts[i].text = string.Empty;
             playerCharacterIndexes[i].text = string.Empty;
+            playerCharacterSprites[i].GetComponent<Image>().sprite = DefaultSprite;
         }
 
         //set it all back
@@ -125,6 +134,59 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
             playerCharacterSprites[i].GetComponent<Image>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
         }
+    }
+
+    public void UpdateAvailableSprites()
+    {
+        if (!hasAuthority) //hasAuthority is better than islocalPlayer because isLocalPlayer ONLY refers to the player object, if this doesn't belong to us
+        {
+            foreach (var player in Room.RoomPlayers)
+            {
+                if (player.hasAuthority) //find the one that belongs to us
+                {
+                    player.UpdateAvailableSprites(); //call this method again
+                    break;
+                }
+            }
+
+            return;
+        }
+
+        //go through each player
+        //check their selectedIndex
+        //if NOT -1
+        //go through each OTHER player
+        //make the opacity of playerCharacterSprites[selectedIndex].GetComponent<Image>().color lower
+
+        Debug.Log("hi");
+        for (int i = 0; i < Room.RoomPlayers.Count; i++)
+        {
+            if (Room.RoomPlayers[i].CharacterSelectedIndex != -1)
+            {
+                for (int j = 0; j < Room.RoomPlayers.Count; j++)
+                {
+                    if (j != i)
+                    {
+                        Debug.Log("Change sprite");
+                        Room.RoomPlayers[j].CharacterSprites[Room.RoomPlayers[i].CharacterSelectedIndex] = OpaqueSprites[Room.RoomPlayers[i].CharacterSelectedIndex];
+                        //playerCharacterSprites[j].GetComponent<Image>().color = new Color(1, 1, 1, 0.5f);
+                        //playerCharacterSprites[Room.RoomPlayers[i].CharacterSelectedIndex].GetComponent<Image>().color = new Color(1, 1, 1, 0.5f);
+                    }
+                }
+            }
+        }
+
+
+
+        //    for (int i = 0; i < playerCharacterSprites.Length; i++)
+        //{
+        //    if (Room.RoomPlayers[i].CharacterSelectedIndex != -1)
+        //    {
+
+        //    }
+        //    playerCharacterSprites[i].GetComponent<Image>().color = new Color(1, 1, 1, 0.5f);
+        //}
+
     }
 
     public void HandleReadyToStart(bool readyToStart)
@@ -149,9 +211,16 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSetCharacter(int charIndex)
+    public void CmdSetCharacter()
     {
-        CharacterIndex = charIndex;
+        CharacterSelectedIndex = CharacterIndex;
+        Debug.Log(CharacterSelectedIndex);
+    }
+
+    [Command]
+    public void CmdDeselectCharacter()
+    {
+        CharacterSelectedIndex = -1;
     }
 
     [Command]
@@ -166,18 +235,53 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         CharacterIndex = (CharacterIndex + 1 + 3) % 3;
     }
 
+    [Command]
+    public void CmdLockCharacter()
+    {
+        for (int i = 0; i < Room.RoomPlayers.Count; i++)
+        {
+            if(Room.RoomPlayers[i].CharacterSelectedIndex != -1)
+                Room.selectedCharacterIndexes[i] = Room.RoomPlayers[i].CharacterSelectedIndex;
+        }
+    }
+
     public void ReadyUp()
     {
-        if (IsReady)
+        Ready = !Ready;
+
+        if (Ready)
         {
             readyUpButton.gameObject.GetComponent<Image>().color = new Color32(214, 36, 17, 255);
             readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Cancel";
+
+            //CmdSetCharacter();
+
+            for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
+            {
+                if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
+                {
+                    leftPlayerButtons[i].gameObject.SetActive(false);
+                    rightPlayerButtons[i].gameObject.SetActive(false);
+                }
+            }
         }
-        else
+        else if (!Ready)
         {
             readyUpButton.gameObject.GetComponent<Image>().color = new Color32(16, 210, 117, 255);
             readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Ready Up";
+
+            //CmdDeselectCharacter();
+
+            for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
+            {
+                if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
+                {
+                    leftPlayerButtons[i].gameObject.SetActive(true);
+                    rightPlayerButtons[i].gameObject.SetActive(true);
+                }
+            }
         }
+
 
     }
 

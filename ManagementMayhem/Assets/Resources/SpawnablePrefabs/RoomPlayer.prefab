@@ -781,10 +781,15 @@ MonoBehaviour:
   - {fileID: 7538552196143725783}
   - {fileID: 8174884952268099298}
   - {fileID: 7140396938368695395}
+  DefaultSprite: {fileID: 21300000, guid: ba9964009f8f894479f9b66fd48ac062, type: 3}
   CharacterSprites:
+  - {fileID: 9194471417372158973, guid: 548f35d2ea5c384419af68a0a2bea37a, type: 3}
+  - {fileID: 4742827948155025885, guid: bfe310a5c80c93e45aec7cb9fd696313, type: 3}
   - {fileID: -7266867121395701197, guid: 2afb697a8e4cf06429ded599a41983e5, type: 3}
-  - {fileID: 6519556195916724617, guid: bfe310a5c80c93e45aec7cb9fd696313, type: 3}
-  - {fileID: 21300000, guid: 72de0c64f2c6a498096698322c976a67, type: 3}
+  OpaqueSprites:
+  - {fileID: 21300000, guid: 8afd73b29f8e34c70b0db80184b8cc7f, type: 3}
+  - {fileID: 21300000, guid: 8afd73b29f8e34c70b0db80184b8cc7f, type: 3}
+  - {fileID: 21300000, guid: 8afd73b29f8e34c70b0db80184b8cc7f, type: 3}
   leftPlayerButtons:
   - {fileID: 4488789046428730245}
   - {fileID: 2857030524014162352}
@@ -797,7 +802,9 @@ MonoBehaviour:
   readyUpButton: {fileID: 443142101861375911}
   DisplayName: Loading...
   IsReady: 0
+  Ready: 0
   CharacterIndex: 0
+  CharacterSelectedIndex: 0
 --- !u!1 &6768315217450622143
 GameObject:
   m_ObjectHideFlags: 0

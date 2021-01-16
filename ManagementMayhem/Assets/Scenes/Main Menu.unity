@@ -2561,6 +2561,7 @@ MonoBehaviour:
     type: 3}
   currentMatchTime: 0
   animations: []
+  selectedCharacterIndexes: 
 --- !u!4 &1122674849
 Transform:
   m_ObjectHideFlags: 0
