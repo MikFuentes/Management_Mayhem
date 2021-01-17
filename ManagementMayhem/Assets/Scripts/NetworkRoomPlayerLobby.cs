@@ -74,6 +74,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         Room.RoomPlayers.Add(this);
 
+        CmdDeselectCharacter();
+
         for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
         {
             if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
@@ -96,8 +98,14 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay(); //call the method without using the parameters (they are not needed)
     public void HandleDisplayNameChanged(string oldValue, string newValue) => UpdateDisplay();
     public void HandleCharacterChanged(int oldValue, int newValue) => UpdateDisplay();
+    public void HandleCharacterLocked(int oldValue, int newValue) 
+    {
+        if(newValue != -1)
+        {
+            UpdateDisplay();
+        }
+    }
 
-    public void HandleCharacterLocked(int oldValue, int newValue) => UpdateAvailableSprites();
 
     private void UpdateDisplay()
     {
@@ -131,20 +139,25 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             playerReadyTexts[i].text = Room.RoomPlayers[i].IsReady ?
                 "<color=green>Ready</color>" :
                 "<color=red>Not Ready</color>";
+
             playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
             playerCharacterSprites[i].GetComponent<Image>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
+
         }
     }
 
     public void UpdateAvailableSprites()
     {
+        //check if highlighted sprite is available
+        //if not, disable ready up button
+
         if (!hasAuthority) //hasAuthority is better than islocalPlayer because isLocalPlayer ONLY refers to the player object, if this doesn't belong to us
         {
             foreach (var player in Room.RoomPlayers)
             {
                 if (player.hasAuthority) //find the one that belongs to us
                 {
-                    player.UpdateAvailableSprites(); //call this method again
+                    player.UpdateDisplay(); //call this method again
                     break;
                 }
             }
@@ -152,41 +165,95 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             return;
         }
 
-        //go through each player
-        //check their selectedIndex
-        //if NOT -1
-        //go through each OTHER player
-        //make the opacity of playerCharacterSprites[selectedIndex].GetComponent<Image>().color lower
-
         Debug.Log("hi");
-        for (int i = 0; i < Room.RoomPlayers.Count; i++)
-        {
-            if (Room.RoomPlayers[i].CharacterSelectedIndex != -1)
-            {
-                for (int j = 0; j < Room.RoomPlayers.Count; j++)
-                {
-                    if (j != i)
-                    {
-                        Debug.Log("Change sprite");
-                        Room.RoomPlayers[j].CharacterSprites[Room.RoomPlayers[i].CharacterSelectedIndex] = OpaqueSprites[Room.RoomPlayers[i].CharacterSelectedIndex];
-                        //playerCharacterSprites[j].GetComponent<Image>().color = new Color(1, 1, 1, 0.5f);
-                        //playerCharacterSprites[Room.RoomPlayers[i].CharacterSelectedIndex].GetComponent<Image>().color = new Color(1, 1, 1, 0.5f);
-                    }
-                }
-            }
-        }
 
-
-
-        //    for (int i = 0; i < playerCharacterSprites.Length; i++)
+        //if (Room.selectedCharacterIndexes.Contains(CharacterIndex))
         //{
-        //    if (Room.RoomPlayers[i].CharacterSelectedIndex != -1)
-        //    {
-
-        //    }
-        //    playerCharacterSprites[i].GetComponent<Image>().color = new Color(1, 1, 1, 0.5f);
+        //    readyUpButton.interactable = false;
         //}
 
+    }
+
+    [Command]
+    public void CmdSetCharacter()
+    {
+        CharacterSelectedIndex = CharacterIndex;
+
+        for (int i = 0; i < Room.RoomPlayers.Count; i++)
+        {
+            Room.selectedCharacterIndexes[i] = Room.RoomPlayers[i].CharacterSelectedIndex;
+        }
+
+        Check();
+    }
+
+    [Command]
+    public void CmdDeselectCharacter()
+    {
+        CharacterSelectedIndex = -1;
+
+        for (int i = 0; i < Room.RoomPlayers.Count; i++)
+        {
+            Room.selectedCharacterIndexes[i] = Room.RoomPlayers[i].CharacterSelectedIndex;
+        }
+
+        Check();
+    }
+
+    [Command]
+    public void CmdCharacterLeft()
+    {
+        CharacterIndex = (CharacterIndex - 1 + 3) % 3;
+
+        //while (Room.selectedCharacterIndexes.Contains(CharacterIndex))
+        //{
+        //    CharacterIndex = (CharacterIndex - 1 + 3) % 3;
+        //}
+
+        Check();
+    }
+
+    [Command]
+    public void CmdSetCharacterRight()
+    {
+        CharacterIndex = (CharacterIndex + 1 + 3) % 3;
+
+        //while (Room.selectedCharacterIndexes.Contains(CharacterIndex))
+        //{
+        //    CharacterIndex = (CharacterIndex + 1 + 3) % 3;
+        //}
+
+        Check();
+    }
+
+    [Server]
+    public void Check()
+    {
+        for (int i = 0; i < Room.RoomPlayers.Count; i++)
+        {
+            for (int j = 0; j < Room.RoomPlayers.Count; j++)
+            {
+                if (i != j)
+                {
+                    if (Room.selectedCharacterIndexes[i] == Room.RoomPlayers[j].CharacterIndex)
+                    {
+                        Room.RoomPlayers[j].readyUpButton.interactable = false;
+                    }
+                    else
+                    {
+                        Room.RoomPlayers[j].readyUpButton.interactable = true;
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    [Command]
+    private void CmdSetDisplayName(string displayName)
+    {
+        DisplayName = displayName; //syncvar is changed on the server
     }
 
     public void HandleReadyToStart(bool readyToStart)
@@ -197,52 +264,11 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     }
 
     [Command]
-    private void CmdSetDisplayName(string displayName)
-    {
-        DisplayName = displayName; //syncvar is changed on the server
-    }
-
-    [Command]
     public void CmdReadyUp()
     {
         IsReady = !IsReady; //syncvar is changed on the server
 
         Room.NotifyPlayersOfReadyState();
-    }
-
-    [Command]
-    public void CmdSetCharacter()
-    {
-        CharacterSelectedIndex = CharacterIndex;
-        Debug.Log(CharacterSelectedIndex);
-    }
-
-    [Command]
-    public void CmdDeselectCharacter()
-    {
-        CharacterSelectedIndex = -1;
-    }
-
-    [Command]
-    public void CmdCharacterLeft()
-    {
-        CharacterIndex = (CharacterIndex - 1 + 3) % 3;
-    }
-
-    [Command]
-    public void CmdSetCharacterRight()
-    {
-        CharacterIndex = (CharacterIndex + 1 + 3) % 3;
-    }
-
-    [Command]
-    public void CmdLockCharacter()
-    {
-        for (int i = 0; i < Room.RoomPlayers.Count; i++)
-        {
-            if(Room.RoomPlayers[i].CharacterSelectedIndex != -1)
-                Room.selectedCharacterIndexes[i] = Room.RoomPlayers[i].CharacterSelectedIndex;
-        }
     }
 
     public void ReadyUp()
@@ -254,7 +280,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             readyUpButton.gameObject.GetComponent<Image>().color = new Color32(214, 36, 17, 255);
             readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Cancel";
 
-            //CmdSetCharacter();
+            CmdSetCharacter();
 
             for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
             {
@@ -270,7 +296,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             readyUpButton.gameObject.GetComponent<Image>().color = new Color32(16, 210, 117, 255);
             readyUpButton.transform.Find("Ready_Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Ready Up";
 
-            //CmdDeselectCharacter();
+            CmdDeselectCharacter();
 
             for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
             {
@@ -281,7 +307,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
                 }
             }
         }
-
 
     }
 
