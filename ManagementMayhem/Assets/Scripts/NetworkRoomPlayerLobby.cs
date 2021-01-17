@@ -30,7 +30,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     //public bool onlyHost;
     [SyncVar(hook = nameof(HandleCharacterChanged))]
     public int CharacterIndex = 0;
-    [SyncVar(hook = nameof(HandleCharacterLocked))]
+    [SyncVar]
     public int CharacterSelectedIndex = -1;
 
     private bool isLeader;
@@ -84,7 +84,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
                 rightPlayerButtons[i].gameObject.SetActive(true);
             }
         }
-
         UpdateDisplay();
     }
 
@@ -98,14 +97,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay(); //call the method without using the parameters (they are not needed)
     public void HandleDisplayNameChanged(string oldValue, string newValue) => UpdateDisplay();
     public void HandleCharacterChanged(int oldValue, int newValue) => UpdateDisplay();
-    public void HandleCharacterLocked(int oldValue, int newValue) 
-    {
-        if(newValue != -1)
-        {
-            UpdateDisplay();
-        }
-    }
-
 
     private void UpdateDisplay()
     {
@@ -119,7 +110,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
                     break;
                 }
             }
-
             return;
         }
 
@@ -142,36 +132,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
             playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
             playerCharacterSprites[i].GetComponent<Image>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
-
         }
-    }
-
-    public void UpdateAvailableSprites()
-    {
-        //check if highlighted sprite is available
-        //if not, disable ready up button
-
-        if (!hasAuthority) //hasAuthority is better than islocalPlayer because isLocalPlayer ONLY refers to the player object, if this doesn't belong to us
-        {
-            foreach (var player in Room.RoomPlayers)
-            {
-                if (player.hasAuthority) //find the one that belongs to us
-                {
-                    player.UpdateDisplay(); //call this method again
-                    break;
-                }
-            }
-
-            return;
-        }
-
-        Debug.Log("hi");
-
-        //if (Room.selectedCharacterIndexes.Contains(CharacterIndex))
-        //{
-        //    readyUpButton.interactable = false;
-        //}
-
     }
 
     [Command]
@@ -205,11 +166,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         CharacterIndex = (CharacterIndex - 1 + 3) % 3;
 
-        //while (Room.selectedCharacterIndexes.Contains(CharacterIndex))
-        //{
-        //    CharacterIndex = (CharacterIndex - 1 + 3) % 3;
-        //}
-
         Check();
     }
 
@@ -217,11 +173,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public void CmdSetCharacterRight()
     {
         CharacterIndex = (CharacterIndex + 1 + 3) % 3;
-
-        //while (Room.selectedCharacterIndexes.Contains(CharacterIndex))
-        //{
-        //    CharacterIndex = (CharacterIndex + 1 + 3) % 3;
-        //}
 
         Check();
     }
@@ -235,19 +186,23 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             {
                 if (i != j)
                 {
-                    if (Room.selectedCharacterIndexes[i] == Room.RoomPlayers[j].CharacterIndex)
+                    if (Room.selectedCharacterIndexes[i] == Room.RoomPlayers[j].CharacterIndex && Room.selectedCharacterIndexes[i] != -1)
                     {
-                        Room.RoomPlayers[j].readyUpButton.interactable = false;
+                        RpcEnableReadyButton(j, false);
                     }
                     else
                     {
-                        Room.RoomPlayers[j].readyUpButton.interactable = true;
+                        RpcEnableReadyButton(j, true);
                     }
                 }
-
             }
-
         }
+    }
+
+    [ClientRpc]
+    public void RpcEnableReadyButton(int j, bool Enable)
+    {
+        Room.RoomPlayers[j].readyUpButton.interactable = Enable;
     }
 
     [Command]
