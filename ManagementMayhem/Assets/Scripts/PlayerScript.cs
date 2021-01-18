@@ -42,7 +42,7 @@ public class PlayerScript : NetworkBehaviour
     private static event Action<float> OnTimeChange;
     [SyncVar] private float currentTime;
     private static event Action<int> OnWaitChange;
-    [SyncVar] public float current_wait_time;
+    //[SyncVar] public float current_wait_time;
     [SyncVar] public bool timerNotStarted = true;
 
     [Header("Movement")]
@@ -90,7 +90,7 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] public GameObject pickup;
     [SyncVar] public bool pickUpActive = false;
     public GameObject interactable;
-    [SyncVar] public GameObject NPC;
+    public GameObject NPC;
     [SyncVar] public bool canDeposit;
     [SyncVar] public bool canDelete;
     public bool UI_Active;
@@ -127,8 +127,6 @@ public class PlayerScript : NetworkBehaviour
         OnTimeChange += HandleTimeChange;
         OnWaitChange += HandleWaitChange;
         PushTheButton.ButtonPressed += AddDigitToSequence;
-
-        NPC = GameObject.Find("NPC_P (1)");
     }
 
     [ClientCallback]
@@ -308,11 +306,9 @@ public class PlayerScript : NetworkBehaviour
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
                 tempName = null;
 
-                if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && timerNotStarted)
+                if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && Room.GamePlayers[0].timerStarted == false)
                 {
-                    gameObject.GetComponent<NetworkIdentity>().AssignClientAuthority(this.GetComponent<NetworkIdentity>().connectionToClient);
-
-                    CmdStartWaitTimer(10);
+                    CmdStartWaitTimer(10, NPC);
 
                     //gameObject.GetComponent<NetworkIdentity>().RemoveClientAuthority();
                 }
@@ -882,47 +878,59 @@ public class PlayerScript : NetworkBehaviour
         //if not active already
         if (timerNotStarted)
         {
-            StartCoroutine(StartWaiting(value));
+            //StartCoroutine(StartWaiting(value));
             timerNotStarted = false;
         }
     }
 
     [Server]
-    private IEnumerator StartWaiting(int timeToWait)
+    private IEnumerator StartWaiting(int timeToWait, GameObject NPC)
     {
-        CmdChangeSprite(NPC, null);
+        Debug.Log("StartWaiting");
+        RpcChangeSprite(NPC, null);
+        //CmdChangeSprite(NPC, null);
 
         for (int i = timeToWait; i >= 0; --i)
         {
-            if (NPC_item_match)
-            {
-                i = timeToWait;
-            }
+            //if (NPC_item_match)
+            //{
+            //    i = timeToWait;
+            //}
 
-            current_wait_time = i;
+            Room.currentWaitTime = i;
 
-            CmdSetSize(NPC, current_wait_time / timeToWait); //0.0 - 1.0
-
-            CmdSetColor(NPC, current_wait_time / timeToWait); //0.0 - 1.0
+            RpcSetTimerSize(Room.currentWaitTime / timeToWait, NPC);
+            RpcSetTimerColor(Room.currentWaitTime / timeToWait, NPC);
 
             yield return new WaitForSeconds(1);
-
-            //Debug.Log(i);
         }
 
-        yield return new WaitForSeconds(1);
-
         //restart countdown
-        StartCoroutine(StartWaiting(timeToWait));
+        StartCoroutine(StartWaiting(timeToWait, NPC));
 
     }
 
     //Tells the server to start the wait timer
     [Command]
-    private void CmdStartWaitTimer(int value)
+    private void CmdStartWaitTimer(int value, GameObject NPC)
     {
-        HandleWaitChange(value);
+
+        RpcStartTimer(NPC);
+        StartCoroutine(StartWaiting(value, NPC));
+
+        Debug.Log("CmdStartWaitTimer");
+        //HandleWaitChange(value);
         //RpcStartWaitTimer(value);
+    }
+
+    [ClientRpc]
+    private void RpcStartTimer(GameObject go)
+    {
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].timerStarted = true;
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC = go;
+        }
     }
 
     [ClientRpc]
@@ -938,6 +946,28 @@ public class PlayerScript : NetworkBehaviour
         NPC = go;
         float size = f;
         NPC.GetComponent<NPC_Script>().RpcSetSize(size);
+    }
+
+    [ClientRpc]
+    private void RpcSetTimerSize(float f, GameObject go)
+    {
+        NPC = go;
+        float size = f;
+        NPC.GetComponent<NPC_Script>().SetSize(size);
+    }
+
+    [ClientRpc]
+    private void RpcSetTimerColor(float f, GameObject go)
+    {
+        NPC = go;
+        float size = f;
+
+        if (size >= 0.5)
+            NPC.GetComponent<NPC_Script>().SetColor(Color.green);
+        else if (size >= 0.2)
+            NPC.GetComponent<NPC_Script>().SetColor(Color.yellow);
+        else
+            NPC.GetComponent<NPC_Script>().SetColor(Color.red);
     }
 
     [Command]

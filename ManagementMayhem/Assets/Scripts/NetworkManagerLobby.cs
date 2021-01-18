@@ -24,6 +24,9 @@ public class NetworkManagerLobby : NetworkManager
     private float matchLength = 180;
     public float currentMatchTime;
     private Coroutine timerCoroutine;
+
+    public float currentWaitTime;
+
     public RuntimeAnimatorController[] animations;
     public List<int> selectedCharacterIndexes;
 

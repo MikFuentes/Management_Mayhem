@@ -6512,7 +6512,6 @@ MonoBehaviour:
   frontWalls: []
   Indoors: 0
   ui_Timer: {fileID: 179430321623164998}
-  current_wait_time: 0
   timerNotStarted: 1
   playerPos: {x: 0, y: 0, z: 0}
   moveSpeed: 6
@@ -6534,7 +6533,7 @@ MonoBehaviour:
   pickup: {fileID: 0}
   pickUpActive: 0
   interactable: {fileID: 0}
-  NPC: {fileID: 5934964285671695091, guid: 7c669c43396e878458f8e6aece460a16, type: 3}
+  NPC: {fileID: 0}
   canDeposit: 0
   canDelete: 0
   UI_Active: 0
@@ -6571,6 +6570,8 @@ MonoBehaviour:
   syncInterval: 0.1
   displayName: Loading...
   playerName: {fileID: 2328041787542742268}
+  animatorIndex: 0
+  timerStarted: 0
 --- !u!114 &5149456549430114938
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -21,11 +21,6 @@ public class NPC_Script : NetworkBehaviour
         bar = transform.Find("Health_Bar/Bar");
     }
 
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (!collision.gameObject.CompareTag("Player")) return;
-    //}
-
     [ClientRpc]
     public void RpcRemoveFromArray(string sprite_name)
     {
@@ -52,16 +47,15 @@ public class NPC_Script : NetworkBehaviour
         sprite_go.GetComponent<SpriteRenderer>().sprite = blank_sprite;
     }
 
-    [ClientRpc]
-    public void RpcSetSize(float size_normalized)
+    public void SetSize(float size_normalized)
     {
         bar.localScale = new Vector3(size_normalized, 1f);
     }
 
-    [ClientRpc]
-    public void RpcSetColor(Color color)
+    public void SetColor(Color color)
     {
         bar.transform.Find("Bar_Sprite").GetComponent<SpriteRenderer>().color = color;
     }
+
 
 }
