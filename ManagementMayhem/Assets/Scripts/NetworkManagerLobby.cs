@@ -25,7 +25,11 @@ public class NetworkManagerLobby : NetworkManager
     public float currentMatchTime;
     private Coroutine timerCoroutine;
 
+    public int ItemsRemaining;
+    public Coroutine waitTimerCoroutine;
     public float currentWaitTime;
+    public int prev_rand = -1;
+
 
     public RuntimeAnimatorController[] animations;
     public List<int> selectedCharacterIndexes;
@@ -48,6 +52,8 @@ public class NetworkManagerLobby : NetworkManager
         selectedCharacterIndexes.Add(-1);
         selectedCharacterIndexes.Add(-1);
         selectedCharacterIndexes.Add(-1);
+
+        ItemsRemaining = 5;
     } 
 
     public override void OnStartClient()

@@ -21,8 +21,7 @@ public class NPC_Script : NetworkBehaviour
         bar = transform.Find("Health_Bar/Bar");
     }
 
-    [ClientRpc]
-    public void RpcRemoveFromArray(string sprite_name)
+    public void RemoveFromArray(string sprite_name)
     {
         for(int i = 0; i < item_sprite_array.Count; ++i)
         {
@@ -31,11 +30,9 @@ public class NPC_Script : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void RpcChangeSprite(int rand)
+    public void ChangeSprite(int rand)
     {
-        //Debug.Log(item_sprite_array[rand].name);
-        if(rand < 0)
+        if (rand < 0)
             sprite_go.GetComponent<SpriteRenderer>().sprite = blank_sprite;
         else
             sprite_go.GetComponent<SpriteRenderer>().sprite = item_sprite_array[rand]; // assign random sprite from array
