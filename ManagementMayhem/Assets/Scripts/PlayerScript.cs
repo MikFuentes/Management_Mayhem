@@ -76,16 +76,20 @@ public class PlayerScript : NetworkBehaviour
     private string tempName = null;
     private bool NPC_item_match = false;
     private bool Cooldown = false;
+    public int totalItems;
+    public int remainingItems;
 
     [Header("Debug Info")]
     [SyncVar] public GameObject pickup;
     [SyncVar] public bool pickUpActive = false;
     public GameObject interactable;
     public GameObject NPC;
+    public int NPCWaitTime = 20;
     [SyncVar] public bool canDeposit;
     [SyncVar] public bool canDelete;
     public bool UI_Active;
     public GameObject[] sceneObjects = null;
+    [SyncVar] public bool gameOver;
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -250,7 +254,7 @@ public class PlayerScript : NetworkBehaviour
                         NPC_item_match = false;
 
                         //restart wait timer
-                        CmdRestartWaitTimer(10, NPC);
+                        CmdRestartWaitTimer(NPCWaitTime, NPC);
                     }
 
                     string itemName = pickup.GetComponent<PickupProperties>().itemName;
@@ -291,7 +295,7 @@ public class PlayerScript : NetworkBehaviour
 
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && Room.GamePlayers[0].timerStarted == false)
                 {
-                    CmdStartWaitTimer(10, NPC);
+                    CmdStartWaitTimer(NPCWaitTime, NPC);
                 }
                 else
                 {
@@ -463,6 +467,15 @@ public class PlayerScript : NetworkBehaviour
         NetworkServer.Destroy(gameObject);
     }
 
+    [ClientRpc]
+    private void RpcUpdateItemCount(int Total, int Remaining)
+    {
+        Debug.Log(Total);
+        Debug.Log(Remaining);
+        totalItems = Total;
+        remainingItems = Remaining;
+    }
+
     #endregion
 
     #region Actions
@@ -545,9 +558,12 @@ public class PlayerScript : NetworkBehaviour
     {
         NPC = go;
 
+        RpcUpdateItemCount(Room.TotalItems, Room.ItemsRemaining);
+
         if (Room.ItemsRemaining == 0)
         {
             RpcChangeItemSprite(-1, go);
+            RpcBringUpResultsScreen();
         }
         else if (ItemName != null)
         {
@@ -643,6 +659,35 @@ public class PlayerScript : NetworkBehaviour
     {
         NPC = go;
         NPC.GetComponent<NPC_Script>().RemoveFromArray(ItemName);
+    }
+
+    [ClientRpc]
+    public void RpcBringUpResultsScreen()
+    {
+        //this doesn't sync
+        //gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
+        //gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
+        //gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
+        //gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
+
+        //idk about this yet
+        //gameObject.GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
+        //gameObject].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
+        //gameObject.GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
+
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            //this syncs
+            Room.GamePlayers[i].transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
+            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
+            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
+            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
+
+            //idk about this yet
+            //Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
+            //Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
+            //Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
+        }
     }
     #endregion
 
@@ -831,6 +876,9 @@ public class PlayerScript : NetworkBehaviour
     private void CmdUpdateTime()
     {
         currentTime = Room.GetTime();
+
+        if (currentTime == 0)
+            RpcBringUpResultsScreen();
         RpcUpdateTime(currentTime);
     }
 
@@ -838,6 +886,13 @@ public class PlayerScript : NetworkBehaviour
     private void RpcUpdateTime(float value)
     {
         OnTimeChange?.Invoke(value);
+    }
+
+    private string ReturnCurrentTime(float currentMatchTime)
+    {
+        float minutes = Mathf.FloorToInt(currentMatchTime / 60);
+        float seconds = Mathf.FloorToInt(currentMatchTime % 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
     //Tell the server to start the wait timer
@@ -874,19 +929,25 @@ public class PlayerScript : NetworkBehaviour
     private IEnumerator StartWaiting(int timeToWait, GameObject NPC)
     {
         ChangeSprite(null, NPC);
-
-        for (int i = timeToWait; i >= 0; --i)
+        if (Room.ItemsRemaining == 0)
         {
-            Room.currentWaitTime = i;
-
-            RpcSetTimerSize(Room.currentWaitTime / timeToWait, NPC);
-            RpcSetTimerColor(Room.currentWaitTime / timeToWait, NPC);
-
-            yield return new WaitForSeconds(1);
+            StopCoroutine(Room.waitTimerCoroutine);
         }
+        else
+        {
+            for (int i = timeToWait; i >= 0; --i)
+            {
+                Room.currentWaitTime = i;
 
-        //restart countdown
-        Room.waitTimerCoroutine = StartCoroutine(StartWaiting(timeToWait, NPC));
+                RpcSetTimerSize(Room.currentWaitTime / timeToWait, NPC);
+                RpcSetTimerColor(Room.currentWaitTime / timeToWait, NPC);
+
+                yield return new WaitForSeconds(1);
+            }
+
+            //restart countdown
+            Room.waitTimerCoroutine = StartCoroutine(StartWaiting(timeToWait, NPC));
+        }
     }
 
     [ClientRpc]

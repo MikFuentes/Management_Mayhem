@@ -21,15 +21,15 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private GameObject playerSpawnSystem = null;
     //[SerializeField] private GameObject roundSystem = null;
 
-    private float matchLength = 180;
+    private float matchLength = 30;
     public float currentMatchTime;
-    private Coroutine timerCoroutine;
+    public Coroutine timerCoroutine;
 
+    public int TotalItems;
     public int ItemsRemaining;
     public Coroutine waitTimerCoroutine;
     public float currentWaitTime;
     public int prev_rand = -1;
-
 
     public RuntimeAnimatorController[] animations;
     public List<int> selectedCharacterIndexes;
@@ -53,7 +53,8 @@ public class NetworkManagerLobby : NetworkManager
         selectedCharacterIndexes.Add(-1);
         selectedCharacterIndexes.Add(-1);
 
-        ItemsRemaining = 5;
+        TotalItems = 5;
+        ItemsRemaining = TotalItems;
     } 
 
     public override void OnStartClient()
@@ -211,7 +212,8 @@ public class NetworkManagerLobby : NetworkManager
         if(currentMatchTime <= 0)
         {
             timerCoroutine = null;
-            Debug.Log("Time's up!");
+
+            //Debug.Log("Time's up!");
         }
         else
         {
@@ -219,6 +221,7 @@ public class NetworkManagerLobby : NetworkManager
             timerCoroutine = StartCoroutine(Timer());
         }
     }
+
     private void EndGame()
     {
         //set game state to ending

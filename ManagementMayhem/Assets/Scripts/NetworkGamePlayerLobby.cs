@@ -14,7 +14,9 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [SyncVar] [SerializeField] public int animatorIndex = 0;
     public bool timerStarted = false;
 
-
+    [SerializeField] public TMP_Text Items_Gathered;
+    [SerializeField] public TMP_Text Remaining_Balance;
+    [SerializeField] public TMP_Text Remaining_Time;
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
