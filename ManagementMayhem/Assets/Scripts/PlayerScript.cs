@@ -1,14 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Mirror;
 using System;
-using Mirror;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using UnityEditor;
-using UnityEngine.SceneManagement;
 //using System.Security.Policy;
 
 /*
@@ -41,15 +37,12 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private TMP_Text ui_Timer = null;
     private static event Action<float> OnTimeChange;
     [SyncVar] private float currentTime;
-    private static event Action<int> OnWaitChange;
-    //[SyncVar] public float current_wait_time;
     [SyncVar] public bool timerNotStarted = true;
 
     [Header("Movement")]
     [SyncVar] public Vector3 playerPos;
     public float moveSpeed;
     private float horizontalMove, verticalMove;
-    private bool facingRight = true;
     private Vector3 movement;
 
     [Header("Money")]
@@ -80,9 +73,7 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Items")]
     public GameObject itemPrefab;
-    //[SyncVar] private int rand = 0;
-    //[SyncVar] private int prev_rand = -1;
-    private String tempName = null;
+    private string tempName = null;
     private bool NPC_item_match = false;
     private bool Cooldown = false;
 
@@ -96,13 +87,13 @@ public class PlayerScript : NetworkBehaviour
     public bool UI_Active;
     public GameObject[] sceneObjects = null;
 
-
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
     {
         get
         {
-            if (room != null) {
+            if (room != null)
+            {
                 return room;
             }
             return room = NetworkManager.singleton as NetworkManagerLobby;
@@ -163,7 +154,6 @@ public class PlayerScript : NetworkBehaviour
             theNameScale.x = Math.Abs(theNameScale.x) * -1;
             gameName.transform.localScale = theNameScale;
 
-            //if (facingRight) { flipPlayer(); } // if moving left while facing right...
             horizontalMove = -moveSpeed;
         }
         else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
@@ -177,8 +167,6 @@ public class PlayerScript : NetworkBehaviour
             theNameScale.x = Math.Abs(theNameScale.x);
             gameName.transform.localScale = theNameScale;
 
-
-            //if (!facingRight) { flipPlayer(); } // if moving right while facing left...
             horizontalMove = moveSpeed;
         }
         else
@@ -296,9 +284,6 @@ public class PlayerScript : NetworkBehaviour
                 NPC = collision.gameObject;
 
                 gameObject.GetComponent<BoxCollider2D>().enabled = false;
-                //NPC.transform.Find("Health_Bar").gameObject.SetActive(true);
-                //NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
-                //NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
 
                 //GameObject Health_Bar = NPC.transform.Find("Health_Bar").gameObject;
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
@@ -307,8 +292,6 @@ public class PlayerScript : NetworkBehaviour
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && Room.GamePlayers[0].timerStarted == false)
                 {
                     CmdStartWaitTimer(10, NPC);
-
-                    //gameObject.GetComponent<NetworkIdentity>().RemoveClientAuthority();
                 }
                 else
                 {
@@ -376,7 +359,7 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("Hidable"))
             {
-                if(frontWalls.Count < 8)
+                if (frontWalls.Count < 8)
                 {
                     if (!frontWalls.Contains(collision.gameObject))
                     {
@@ -410,15 +393,13 @@ public class PlayerScript : NetworkBehaviour
 
         if (!collision.IsTouching(playerTrigger))
         {
-            if (collision.gameObject.CompareTag("Pickup") && !pickUpActive) {
+            if (collision.gameObject.CompareTag("Pickup") && !pickUpActive)
+            {
                 pickup = null;
                 CmdTriggerExitPickup();
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
-                //NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
-                //NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
-                //NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
                 canDelete = false;
 
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
@@ -440,10 +421,6 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("Hidable"))
             {
-                //frontWalls.Clear();
-
-                
-                //StartCoroutine(DelayedClear());
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
             }
         }
@@ -542,10 +519,7 @@ public class PlayerScript : NetworkBehaviour
         pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive);
         pickup.transform.position = dropPoint.position; // BUG: doesn't always drop at the drop point...
 
-
         RpcDropOnClick();
-
-
 
         //pickup = null; // (1/2) BUG: exit trigger doesn't always trigger | WORKAROUND: force the exit trigger every time by making pickup null 
         //commented the above due to null error message when dropping items
@@ -632,12 +606,12 @@ public class PlayerScript : NetworkBehaviour
     private IEnumerator FadeOut()
     {
         int opacity = 10;
-        while(opacity > 0)
+        while (opacity > 0)
         {
             opacity--;
             foreach (GameObject go in frontWalls)
             {
-                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity/10f);
+                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity / 10f);
             }
             yield return new WaitForSeconds(0.01f);
         }
@@ -651,7 +625,7 @@ public class PlayerScript : NetworkBehaviour
             opacity++;
             foreach (GameObject go in frontWalls)
             {
-                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity/10f);
+                go.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, opacity / 10f);
             }
             yield return new WaitForSeconds(0.01f);
         }
@@ -673,26 +647,6 @@ public class PlayerScript : NetworkBehaviour
     #endregion
 
     #region Movement
-    //private void flipPlayer()
-    //{
-    //    Vector3 temp = gameName.transform.localScale;
-    //    Vector3 theScale = transform.localScale;
-
-    //    theScale.x *= -1;
-    //    transform.localScale = theScale;
-    //    facingRight = !facingRight;
-
-    //    if (theScale.x < 0)
-    //    {
-    //        temp.x *= -1; // facing left
-    //        gameName.transform.localScale = temp;
-    //    }
-    //    else
-    //    {
-    //        temp.x = Mathf.Abs(temp.x);
-    //        gameName.transform.localScale = temp;
-    //    }
-    //}
 
     [Command]
     void CmdRun()
@@ -782,7 +736,6 @@ public class PlayerScript : NetworkBehaviour
 
         if (IsValidWithdrawAmount(amount))
         {
-
             StartCoroutine(ActivateATMLoadScreen());
 
             DispenseCoins(amount);
@@ -818,19 +771,19 @@ public class PlayerScript : NetworkBehaviour
         int fiftycoins = 0;
         int twofivecoins = 0;
 
-        while(amount >= 100)
+        while (amount >= 100)
         {
             amount -= 100;
             hundredcoins++;
             CmdSpawn("P100");
         }
-        while(amount >= 50)
+        while (amount >= 50)
         {
             amount -= 50;
             fiftycoins++;
             CmdSpawn("P50");
         }
-        while(amount >= 25)
+        while (amount >= 25)
         {
             amount -= 25;
             twofivecoins++;
@@ -844,11 +797,11 @@ public class PlayerScript : NetworkBehaviour
         processingPanel.SetActive(true);
         withdrawPanel.SetActive(false);
         yield return new WaitForSeconds(1);
-        
+
         //wait some time
         processingText.text += ".";
         yield return new WaitForSeconds(1);
-       
+
         processingText.text += ".";
         yield return new WaitForSeconds(1);
 
@@ -910,6 +863,10 @@ public class PlayerScript : NetworkBehaviour
         {
             Room.GamePlayers[i].timerStarted = true;
             Room.GamePlayers[i].GetComponent<PlayerScript>().NPC = go;
+
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(true);
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(true);
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(true);
         }
     }
 

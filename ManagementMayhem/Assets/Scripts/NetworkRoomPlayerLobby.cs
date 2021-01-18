@@ -13,6 +13,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[3];
     [SerializeField] private TMP_Text[] playerCharacterIndexes = new TMP_Text[3];
     [SerializeField] private GameObject[] playerCharacterSprites = new GameObject[3];
+    private List<string> SpriteNames = new List<string> { "Finance", "Logistics", "Programs" };
+
 
     [SerializeField] private Sprite DefaultSprite;
     [SerializeField] private Sprite[] CharacterSprites = new Sprite[3]; //Canvas only renders Images, not Sprites
@@ -131,7 +133,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
                 "<color=green>Ready</color>" :
                 "<color=red>Not Ready</color>";
 
-            playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
+            playerCharacterIndexes[i].text = SpriteNames[Room.RoomPlayers[i].CharacterIndex];
+            //playerCharacterIndexes[i].text = Room.RoomPlayers[i].CharacterIndex.ToString();
             playerCharacterSprites[i].GetComponent<Image>().sprite = CharacterSprites[Room.RoomPlayers[i].CharacterIndex];
         }
     }
@@ -186,14 +189,11 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             for (int j = 0; j < Room.RoomPlayers.Count; j++)
             {
-                //if (i != j) //check the other players
-                //{
-                    if (Room.selectedCharacterIndexes[i] != Room.RoomPlayers[j].CharacterIndex && Room.selectedCharacterIndexes[i] == -1)
-                    {
-                        Debug.Log("Enable: " + j);
-                        RpcEnableReadyButton(j, true);
-                    }
-                //}
+                if (Room.selectedCharacterIndexes[i] != Room.RoomPlayers[j].CharacterIndex && Room.selectedCharacterIndexes[i] == -1)
+                {
+                    //Debug.Log("Enable: " + j);
+                    RpcEnableReadyButton(j, true);
+                }
             }
         }
 
@@ -206,7 +206,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
                 {
                     if (Room.selectedCharacterIndexes[i] == Room.RoomPlayers[j].CharacterIndex && Room.selectedCharacterIndexes[i] != -1)
                     {
-                        Debug.Log("Disable: " + j);
+                        //Debug.Log("Disable: " + j);
                         RpcEnableReadyButton(j, false);
                     }
                 }
