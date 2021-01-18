@@ -57,6 +57,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public override void OnStartAuthority()
     {
         CmdSetDisplayName(PlayerNameInput.DisplayName);
+        CmdDeselectCharacter();
 
         foreach (Button b in leftPlayerButtons)
         {
@@ -74,7 +75,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         Room.RoomPlayers.Add(this);
 
-        CmdDeselectCharacter();
+        //CmdDeselectCharacter();
 
         for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
         {
@@ -180,19 +181,33 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [Server]
     public void Check()
     {
+        //Enable buttons
         for (int i = 0; i < Room.RoomPlayers.Count; i++)
         {
             for (int j = 0; j < Room.RoomPlayers.Count; j++)
             {
-                if (i != j)
+                //if (i != j) //check the other players
+                //{
+                    if (Room.selectedCharacterIndexes[i] != Room.RoomPlayers[j].CharacterIndex && Room.selectedCharacterIndexes[i] == -1)
+                    {
+                        Debug.Log("Enable: " + j);
+                        RpcEnableReadyButton(j, true);
+                    }
+                //}
+            }
+        }
+
+        //Disable buttons
+        for (int i = 0; i < Room.RoomPlayers.Count; i++)
+        {
+            for (int j = 0; j < Room.RoomPlayers.Count; j++)
+            {
+                if (i != j) //check the other players
                 {
                     if (Room.selectedCharacterIndexes[i] == Room.RoomPlayers[j].CharacterIndex && Room.selectedCharacterIndexes[i] != -1)
                     {
+                        Debug.Log("Disable: " + j);
                         RpcEnableReadyButton(j, false);
-                    }
-                    else
-                    {
-                        RpcEnableReadyButton(j, true);
                     }
                 }
             }
