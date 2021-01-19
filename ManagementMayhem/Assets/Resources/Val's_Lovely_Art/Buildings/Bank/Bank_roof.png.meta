@@ -1,31 +1,7 @@
 fileFormatVersion: 2
-guid: acada71fe2ffaaa4482992bbb19dfa6b
+guid: dc525137f9583c14684bf46f4c21e87b
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -2309903680481790935
-    second: Warehouse_side_0
-  - first:
-      213: -5245981340722646963
-    second: Warehouse_side_1
-  - first:
-      213: -8817495873623440381
-    second: Warehouse_side_2
-  - first:
-      213: -8964189437324136385
-    second: Warehouse_side_3
-  - first:
-      213: -4040926162672642652
-    second: Warehouse_side_4
-  - first:
-      213: -3864016415449562202
-    second: Warehouse_side_5
-  - first:
-      213: -2145018721079114845
-    second: Warehouse_side_0
-  - first:
-      213: 7481261407985902156
-    second: Warehouse_side_1
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -64,11 +40,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.5, y: 0.05}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -133,49 +109,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: Warehouse_side_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 80
-        width: 192
-        height: 80
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3a3448586dc5b32e0800000000000000
-      internalID: -2145018721079114845
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Warehouse_side_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 192
-        height: 80
-      alignment: 9
-      pivot: {x: 0.5, y: 0.1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c42a6d6fc97c2d760800000000000000
-      internalID: 7481261407985902156
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     physicsShape: []
     bones: []
