@@ -71,7 +71,6 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private GameObject processingPanel = null;
     [SerializeField] private TMP_Text processingText = null;
 
-
     [Header("Items")]
     public GameObject itemPrefab;
     private string tempName = null;
@@ -553,7 +552,7 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     void CmdChangeSprite(GameObject go, string ItemName)
     {
-        ChangeSprite(ItemName, go);
+        ChangeSprite(ItemName, go); //runs properly when [Server] rather than [Command]
     }
 
     [Server]
@@ -566,6 +565,7 @@ public class PlayerScript : NetworkBehaviour
         if (Room.ItemsRemaining == 0)
         {
             RpcChangeItemSprite(-1, go);
+            RpcDisableNPC(go);
             RpcBringUpResultsScreen();
         }
         else if (ItemName != null)
@@ -665,18 +665,33 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [ClientRpc]
+    private void RpcDisableNPC(GameObject go)
+    {
+        NPC = go;
+
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
+        }
+    }
+
+    [Command]
+    private void CmdEndGame()
+    {
+        RpcUpdateItemCount(Room.TotalItems, Room.ItemsRemaining);
+        RpcBringUpResultsScreen();
+    }
+
+    [ClientRpc]
     public void RpcBringUpResultsScreen()
     {
-        //this doesn't sync
+        ////this doesn't sync
         //gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
         //gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
         //gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
         //gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-
-        //idk about this yet
-        //gameObject.GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
-        //gameObject].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
-        //gameObject.GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
 
         for (int i = 0; i < Room.GamePlayers.Count; i++)
         {
@@ -685,11 +700,6 @@ public class PlayerScript : NetworkBehaviour
             Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
             Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
             Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-
-            //idk about this yet
-            //Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
-            //Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
-            //Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
         }
     }
     #endregion
@@ -872,7 +882,10 @@ public class PlayerScript : NetworkBehaviour
     {
         if (!isLocalPlayer) return; //stops double calculations of timer
 
-        Debug.Log(oldValue + ", " + newValue);
+        if (newValue == 0)
+            CmdEndGame();
+
+        //Debug.Log(oldValue + ", " + newValue);
         float minutes = Mathf.FloorToInt(newValue / 60);
         float seconds = Mathf.FloorToInt(newValue % 60);
         ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
