@@ -36,7 +36,7 @@ public class PlayerScript : NetworkBehaviour
     [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
     private static event Action<float> OnTimeChange;
-    [SyncVar (hook = nameof(HandleTimeChange))] private float matchLength;
+    [SyncVar(hook = nameof(HandleTimeChange))] private float matchLength;
     [SyncVar(hook = nameof(HandleTimeChange))] public float currentTime;
     [SyncVar] public bool timerNotStarted = true;
 
@@ -77,7 +77,8 @@ public class PlayerScript : NetworkBehaviour
     private bool NPC_item_match = false;
     private bool Cooldown = false;
     public int totalItems;
-    public int remainingItems;
+    [SyncVar(hook = nameof(HandleNumItems))] public int remainingItems;
+    public static event Action<int> OnNumItemsUpdate;
 
     [Header("Debug Info")]
     [SyncVar] public GameObject pickup;
@@ -119,7 +120,6 @@ public class PlayerScript : NetworkBehaviour
         // subscribe to events
         OnMoneyChange += HandleMoneyChange;
         OnBalanceChange += HandleBalanceChange;
-        //OnTimeChange += HandleTimeChange;
         PushTheButton.ButtonPressed += AddDigitToSequence;
 
         CmdSyncStartTime();
@@ -131,7 +131,6 @@ public class PlayerScript : NetworkBehaviour
         if (!hasAuthority) { return; } // do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
         OnBalanceChange -= HandleBalanceChange;
-        //OnTimeChange -= HandleTimeChange;
     }
 
     void Update()
@@ -191,9 +190,6 @@ public class PlayerScript : NetworkBehaviour
         // don't affect other players
         if (!isLocalPlayer)
             return;
-
-        //// update match time
-        //CmdUpdateTime();
 
         // update movement
         movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
@@ -331,7 +327,6 @@ public class PlayerScript : NetworkBehaviour
                         Debug.Log("I want " + tempName);
                     }
                 }
-
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
@@ -455,6 +450,24 @@ public class PlayerScript : NetworkBehaviour
         return null;
     }
 
+    private void HandleNumItems(int oldValue, int newValue)
+    {
+        if (!isLocalPlayer) return; //stops double calculations
+
+        if (newValue == 0)
+            CmdEndGame();
+    }
+
+    [Server]
+    private void UpdateNumItems()
+    {
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().remainingItems = Room.ItemsRemaining;
+        }
+    }
+
+
     [Command]
     void CmdSpawn(string itemName)
     {
@@ -472,8 +485,6 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     private void RpcUpdateItemCount(int Total, int Remaining)
     {
-        //Debug.Log(Total);
-        //Debug.Log(Remaining);
         totalItems = Total;
         remainingItems = Remaining;
     }
@@ -560,7 +571,7 @@ public class PlayerScript : NetworkBehaviour
     {
         NPC = go;
 
-        RpcUpdateItemCount(Room.TotalItems, Room.ItemsRemaining);
+        UpdateNumItems();
 
         if (Room.ItemsRemaining == 0)
         {
@@ -674,6 +685,7 @@ public class PlayerScript : NetworkBehaviour
             Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Health_Bar").gameObject.SetActive(false);
             Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Speech_Bubble_Sprite").gameObject.SetActive(false);
             Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.transform.Find("Item_Sprite").gameObject.SetActive(false);
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.GetComponent<CapsuleCollider2D>().enabled = false;
         }
     }
 
@@ -684,23 +696,15 @@ public class PlayerScript : NetworkBehaviour
         RpcBringUpResultsScreen();
     }
 
+
     [ClientRpc]
     public void RpcBringUpResultsScreen()
     {
-        ////this doesn't sync
-        //gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
-        //gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
-        //gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
-        //gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-
-        for (int i = 0; i < Room.GamePlayers.Count; i++)
-        {
-            //this syncs
-            Room.GamePlayers[i].transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
-            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
-            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
-            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-        }
+        //only bring up your own screen
+        gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
+        gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
+        gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
+        gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
     }
     #endregion
 
@@ -984,14 +988,7 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdSyncStartTime()
     {
-        matchLength = Room.matchLength; 
-        RpcSyncStartTime(matchLength);
-    }
-
-    [ClientRpc]
-    private void RpcSyncStartTime(float value)
-    {
-        OnTimeChange?.Invoke(value);
+        matchLength = Room.matchLength;
     }
     #endregion
 }

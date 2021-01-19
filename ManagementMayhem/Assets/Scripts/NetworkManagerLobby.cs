@@ -1,11 +1,10 @@
-﻿using System.Collections;
+﻿using Mirror;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Mirror;
-using System;
-using System.Linq;
-using TMPro;
 
 public class NetworkManagerLobby : NetworkManager
 {
@@ -28,6 +27,7 @@ public class NetworkManagerLobby : NetworkManager
 
     public int TotalItems;
     public int ItemsRemaining;
+
     public Coroutine waitTimerCoroutine;
     public float currentWaitTime;
     public int prev_rand = -1;
@@ -37,12 +37,13 @@ public class NetworkManagerLobby : NetworkManager
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
+
     public static event Action<NetworkConnection> OnServerReadied;
     public static event Action OnServerStopped;
     public static event Action OnTimerCountdown;
 
     public override void OnStartServer()
-    { 
+    {
         spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
         animations = new RuntimeAnimatorController[3];
@@ -58,7 +59,7 @@ public class NetworkManagerLobby : NetworkManager
         ItemsRemaining = TotalItems;
 
         OnTimeUpdate += HandleTimeUpdate;
-    } 
+    }
 
     public override void OnStartClient()
     {
@@ -83,7 +84,7 @@ public class NetworkManagerLobby : NetworkManager
     {
         base.OnClientConnect(conn); //do base logic
 
-        OnClientConnected?.Invoke(); 
+        OnClientConnected?.Invoke();
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -102,7 +103,7 @@ public class NetworkManagerLobby : NetworkManager
             return;
         }
 
-        if(SceneManager.GetActiveScene().path != menuScene)
+        if (SceneManager.GetActiveScene().path != menuScene)
         {
             //disconnect if not on the menu scene
             conn.Disconnect();
@@ -129,8 +130,8 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
-        if (conn.identity != null) { 
-
+        if (conn.identity != null)
+        {
             var player = conn.identity.GetComponent<NetworkRoomPlayerLobby>(); //get the roomPlayerScript
 
             RoomPlayers.Remove(player); //remove player from the list
@@ -165,13 +166,12 @@ public class NetworkManagerLobby : NetworkManager
         {
             if (!player.IsReady) { return false; } //don't start if someone is not ready
         }
-
         return true;
     }
 
     public void StartGame()
     {
-        if(SceneManager.GetActiveScene().path == menuScene)
+        if (SceneManager.GetActiveScene().path == menuScene)
         {
             if (!IsReadyToStart()) { return; }
 
@@ -199,21 +199,16 @@ public class NetworkManagerLobby : NetworkManager
         timerCoroutine = StartCoroutine(Timer());
     }
 
-    //public float GetTime()
-    //{
-    //    return currentMatchTime;
-    //}
-
-
     private IEnumerator Timer()
     {
         OnTimeUpdate?.Invoke(currentMatchTime);
         currentMatchTime--;
 
-        if(currentMatchTime <= 0)
+        if (currentMatchTime <= 0)
         {
             yield return new WaitForSeconds(1f);
             OnTimeUpdate?.Invoke(currentMatchTime);
+            StopCoroutine(timerCoroutine);
             timerCoroutine = null;
         }
         else
@@ -223,11 +218,12 @@ public class NetworkManagerLobby : NetworkManager
         }
     }
 
+    //this hook method is triggered when currentMatchTime changes
     private void HandleTimeUpdate(float currentMatchTime)
     {
         for (int i = 0; i < GamePlayers.Count; i++)
         {
-            GamePlayers[i].GetComponent<PlayerScript>().currentTime = currentMatchTime;
+            GamePlayers[i].GetComponent<PlayerScript>().currentTime = currentMatchTime; //triggers the hook method of each player
         }
     }
 
@@ -253,7 +249,7 @@ public class NetworkManagerLobby : NetworkManager
         //From menu to game
         else if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Stage"))
         {
-            for(int i = RoomPlayers.Count - 1; i >= 0; i--)
+            for (int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
