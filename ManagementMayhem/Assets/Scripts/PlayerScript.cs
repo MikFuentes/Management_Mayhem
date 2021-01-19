@@ -36,7 +36,8 @@ public class PlayerScript : NetworkBehaviour
     [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
     private static event Action<float> OnTimeChange;
-    [SyncVar] private float currentTime;
+    [SyncVar (hook = nameof(HandleTimeChange))] private float matchLength;
+    [SyncVar(hook = nameof(HandleTimeChange))] public float currentTime;
     [SyncVar] public bool timerNotStarted = true;
 
     [Header("Movement")]
@@ -119,8 +120,10 @@ public class PlayerScript : NetworkBehaviour
         // subscribe to events
         OnMoneyChange += HandleMoneyChange;
         OnBalanceChange += HandleBalanceChange;
-        OnTimeChange += HandleTimeChange;
+        //OnTimeChange += HandleTimeChange;
         PushTheButton.ButtonPressed += AddDigitToSequence;
+
+        CmdSyncStartTime();
     }
 
     [ClientCallback]
@@ -129,7 +132,7 @@ public class PlayerScript : NetworkBehaviour
         if (!hasAuthority) { return; } // do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
         OnBalanceChange -= HandleBalanceChange;
-        OnTimeChange -= HandleTimeChange;
+        //OnTimeChange -= HandleTimeChange;
     }
 
     void Update()
@@ -190,8 +193,8 @@ public class PlayerScript : NetworkBehaviour
         if (!isLocalPlayer)
             return;
 
-        // update match time
-        CmdUpdateTime();
+        //// update match time
+        //CmdUpdateTime();
 
         // update movement
         movement = new Vector3(horizontalMove, verticalMove, 0f).normalized;
@@ -470,8 +473,8 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     private void RpcUpdateItemCount(int Total, int Remaining)
     {
-        Debug.Log(Total);
-        Debug.Log(Remaining);
+        //Debug.Log(Total);
+        //Debug.Log(Remaining);
         totalItems = Total;
         remainingItems = Remaining;
     }
@@ -865,27 +868,14 @@ public class PlayerScript : NetworkBehaviour
     #endregion
 
     #region Time
-    private void HandleTimeChange(float currentMatchTime)
+    private void HandleTimeChange(float oldValue, float newValue)
     {
-        float minutes = Mathf.FloorToInt(currentMatchTime / 60);
-        float seconds = Mathf.FloorToInt(currentMatchTime % 60);
+        if (!isLocalPlayer) return; //stops double calculations of timer
+
+        Debug.Log(oldValue + ", " + newValue);
+        float minutes = Mathf.FloorToInt(newValue / 60);
+        float seconds = Mathf.FloorToInt(newValue % 60);
         ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-    }
-
-    [Command]
-    private void CmdUpdateTime()
-    {
-        currentTime = Room.GetTime();
-
-        if (currentTime == 0)
-            RpcBringUpResultsScreen();
-        RpcUpdateTime(currentTime);
-    }
-
-    [ClientRpc]
-    private void RpcUpdateTime(float value)
-    {
-        OnTimeChange?.Invoke(value);
     }
 
     private string ReturnCurrentTime(float currentMatchTime)
@@ -899,7 +889,7 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdStartWaitTimer(int value, GameObject NPC)
     {
-        RpcSynchTimers(NPC);
+        RpcSyncTimers(NPC);
         Room.waitTimerCoroutine = StartCoroutine(StartWaiting(value, NPC));
     }
 
@@ -912,7 +902,7 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RpcSynchTimers(GameObject go)
+    private void RpcSyncTimers(GameObject go)
     {
         for (int i = 0; i < Room.GamePlayers.Count; i++)
         {
@@ -978,5 +968,17 @@ public class PlayerScript : NetworkBehaviour
         Cooldown = false;
     }
 
+    [Command]
+    private void CmdSyncStartTime()
+    {
+        matchLength = Room.matchLength; 
+        RpcSyncStartTime(matchLength);
+    }
+
+    [ClientRpc]
+    private void RpcSyncStartTime(float value)
+    {
+        OnTimeChange?.Invoke(value);
+    }
     #endregion
 }

@@ -21,9 +21,10 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private GameObject playerSpawnSystem = null;
     //[SerializeField] private GameObject roundSystem = null;
 
-    private float matchLength = 30;
+    public float matchLength; //in seconds
     public float currentMatchTime;
     public Coroutine timerCoroutine;
+    public static event Action<float> OnTimeUpdate;
 
     public int TotalItems;
     public int ItemsRemaining;
@@ -55,6 +56,8 @@ public class NetworkManagerLobby : NetworkManager
 
         TotalItems = 5;
         ItemsRemaining = TotalItems;
+
+        OnTimeUpdate += HandleTimeUpdate;
     } 
 
     public override void OnStartClient()
@@ -193,32 +196,38 @@ public class NetworkManagerLobby : NetworkManager
     private void InitializeTimer()
     {
         currentMatchTime = matchLength;
-
         timerCoroutine = StartCoroutine(Timer());
     }
 
-    public float GetTime()
-    {
-        return currentMatchTime;
-    }
+    //public float GetTime()
+    //{
+    //    return currentMatchTime;
+    //}
 
 
     private IEnumerator Timer()
     {
-        yield return new WaitForSeconds(1f);
-
+        OnTimeUpdate?.Invoke(currentMatchTime);
         currentMatchTime--;
 
         if(currentMatchTime <= 0)
         {
+            yield return new WaitForSeconds(1f);
+            OnTimeUpdate?.Invoke(currentMatchTime);
             timerCoroutine = null;
-
-            //Debug.Log("Time's up!");
         }
         else
         {
-            //Debug.Log(currentMatchTime);
+            yield return new WaitForSeconds(1f);
             timerCoroutine = StartCoroutine(Timer());
+        }
+    }
+
+    private void HandleTimeUpdate(float currentMatchTime)
+    {
+        for (int i = 0; i < GamePlayers.Count; i++)
+        {
+            GamePlayers[i].GetComponent<PlayerScript>().currentTime = currentMatchTime;
         }
     }
 

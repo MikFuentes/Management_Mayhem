@@ -6892,6 +6892,7 @@ MonoBehaviour:
   frontWalls: []
   Indoors: 0
   ui_Timer: {fileID: 179430321623164998}
+  currentTime: 0
   timerNotStarted: 1
   playerPos: {x: 0, y: 0, z: 0}
   moveSpeed: 6
@@ -6910,6 +6911,8 @@ MonoBehaviour:
   processingPanel: {fileID: 857424626615220727}
   processingText: {fileID: 699661484373269641}
   itemPrefab: {fileID: 0}
+  totalItems: 0
+  remainingItems: 0
   pickup: {fileID: 0}
   pickUpActive: 0
   interactable: {fileID: 0}
@@ -6919,6 +6922,7 @@ MonoBehaviour:
   canDelete: 0
   UI_Active: 0
   sceneObjects: []
+  gameOver: 0
 --- !u!114 &7683990943109430950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10720,7 +10724,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0:00
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ed485c19197f9e34a9df746ffe599200, type: 2}
   m_sharedMaterial: {fileID: -3940620140548613261, guid: ed485c19197f9e34a9df746ffe599200,
