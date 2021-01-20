@@ -2559,7 +2559,7 @@ MonoBehaviour:
     type: 3}
   playerSpawnSystem: {fileID: 2739164877689454984, guid: c50b4ae2263c3284ca523faaf49ee473,
     type: 3}
-  matchLength: 10
+  matchLength: 180
   currentMatchTime: 0
   TotalItems: 0
   ItemsRemaining: 0
