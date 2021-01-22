@@ -206,6 +206,16 @@ public class PlayerScript : NetworkBehaviour
 
         if (!Cooldown)
         {
+            //if(canDeposit && pickUpActive)
+            //{
+            //    if (pickup.GetComponent<PickupProperties>().itemType == "Box")
+            //    {
+
+            //        float cost = pickup.GetComponent<PickupProperties>().value;
+            //        string itemName = pickup.GetComponent<PickupProperties>().itemName;
+            //    }
+            //}
+
             // depositing money, buying items
             if (canDeposit && !pickUpActive && pickup != null) // if you're standing next to a depositor empty-handed with the item on the floor
             {
@@ -283,6 +293,11 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
+                if (pickUpActive && pickup.GetComponent<PickupProperties>().itemType == "Item")
+                {
+                    dropButton.transform.Find("Text").GetComponent<Text>().text = "Give";
+                }
+
                 NPC = collision.gameObject;
 
                 gameObject.GetComponent<BoxCollider2D>().enabled = false;
@@ -335,6 +350,8 @@ public class PlayerScript : NetworkBehaviour
 
                 if (interactable.name == "ATM")
                 {
+                    interactButton.transform.Find("Text").GetComponent<Text>().text = "Withdraw";
+
                     CmdUpdateBalance(0); // show the most recent balance
 
                     //reset the ATM
@@ -344,9 +361,37 @@ public class PlayerScript : NetworkBehaviour
                     homePanel.SetActive(true);
                     withdrawPanel.SetActive(false);
                 }
+                else if (interactable.name == "Phone")
+                {
+                    interactButton.transform.Find("Text").GetComponent<Text>().text = "Call";
+                }
             }
             else if (collision.gameObject.CompareTag("Depositor"))
+            {
                 canDeposit = true;
+
+                if (pickUpActive)
+                {
+                    if (pickup.GetComponent<PickupProperties>().itemType == "Money")
+                    {
+                        dropButton.transform.Find("Text").GetComponent<Text>().text = "Give";
+                    }
+                    else if (pickup.GetComponent<PickupProperties>().itemType == "Box")
+                    {
+                        dropButton.transform.Find("Text").GetComponent<Text>().text = "Buy";
+                    }
+                }
+
+
+
+                //interactable = collision.gameObject;
+                //interactButton.interactable = true;
+
+                //if(interactable.name == "NPC_Cashier")
+                //{
+                //    interactButton.transform.Find("Text").GetComponent<Text>().text = "Buy";
+                //}
+            }
             else if (collision.gameObject.CompareTag("Deleter"))
                 canDelete = true;
             else if (collision.gameObject.CompareTag("Indoor"))
@@ -401,18 +446,25 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
+                dropButton.transform.Find("Text").GetComponent<Text>().text = "Drop";
+
                 canDelete = false;
 
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
+                interactButton.transform.Find("Text").GetComponent<Text>().text = "Interact";
                 interactable = null;
                 interactButton.interactable = false;
                 Deactivate_Interactable_UI();
             }
             else if (collision.gameObject.CompareTag("Depositor"))
+            {
+                dropButton.transform.Find("Text").GetComponent<Text>().text = "Drop";
                 canDeposit = false;
+            }
+
             else if (collision.gameObject.CompareTag("Deleter"))
                 canDelete = false;
             else if (collision.gameObject.CompareTag("Indoor"))
@@ -843,7 +895,7 @@ public class PlayerScript : NetworkBehaviour
 
         const int xPos = -19; const int yPos = -1;
         int xMax = xPos + 4; int yMax = yPos - 7;
-        int x = -xPos; int y = yPos;
+        int x = xPos; int y = yPos;
 
         while (amount >= 100)
         {
