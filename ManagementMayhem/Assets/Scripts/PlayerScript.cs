@@ -477,6 +477,14 @@ public class PlayerScript : NetworkBehaviour
     }
 
     [Command]
+    void CmdSpawnAt(string itemName, Vector3 v)
+    {
+        itemPrefab = FindItem(itemName);
+        GameObject item = (GameObject)Instantiate(itemPrefab, v, Quaternion.identity);
+        NetworkServer.Spawn(item);
+    }
+
+    [Command]
     void CmdDestroy(GameObject gameObject)
     {
         NetworkServer.Destroy(gameObject);
@@ -833,23 +841,48 @@ public class PlayerScript : NetworkBehaviour
         int fiftycoins = 0;
         int twofivecoins = 0;
 
+        const int xPos = -19; const int yPos = -1;
+        int xMax = xPos + 4; int yMax = yPos - 7;
+        int x = -xPos; int y = yPos;
+
         while (amount >= 100)
         {
             amount -= 100;
             hundredcoins++;
-            CmdSpawn("P100");
+            CmdSpawnAt("P100", new Vector3(x, y, 0));
+            x++;
+
+            if (x == xMax)
+            {
+                x = xPos; y--;
+                if (y == yMax) y = yPos;
+            }
         }
         while (amount >= 50)
         {
             amount -= 50;
             fiftycoins++;
-            CmdSpawn("P50");
+            CmdSpawnAt("P50", new Vector3(x, y, 0));
+            x++;
+
+            if (x == xMax)
+            {
+                x = xPos; y--;
+                if (y == yMax) y = yPos;
+            }
         }
         while (amount >= 25)
         {
             amount -= 25;
             twofivecoins++;
-            CmdSpawn("P25");
+            CmdSpawnAt("P25", new Vector3(x, y, 0));
+            x++;
+
+            if (x == xMax)
+            {
+                x = xPos; y--;
+                if (y == yMax) y = yPos;
+            }
         }
     }
 
