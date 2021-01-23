@@ -29,6 +29,8 @@ public class PlayerScript : NetworkBehaviour
     public GameObject Faded_Background;
     [SerializeField] private GameObject gameName;
 
+    [SerializeField] private List<Sprite> buttonSprites;
+
     [Header("Terrain")]
     public List<GameObject> frontWalls;
     public bool Indoors = false;
@@ -295,7 +297,8 @@ public class PlayerScript : NetworkBehaviour
             {
                 if (pickUpActive && pickup.GetComponent<PickupProperties>().itemType == "Item")
                 {
-                    dropButton.transform.Find("Text").GetComponent<Text>().text = "Give";
+                    dropButton.GetComponent<Image>().sprite = buttonSprites[4];
+                    dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Give";
                 }
 
                 NPC = collision.gameObject;
@@ -346,11 +349,13 @@ public class PlayerScript : NetworkBehaviour
             else if (collision.gameObject.CompareTag("Interactable"))
             {
                 interactable = collision.gameObject;
+                interactButton.gameObject.SetActive(true);
                 interactButton.interactable = true;
 
                 if (interactable.name == "ATM")
                 {
-                    interactButton.transform.Find("Text").GetComponent<Text>().text = "Withdraw";
+                    interactButton.GetComponent<Image>().sprite = buttonSprites[3];
+                    interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Withdraw";
 
                     CmdUpdateBalance(0); // show the most recent balance
 
@@ -363,7 +368,8 @@ public class PlayerScript : NetworkBehaviour
                 }
                 else if (interactable.name == "Phone")
                 {
-                    interactButton.transform.Find("Text").GetComponent<Text>().text = "Call";
+                    interactButton.GetComponent<Image>().sprite = buttonSprites[0];
+                    interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Call";
                 }
             }
             else if (collision.gameObject.CompareTag("Depositor"))
@@ -374,11 +380,13 @@ public class PlayerScript : NetworkBehaviour
                 {
                     if (pickup.GetComponent<PickupProperties>().itemType == "Money")
                     {
-                        dropButton.transform.Find("Text").GetComponent<Text>().text = "Give";
+                        dropButton.GetComponent<Image>().sprite = buttonSprites[4];
+                        dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Give";
                     }
                     else if (pickup.GetComponent<PickupProperties>().itemType == "Box")
                     {
-                        dropButton.transform.Find("Text").GetComponent<Text>().text = "Buy";
+                        dropButton.GetComponent<Image>().sprite = buttonSprites[2];
+                        dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Buy";
                     }
                 }
 
@@ -446,7 +454,8 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
-                dropButton.transform.Find("Text").GetComponent<Text>().text = "Drop";
+                dropButton.GetComponent<Image>().sprite = buttonSprites[1];
+                dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Drop";
 
                 canDelete = false;
 
@@ -454,14 +463,17 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("Interactable"))
             {
-                interactButton.transform.Find("Text").GetComponent<Text>().text = "Interact";
+                interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Interact";
                 interactable = null;
+                interactButton.gameObject.SetActive(false);
                 interactButton.interactable = false;
+
                 Deactivate_Interactable_UI();
             }
             else if (collision.gameObject.CompareTag("Depositor"))
             {
-                dropButton.transform.Find("Text").GetComponent<Text>().text = "Drop";
+                dropButton.GetComponent<Image>().sprite = buttonSprites[1];
+                dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Drop";
                 canDeposit = false;
             }
 
@@ -590,6 +602,7 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.gameObject.SetActive(false);
         dropButton.gameObject.SetActive(true);
         pickup.transform.Find("Shadow").gameObject.SetActive(false); //disable shadow when picking up
+        pickup.GetComponent<SpriteRenderer>().sortingOrder = 1;
     }
     [Command]
     public void CmdHold()
@@ -613,11 +626,13 @@ public class PlayerScript : NetworkBehaviour
 
     [ClientRpc]
     void RpcDropOnClick()
-    {
+    {        
+        pickUpButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
         pickUpButton.interactable = false; // (2/2) and making pickUpButton non-interactable
         pickUpButton.gameObject.SetActive(true);
         dropButton.gameObject.SetActive(false);
         pickup.transform.Find("Shadow").gameObject.SetActive(true); //enable shadow when picking up
+        pickup.GetComponent<SpriteRenderer>().sortingOrder = 0;
     }
 
     [Command]
@@ -677,6 +692,7 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     void RpcTriggerStayPickup()
     {
+        pickUpButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
         pickUpButton.interactable = true;
     }
 
@@ -690,6 +706,7 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     void RpcTriggerExitPickup()
     {
+        pickUpButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
         pickUpButton.interactable = false;
     }
 
