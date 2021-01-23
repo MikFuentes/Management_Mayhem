@@ -12,6 +12,9 @@ public class JoinLobbyMenu : MonoBehaviour
     [SerializeField] private GameObject landingPagePanel = null;
     [SerializeField] private TMP_InputField ipAddressInputField = null;
     [SerializeField] private Button joinButton = null;
+    [SerializeField] private Button backButton = null;
+    [SerializeField] private GameObject LoadingIcon = null;
+    [SerializeField] private GameObject ErrorIcon = null;
 
     private void OnEnable()
     {
@@ -25,28 +28,60 @@ public class JoinLobbyMenu : MonoBehaviour
         NetworkManagerLobby.OnClientDisconnected -= HandleClientDisconnected;
     }
 
+    public void SetIPAddress(string name)
+    {
+        joinButton.interactable = !string.IsNullOrEmpty(name);
+
+        if (string.IsNullOrEmpty(name))
+        {
+            joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
+        }
+        else
+        {
+            joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
+        }
+
+    }
+
     public void JoinLobby()
     {
         string ipAddress = ipAddressInputField.text;
 
         networkManager.networkAddress = ipAddress; //set network address to specified ip address
         networkManager.StartClient(); //start as a client
-         
+
+        LoadingIcon.SetActive(true);
+        ErrorIcon.SetActive(false);
+
+        backButton.interactable = false;
+
         joinButton.interactable = false;
+        joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
     }
 
     //Called when the player successfully connects to the server
     private void HandleClientConnected()
     {
+        LoadingIcon.SetActive(false);
+        ErrorIcon.SetActive(false);
+
+        backButton.interactable = true;
+
         joinButton.interactable = true;
 
+        landingPagePanel.SetActive(true);
         gameObject.SetActive(false); 
-        //landingPagePanel.SetActive(false);
     }
 
     //Called when the player fails to connect to the server
     private void HandleClientDisconnected()
     {
+        LoadingIcon.SetActive(false);
+        ErrorIcon.SetActive(true);
+
+        backButton.interactable = true;
+
         joinButton.interactable = true;
+        joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
     }
 }

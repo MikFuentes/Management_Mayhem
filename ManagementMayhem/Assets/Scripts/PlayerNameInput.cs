@@ -30,6 +30,16 @@ public class PlayerNameInput : MonoBehaviour
     public void SetPlayerName(string name)
     {
         continueButton.interactable = !string.IsNullOrEmpty(name);
+
+        if (string.IsNullOrEmpty(name))
+        {
+            continueButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
+        }
+        else
+        {
+            continueButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
+        }
+
     }
 
     public void SavePlayerName()
