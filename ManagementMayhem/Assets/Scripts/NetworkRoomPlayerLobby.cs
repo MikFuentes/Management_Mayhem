@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class NetworkRoomPlayerLobby : NetworkBehaviour
 {
@@ -14,7 +15,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerCharacterIndexes = new TMP_Text[3];
     [SerializeField] private GameObject[] playerCharacterSprites = new GameObject[3];
     private List<string> SpriteNames = new List<string> { "Finance", "Logistics", "Programs" };
-
 
     [SerializeField] private Sprite DefaultSprite;
     [SerializeField] private Sprite[] CharacterSprites = new Sprite[3]; //Canvas only renders Images, not Sprites
@@ -58,6 +58,22 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
+
+        //// get a reference to the scene you want to search. 
+        //Scene s = SceneManager.GetSceneByName("Main Menu");
+
+        //GameObject[] gameObjects = s.GetRootGameObjects();
+
+        //foreach (GameObject g in gameObjects)
+        //{
+        //    if (g.name == "Main Camera")
+        //    {
+        //        gameObject.GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
+        //        break;
+        //    }
+        //}
+
+
         CmdSetDisplayName(PlayerNameInput.DisplayName);
         CmdDeselectCharacter();
 
