@@ -247,6 +247,11 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         if (!isLeader) { return; }
 
         startGameButton.interactable = readyToStart;
+
+        if (!readyToStart)
+            startGameButton.transform.Find("Start_Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
+        else
+            startGameButton.transform.Find("Start_Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1f);
     }
 
     [Command]
