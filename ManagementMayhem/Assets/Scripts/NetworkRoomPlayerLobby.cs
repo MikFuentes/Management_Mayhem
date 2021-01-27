@@ -59,19 +59,19 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public override void OnStartAuthority()
     {
 
-        //// get a reference to the scene you want to search. 
-        //Scene s = SceneManager.GetSceneByName("Main Menu");
+        // get a reference to the scene you want to search. 
+        Scene s = SceneManager.GetSceneByName("Main Menu");
 
-        //GameObject[] gameObjects = s.GetRootGameObjects();
+        GameObject[] gameObjects = s.GetRootGameObjects();
 
-        //foreach (GameObject g in gameObjects)
-        //{
-        //    if (g.name == "Main Camera")
-        //    {
-        //        gameObject.GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
-        //        break;
-        //    }
-        //}
+        foreach (GameObject g in gameObjects)
+        {
+            if (g.name == "Main Camera")
+            {
+                gameObject.transform.Find("Canvas Lobby").GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
+                break;
+            }
+        }
 
 
         CmdSetDisplayName(PlayerNameInput.DisplayName);

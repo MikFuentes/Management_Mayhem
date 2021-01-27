@@ -2497,7 +2497,7 @@ MonoBehaviour:
   minPlayers: 1
   countdownScene: 
   menuScene: Assets/Scenes/Main Menu.unity
-  roomPlayerPrefab: {fileID: 2956085797749125336, guid: a8736b8edcb84c148ae6445d363b4200,
+  roomPlayerPrefab: {fileID: 6091407814012667515, guid: a8736b8edcb84c148ae6445d363b4200,
     type: 3}
   gamePlayerPrefab: {fileID: 740951527728588880, guid: 229270462700af1498b082a9a69138a8,
     type: 3}
@@ -3518,7 +3518,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
