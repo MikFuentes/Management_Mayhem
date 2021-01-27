@@ -65,7 +65,7 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private GameObject withdrawPanel = null;
     [SerializeField] private GameObject withdrawUI = null;
     [SerializeField] private TMP_Text withdrawText = null;
-    [SerializeField] private TMP_Text errorText = null;
+    [SerializeField] private GameObject errorText = null;
     private string codeSequence = "0";
     public Button withdrawButton = null;
 
@@ -363,8 +363,8 @@ public class PlayerScript : NetworkBehaviour
                     codeSequence = "0";
                     withdrawText.text = codeSequence;
                     errorText.gameObject.SetActive(false);
-                    homePanel.SetActive(true);
-                    withdrawPanel.SetActive(false);
+                    //homePanel.SetActive(true);
+                    withdrawPanel.SetActive(true);
                 }
                 else if (interactable.name == "Phone")
                 {
@@ -885,7 +885,7 @@ public class PlayerScript : NetworkBehaviour
         else
         {
             codeSequence = "0";
-            withdrawText.text = "ERROR";
+            withdrawText.text = "Error";
 
             errorText.gameObject.SetActive(true);
         }
@@ -975,7 +975,8 @@ public class PlayerScript : NetworkBehaviour
         yield return new WaitForSeconds(1);
 
         processingPanel.SetActive(false);
-        homePanel.SetActive(true);
+        withdrawPanel.SetActive(true);
+        //homePanel.SetActive(true);
         codeSequence = "0";
         withdrawText.text = codeSequence;
     }
