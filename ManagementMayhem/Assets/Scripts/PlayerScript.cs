@@ -49,7 +49,7 @@ public class PlayerScript : NetworkBehaviour
     private Vector3 movement;
 
     [Header("Money")]
-    [SerializeField] private GameObject moneyUI = null;
+    //[SerializeField] private GameObject moneyUI = null;
     [SerializeField] private TMP_Text moneyText = null;
     [SyncVar] [SerializeField] public float currentMoney;
     private static event Action<float> OnMoneyChange;
@@ -109,7 +109,7 @@ public class PlayerScript : NetworkBehaviour
     public override void OnStartAuthority()
     {
         // ui elements
-        moneyUI.SetActive(true);
+        //moneyUI.SetActive(true);
         holdPoint.gameObject.SetActive(true);
         dropPoint.gameObject.SetActive(true);
 
@@ -592,7 +592,6 @@ public class PlayerScript : NetworkBehaviour
     {
         pickUpActive = true;
         pickup.transform.position = holdPoint.position;
-
         RpcPickUpOnClick();
     }
 
@@ -602,7 +601,7 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.gameObject.SetActive(false);
         dropButton.gameObject.SetActive(true);
         pickup.transform.Find("Shadow").gameObject.SetActive(false); //disable shadow when picking up
-        pickup.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        //pickup.GetComponent<SpriteRenderer>().sortingOrder = 1;
     }
     [Command]
     public void CmdHold()
@@ -632,7 +631,7 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.gameObject.SetActive(true);
         dropButton.gameObject.SetActive(false);
         pickup.transform.Find("Shadow").gameObject.SetActive(true); //enable shadow when picking up
-        pickup.GetComponent<SpriteRenderer>().sortingOrder = 0;
+        //pickup.GetComponent<SpriteRenderer>().sortingOrder = 0;
     }
 
     [Command]
