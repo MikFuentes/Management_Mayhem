@@ -17,6 +17,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [SerializeField] public TMP_Text Items_Gathered;
     [SerializeField] public TMP_Text Remaining_Balance;
     [SerializeField] public TMP_Text Remaining_Time;
+    [SerializeField] public TMP_Text Team_Morale;
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room

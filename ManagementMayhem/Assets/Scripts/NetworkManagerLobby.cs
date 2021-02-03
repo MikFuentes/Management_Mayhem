@@ -28,6 +28,8 @@ public class NetworkManagerLobby : NetworkManager
     public int TotalItems;
     public int ItemsRemaining;
 
+    public float MoraleBar;
+
     public Coroutine waitTimerCoroutine;
     public float currentWaitTime;
     public int prev_rand = -1;
@@ -57,6 +59,8 @@ public class NetworkManagerLobby : NetworkManager
 
         TotalItems = 5;
         ItemsRemaining = TotalItems;
+
+        MoraleBar = 5;
 
         OnTimeUpdate += HandleTimeUpdate;
     }

@@ -16,6 +16,7 @@ public class PlayerScript : NetworkBehaviour
     [Header("Components")]
     public Joystick joystick;
     public Animator animator;
+    [SerializeField] private List<Sprite> buttonSprites;
 
     [Header("UI Elements")]
     public Button interactButton;
@@ -29,59 +30,6 @@ public class PlayerScript : NetworkBehaviour
     public GameObject Faded_Background;
     [SerializeField] private GameObject gameName;
 
-    [SerializeField] private List<Sprite> buttonSprites;
-
-    [Header("Terrain")]
-    public List<GameObject> frontWalls;
-    public bool Indoors = false;
-
-    [Header("Time")]
-    [SerializeField] private TMP_Text ui_Timer = null;
-    private static event Action<float> OnTimeChange;
-    [SyncVar(hook = nameof(HandleTimeChange))] private float matchLength;
-    [SyncVar(hook = nameof(HandleTimeChange))] public float currentTime;
-    [SyncVar] public bool timerNotStarted = true;
-
-    [Header("Movement")]
-    [SyncVar] public Vector3 playerPos;
-    public float moveSpeed;
-    private float horizontalMove, verticalMove;
-    private Vector3 movement;
-
-    [Header("Money")]
-    //[SerializeField] private GameObject moneyUI = null;
-    [SerializeField] private TMP_Text moneyText = null;
-    [SyncVar] [SerializeField] public float currentMoney;
-    private static event Action<float> OnMoneyChange;
-
-    [Header("ATM_Balance")]
-    [SerializeField] private GameObject homePanel = null;
-    [SerializeField] private GameObject balanceUI = null;
-    [SerializeField] private TMP_Text balanceText = null;
-    [SyncVar] [SerializeField] public float currentBalance = 1000;
-    private static event Action<float> OnBalanceChange;
-
-    [Header("ATM_Withdraw")]
-    [SerializeField] private GameObject withdrawPanel = null;
-    [SerializeField] private GameObject withdrawUI = null;
-    [SerializeField] private TMP_Text withdrawText = null;
-    [SerializeField] private GameObject errorText = null;
-    private string codeSequence = "0";
-    public Button withdrawButton = null;
-
-    [Header("ATM_Processing")]
-    [SerializeField] private GameObject processingPanel = null;
-    [SerializeField] private TMP_Text processingText = null;
-
-    [Header("Items")]
-    public GameObject itemPrefab;
-    private string tempName = null;
-    private bool NPC_item_match = false;
-    private bool Cooldown = false;
-    public int totalItems;
-    [SyncVar(hook = nameof(HandleNumItems))] public int remainingItems;
-    public static event Action<int> OnNumItemsUpdate;
-
     [Header("Debug Info")]
     [SyncVar] public GameObject pickup;
     [SyncVar] public bool pickUpActive = false;
@@ -93,6 +41,61 @@ public class PlayerScript : NetworkBehaviour
     public bool UI_Active;
     public GameObject[] sceneObjects = null;
     [SyncVar] public bool gameOver;
+
+    [Header("ATM_Balance")]
+    [SerializeField] private GameObject homePanel = null;
+    [SerializeField] private GameObject balanceUI = null;
+    [SerializeField] private TMP_Text balanceText = null;
+    [SyncVar] [SerializeField] public float currentBalance = 1000;
+    private static event Action<float> OnBalanceChange;
+
+    [Header("ATM_Processing")]
+    [SerializeField] private GameObject processingPanel = null;
+    [SerializeField] private TMP_Text processingText = null;
+
+    [Header("ATM_Withdraw")]
+    [SerializeField] private GameObject withdrawPanel = null;
+    [SerializeField] private GameObject withdrawUI = null;
+    [SerializeField] private TMP_Text withdrawText = null;
+    [SerializeField] private GameObject errorText = null;
+    private string codeSequence = "0";
+    public Button withdrawButton = null;
+
+    [Header("Items")]
+    public GameObject itemPrefab;
+    private string tempName = null;
+    private bool NPC_item_match = false;
+    private bool Cooldown = false;
+    public int totalItems;
+    [SyncVar(hook = nameof(HandleNumItems))] public int remainingItems;
+    public static event Action<int> OnNumItemsUpdate;
+
+    [Header("Money")]
+    //[SerializeField] private GameObject moneyUI = null;
+    [SerializeField] private TMP_Text moneyText = null;
+    [SyncVar] [SerializeField] public float currentMoney;
+    private static event Action<float> OnMoneyChange;
+
+    [Header("Morale")]
+    [SerializeField] private TMP_Text ui_Morale = null;
+    [SyncVar(hook = nameof(InitializeMoraleBar))] public float currentMorale;
+
+    [Header("Movement")]
+    [SyncVar] public Vector3 playerPos;
+    public float moveSpeed;
+    private float horizontalMove, verticalMove;
+    private Vector3 movement;
+
+    [Header("Terrain")]
+    public List<GameObject> frontWalls;
+    public bool Indoors = false;
+
+    [Header("Time")]
+    [SerializeField] private TMP_Text ui_Timer = null;
+    private static event Action<float> OnTimeChange;
+    [SyncVar(hook = nameof(HandleTimeChange))] private float matchLength;
+    [SyncVar(hook = nameof(HandleTimeChange))] public float currentTime;
+    [SyncVar] public bool timerNotStarted = true;
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -125,6 +128,8 @@ public class PlayerScript : NetworkBehaviour
         PushTheButton.ButtonPressed += AddDigitToSequence;
 
         CmdSyncStartTime();
+        CmdInitializeMoraleBar();
+        Debug.Log("hi");
     }
 
     [ClientCallback]
@@ -380,7 +385,7 @@ public class PlayerScript : NetworkBehaviour
                 {
                     if (pickup.GetComponent<PickupProperties>().itemType == "Money")
                     {
-                        dropButton.GetComponent<Image>().sprite = buttonSprites[4];
+                        dropButton.GetComponent<Image>().sprite = buttonSprites[5];
                         dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Give";
                     }
                     else if (pickup.GetComponent<PickupProperties>().itemType == "Box")
@@ -454,7 +459,7 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("NPC"))
             {
-                dropButton.GetComponent<Image>().sprite = buttonSprites[1];
+                dropButton.GetComponent<Image>().sprite = buttonSprites[7];
                 dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Drop";
 
                 canDelete = false;
@@ -472,7 +477,7 @@ public class PlayerScript : NetworkBehaviour
             }
             else if (collision.gameObject.CompareTag("Depositor"))
             {
-                dropButton.GetComponent<Image>().sprite = buttonSprites[1];
+                dropButton.GetComponent<Image>().sprite = buttonSprites[7];
                 dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Drop";
                 canDeposit = false;
             }
@@ -781,6 +786,7 @@ public class PlayerScript : NetworkBehaviour
         gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
         gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
         gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
+        //gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = ReturnCurrentMorale(currentMorale);
     }
     #endregion
 
@@ -1054,9 +1060,29 @@ public class PlayerScript : NetworkBehaviour
                 yield return new WaitForSeconds(1);
             }
 
+            if (Room.currentWaitTime == 0)
+            {
+                if(Room.MoraleBar != 0)
+                {
+                    Room.MoraleBar--;
+                    
+                    for (int i = 0; i < Room.GamePlayers.Count; i++)
+                    {
+                        Room.GamePlayers[i].GetComponent<PlayerScript>().currentMorale = Room.MoraleBar;
+                    }
+                }
+            }
+
             //restart countdown
             Room.waitTimerCoroutine = StartCoroutine(StartWaiting(timeToWait, NPC));
         }
+    }
+
+    [ClientRpc]
+    private void RpcSetMoraleBar(float f)
+    {
+        currentMorale = f;
+        ui_Morale.text = currentMorale.ToString();
     }
 
     [ClientRpc]
@@ -1091,6 +1117,17 @@ public class PlayerScript : NetworkBehaviour
     private void CmdSyncStartTime()
     {
         matchLength = Room.matchLength;
+    }
+
+    [Command]
+    private void CmdInitializeMoraleBar()
+    {
+        currentMorale = Room.MoraleBar;
+    }
+
+    private void InitializeMoraleBar(float oldValue, float newValue)
+    {
+        ui_Morale.text = currentMorale.ToString();
     }
     #endregion
 }
