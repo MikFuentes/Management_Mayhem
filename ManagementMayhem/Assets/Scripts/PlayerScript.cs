@@ -77,9 +77,11 @@ public class PlayerScript : NetworkBehaviour
     private static event Action<float> OnMoneyChange;
 
     [Header("Morale")]
-    [SerializeField] private TMP_Text ui_Morale = null;
+    public GameObject ui_MoraleBar;
+    public GameObject results_MoraleBar;
+    [SerializeField] private TMP_Text ui_Morale_text = null;
     [SyncVar] public float maxMorale;
-    [SyncVar(hook = nameof(InitializeMoraleBar))] public float currentMorale;
+    [SyncVar(hook = nameof(UpdateMoraleBar))] public float currentMorale;
 
     [Header("Movement")]
     [SyncVar] public Vector3 playerPos;
@@ -1082,7 +1084,7 @@ public class PlayerScript : NetworkBehaviour
     private void RpcSetMoraleBar(float f)
     {
         currentMorale = f;
-        ui_Morale.text = currentMorale.ToString();
+        ui_Morale_text.text = currentMorale.ToString();
     }
 
     [ClientRpc]
@@ -1126,9 +1128,28 @@ public class PlayerScript : NetworkBehaviour
         maxMorale = Room.MoraleBar;
     }
 
-    private void InitializeMoraleBar(float oldValue, float newValue)
+    private void UpdateMoraleBar(float oldValue, float newValue)
     {
-        ui_Morale.text = currentMorale.ToString();
+        ui_Morale_text.text = currentMorale.ToString();
+
+        ui_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
+        results_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
+
+        if (currentMorale / maxMorale >= 0.6)
+        {
+            ui_MoraleBar.GetComponent<HealthBar>().SetColor(Color.green);
+            results_MoraleBar.GetComponent<HealthBar>().SetColor(Color.green);
+        }
+        else if (currentMorale / maxMorale >= 0.3)
+        {
+            ui_MoraleBar.GetComponent<HealthBar>().SetColor(Color.yellow);
+            results_MoraleBar.GetComponent<HealthBar>().SetColor(Color.yellow);
+        }
+        else
+        {
+            ui_MoraleBar.GetComponent<HealthBar>().SetColor(Color.red);
+            results_MoraleBar.GetComponent<HealthBar>().SetColor(Color.red);
+        }
     }
     #endregion
 }
