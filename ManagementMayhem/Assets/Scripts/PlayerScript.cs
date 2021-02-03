@@ -78,6 +78,7 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Morale")]
     [SerializeField] private TMP_Text ui_Morale = null;
+    [SyncVar] public float maxMorale;
     [SyncVar(hook = nameof(InitializeMoraleBar))] public float currentMorale;
 
     [Header("Movement")]
@@ -129,7 +130,6 @@ public class PlayerScript : NetworkBehaviour
 
         CmdSyncStartTime();
         CmdInitializeMoraleBar();
-        Debug.Log("hi");
     }
 
     [ClientCallback]
@@ -786,7 +786,7 @@ public class PlayerScript : NetworkBehaviour
         gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
         gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
         gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-        //gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = ReturnCurrentMorale(currentMorale);
+        gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
     }
     #endregion
 
@@ -1123,6 +1123,7 @@ public class PlayerScript : NetworkBehaviour
     private void CmdInitializeMoraleBar()
     {
         currentMorale = Room.MoraleBar;
+        maxMorale = Room.MoraleBar;
     }
 
     private void InitializeMoraleBar(float oldValue, float newValue)
