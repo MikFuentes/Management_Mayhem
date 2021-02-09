@@ -5026,7 +5026,9 @@ MonoBehaviour:
   moneyText: {fileID: 1747922413685236022}
   currentMoney: 0
   ui_MoraleBar: {fileID: 2052485332136710306}
+  ui_bar: {fileID: 1738476562409525525}
   results_MoraleBar: {fileID: 7281193876427408962}
+  results_bar: {fileID: 7012198014571956213}
   ui_Morale_text: {fileID: 190439966662318145}
   maxMorale: 0
   currentMorale: 0
@@ -11066,7 +11068,7 @@ PrefabInstance:
     - target: {fileID: 7616433829985577223, guid: 795fedfa520c896439397a09a436212a,
         type: 3}
       propertyPath: m_Name
-      value: Health_Bar (Canvas)
+      value: Health_Bar_Canvas
       objectReference: {fileID: 0}
     - target: {fileID: 7919766342083324080, guid: 795fedfa520c896439397a09a436212a,
         type: 3}
@@ -11080,15 +11082,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 795fedfa520c896439397a09a436212a, type: 3}
---- !u!1 &7281193876427408962 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7616433829985577223, guid: 795fedfa520c896439397a09a436212a,
+--- !u!4 &7012198014571956213 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7919766342083324080, guid: 795fedfa520c896439397a09a436212a,
     type: 3}
   m_PrefabInstance: {fileID: 916761208134725445}
   m_PrefabAsset: {fileID: 0}
 --- !u!224 &5268936643734676585 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5019253538558200620, guid: 795fedfa520c896439397a09a436212a,
+    type: 3}
+  m_PrefabInstance: {fileID: 916761208134725445}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7281193876427408962 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7616433829985577223, guid: 795fedfa520c896439397a09a436212a,
     type: 3}
   m_PrefabInstance: {fileID: 916761208134725445}
   m_PrefabAsset: {fileID: 0}
@@ -11721,15 +11729,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 228304956ce4e084e9676a207e87854b, type: 3}
+--- !u!224 &5995885118383340302 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5358680785762023941, guid: 228304956ce4e084e9676a207e87854b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1830839104477348107}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5995885118383340303 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5358680785762023940, guid: 228304956ce4e084e9676a207e87854b,
     type: 3}
   m_PrefabInstance: {fileID: 1830839104477348107}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5995885118417703099 stripped
+--- !u!114 &5995885117538912024 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5358680785728754096, guid: 228304956ce4e084e9676a207e87854b,
+  m_CorrespondingSourceObject: {fileID: 5358680784480830995, guid: 228304956ce4e084e9676a207e87854b,
     type: 3}
   m_PrefabInstance: {fileID: 1830839104477348107}
   m_PrefabAsset: {fileID: 0}
@@ -11751,15 +11765,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &5995885118383340302 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5358680785762023941, guid: 228304956ce4e084e9676a207e87854b,
-    type: 3}
-  m_PrefabInstance: {fileID: 1830839104477348107}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5995885117538912024 stripped
+--- !u!114 &5995885118417703099 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5358680784480830995, guid: 228304956ce4e084e9676a207e87854b,
+  m_CorrespondingSourceObject: {fileID: 5358680785728754096, guid: 228304956ce4e084e9676a207e87854b,
     type: 3}
   m_PrefabInstance: {fileID: 1830839104477348107}
   m_PrefabAsset: {fileID: 0}
@@ -12073,22 +12081,33 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6470244182034303879, guid: 795fedfa520c896439397a09a436212a,
+        type: 3}
+      propertyPath: bar
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7616433829985577223, guid: 795fedfa520c896439397a09a436212a,
         type: 3}
       propertyPath: m_Name
-      value: Health_Bar (Canvas)
+      value: Health_Bar_Canvas
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 795fedfa520c896439397a09a436212a, type: 3}
---- !u!224 &3490041488012341897 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5019253538558200620, guid: 795fedfa520c896439397a09a436212a,
+--- !u!4 &1738476562409525525 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7919766342083324080, guid: 795fedfa520c896439397a09a436212a,
     type: 3}
   m_PrefabInstance: {fileID: 8487287201552120229}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2052485332136710306 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7616433829985577223, guid: 795fedfa520c896439397a09a436212a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8487287201552120229}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &3490041488012341897 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5019253538558200620, guid: 795fedfa520c896439397a09a436212a,
     type: 3}
   m_PrefabInstance: {fileID: 8487287201552120229}
   m_PrefabAsset: {fileID: 0}

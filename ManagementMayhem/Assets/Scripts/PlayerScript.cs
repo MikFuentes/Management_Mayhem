@@ -78,7 +78,9 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Morale")]
     public GameObject ui_MoraleBar;
+    public Transform ui_bar;
     public GameObject results_MoraleBar;
+    public Transform results_bar;
     [SerializeField] private TMP_Text ui_Morale_text = null;
     [SyncVar] public float maxMorale;
     [SyncVar(hook = nameof(UpdateMoraleBar))] public float currentMorale;
@@ -209,7 +211,8 @@ public class PlayerScript : NetworkBehaviour
         // update pickup position
         if (pickUpActive)
         {
-            pickup.transform.position = holdPoint.position;
+            if(pickup != null)
+                pickup.transform.position = holdPoint.position;
             CmdHold();
         }
 
@@ -610,11 +613,21 @@ public class PlayerScript : NetworkBehaviour
         pickup.transform.Find("Shadow").gameObject.SetActive(false); //disable shadow when picking up
         //pickup.GetComponent<SpriteRenderer>().sortingOrder = 1;
     }
+
     [Command]
     public void CmdHold()
     {
-        pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive); // BUG: exit trigger is triggered when it's not supposed to | WORKAROUND: place here instead of OnClick (but terrible for performance)
-        pickup.transform.position = holdPoint.position;
+        if(pickup == null)
+        {
+            Debug.Log("hi");
+            pickUpActive = false;
+        }
+        else
+        {
+            pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive); // BUG: exit trigger is triggered when it's not supposed to | WORKAROUND: place here instead of OnClick (but terrible for performance)
+            pickup.transform.position = holdPoint.position;
+        }
+
     }
 
     [Command]
@@ -788,7 +801,7 @@ public class PlayerScript : NetworkBehaviour
         gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
         gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
         gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-        gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
+        //gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
     }
     #endregion
 
@@ -1124,13 +1137,16 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdInitializeMoraleBar()
     {
-        currentMorale = Room.MoraleBar;
         maxMorale = Room.MoraleBar;
+        currentMorale = Room.MoraleBar;
     }
 
     private void UpdateMoraleBar(float oldValue, float newValue)
     {
         ui_Morale_text.text = currentMorale.ToString();
+
+        ui_MoraleBar.GetComponent<HealthBar>().bar = ui_bar;
+        results_MoraleBar.GetComponent<HealthBar>().bar = results_bar;
 
         ui_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
         results_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
