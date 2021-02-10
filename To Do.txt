@@ -5,15 +5,11 @@ Add the credits
 Add the rules
 
 General things
-- Create character select screen
 - Fix major bugs
 - Finalize assets
 - Figure out how to port forward
 
 Stage 2 - Coordination
-- Make the conveyer belt more distinguishable 
-- Fix hitbox of indoor trigger
-- Fix NPC wait timer bug
 - Create results screen
 
 Ken's things:
