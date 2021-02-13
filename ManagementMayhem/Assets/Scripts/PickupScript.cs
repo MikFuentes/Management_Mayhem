@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class PickupScript : NetworkBehaviour
 {
@@ -36,6 +37,17 @@ public class PickupScript : NetworkBehaviour
     {
         triggered = !b;
         pickup_collider.enabled = b;
+    }
+
+    public void FlipIcon(bool b)
+    {
+        Vector3 thePickupScale = transform.localScale; //-x, x
+
+        if (b == true)
+        {
+            thePickupScale.x *= -1; //x, -x
+            transform.localScale = thePickupScale;
+        }
     }
 
 

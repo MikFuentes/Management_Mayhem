@@ -5034,6 +5034,10 @@ MonoBehaviour:
   currentMorale: 0
   playerPos: {x: 0, y: 0, z: 0}
   moveSpeed: 6
+  facingRight: 0
+  InitialAndPrevDirection:
+  - 
+  - 
   frontWalls: []
   Indoors: 0
   ui_Timer: {fileID: 179430321623164998}

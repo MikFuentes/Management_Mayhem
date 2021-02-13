@@ -90,10 +90,12 @@ public class PlayerScript : NetworkBehaviour
     public float moveSpeed;
     private float horizontalMove, verticalMove;
     private Vector3 movement;
+    private bool facingRight = true;
+    [SerializeField] private string[] InitialAndPrevDirection;
 
     [Header("Terrain")]
     public List<GameObject> frontWalls;
-    public bool Indoors = false;
+    public bool Indoors = false; 
 
     [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
@@ -132,6 +134,8 @@ public class PlayerScript : NetworkBehaviour
         OnBalanceChange += HandleBalanceChange;
         PushTheButton.ButtonPressed += AddDigitToSequence;
 
+        InitialAndPrevDirection[0] = null;
+
         CmdSyncStartTime();
         CmdInitializeMoraleBar();
     }
@@ -161,6 +165,8 @@ public class PlayerScript : NetworkBehaviour
         // left and right
         if (Input.GetKey(KeyCode.A) || joystick.Horizontal <= -.2f)
         {
+            facingRight = false;
+
             //face left
             Vector3 theScale = transform.localScale;
             theScale.x = Math.Abs(theScale.x) * -1;
@@ -170,10 +176,33 @@ public class PlayerScript : NetworkBehaviour
             theNameScale.x = Math.Abs(theNameScale.x) * -1;
             gameName.transform.localScale = theNameScale;
 
+            if (pickUpActive && pickup != null)
+            {
+                //if (InitialAndPrevDirection[0] == null)
+                //{
+                //    InitialAndPrevDirection[0] = "Left";
+                //}
+                if (InitialAndPrevDirection[0] != null)
+                {
+                    if ((InitialAndPrevDirection[0] == "Right" && InitialAndPrevDirection[1] == "Right") || (InitialAndPrevDirection[0] == "Left" && InitialAndPrevDirection[1] == "Right"))
+                    {
+                        CmdFlip();
+                        InitialAndPrevDirection[1] = "Left";
+                    }
+                    //else
+                    //{
+                    //    pickup.GetComponent<PickupScript>().FlipIcon(false);
+                    //}
+                }
+                InitialAndPrevDirection[1] = "Left";
+            }
+
             horizontalMove = -moveSpeed;
         }
         else if (Input.GetKey(KeyCode.D) || joystick.Horizontal >= .2f)
         {
+            facingRight = true;
+
             //face right
             Vector3 theScale = transform.localScale;
             theScale.x = Math.Abs(theScale.x);
@@ -183,6 +212,26 @@ public class PlayerScript : NetworkBehaviour
             theNameScale.x = Math.Abs(theNameScale.x);
             gameName.transform.localScale = theNameScale;
 
+            if (pickUpActive && pickup != null)
+            {
+                //if (InitialAndPrevDirection[0] == null)
+                //{
+                //    InitialAndPrevDirection[0] = "Right";
+                //}
+                if (InitialAndPrevDirection[0] != null)
+                {
+                    if ((InitialAndPrevDirection[0] == "Left" && InitialAndPrevDirection[1] == "Left") || (InitialAndPrevDirection[0] == "Right" && InitialAndPrevDirection[1] == "Left"))
+                    {
+                        CmdFlip();
+                        InitialAndPrevDirection[1] = "Right";
+                    }
+                    //else
+                    //{
+                    //    pickup.GetComponent<PickupScript>().FlipIcon(false);
+                    //}
+                }
+                InitialAndPrevDirection[1] = "Right";
+            }
             horizontalMove = moveSpeed;
         }
         else
@@ -211,8 +260,8 @@ public class PlayerScript : NetworkBehaviour
         // update pickup position
         if (pickUpActive)
         {
-            if(pickup != null)
-                pickup.transform.position = holdPoint.position;
+            //if(pickup != null)
+            //    pickup.transform.position = holdPoint.position;
             CmdHold();
         }
 
@@ -611,6 +660,18 @@ public class PlayerScript : NetworkBehaviour
         pickUpButton.gameObject.SetActive(false);
         dropButton.gameObject.SetActive(true);
         pickup.transform.Find("Shadow").gameObject.SetActive(false); //disable shadow when picking up
+
+        if (facingRight)
+        {
+            InitialAndPrevDirection[0] = "Right";
+            InitialAndPrevDirection[1] = "Right";
+        }
+        else
+        {
+            InitialAndPrevDirection[0] = "Left";
+            InitialAndPrevDirection[1] = "Left";
+        }
+
         //pickup.GetComponent<SpriteRenderer>().sortingOrder = 1;
     }
 
@@ -619,7 +680,6 @@ public class PlayerScript : NetworkBehaviour
     {
         if(pickup == null)
         {
-            Debug.Log("hi");
             pickUpActive = false;
         }
         else
@@ -627,7 +687,6 @@ public class PlayerScript : NetworkBehaviour
             pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive); // BUG: exit trigger is triggered when it's not supposed to | WORKAROUND: place here instead of OnClick (but terrible for performance)
             pickup.transform.position = holdPoint.position;
         }
-
     }
 
     [Command]
@@ -636,6 +695,11 @@ public class PlayerScript : NetworkBehaviour
         pickUpActive = false;
         pickup.GetComponent<PickupScript>().RpcEnableTrigger(!pickUpActive);
         pickup.transform.position = dropPoint.position; // BUG: doesn't always drop at the drop point...
+
+        ////face right
+        //Vector3 theScale = pickup.transform.localScale;
+        //theScale.x = Math.Abs(theScale.x);
+        //pickup.transform.localScale = theScale;
 
         RpcDropOnClick();
 
@@ -652,6 +716,9 @@ public class PlayerScript : NetworkBehaviour
         dropButton.gameObject.SetActive(false);
         pickup.transform.Find("Shadow").gameObject.SetActive(true); //enable shadow when picking up
         //pickup.GetComponent<SpriteRenderer>().sortingOrder = 0;
+
+        InitialAndPrevDirection[0] = null;
+        InitialAndPrevDirection[1] = null;
     }
 
     [Command]
@@ -822,6 +889,11 @@ public class PlayerScript : NetworkBehaviour
         animator.SetBool("Running", !(Mathf.Abs(horizontalMove) < 0.01 && Mathf.Abs(verticalMove) < 0.01));
     }
 
+    [Command]
+    private void CmdFlip()
+    {
+        pickup.GetComponent<PickupScript>().FlipIcon(true);
+    }
     #endregion
 
     #region Money
