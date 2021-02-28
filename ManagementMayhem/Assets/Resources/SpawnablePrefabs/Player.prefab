@@ -5034,7 +5034,6 @@ MonoBehaviour:
   currentMorale: 0
   playerPos: {x: 0, y: 0, z: 0}
   moveSpeed: 6
-  facingRight: 0
   InitialAndPrevDirection:
   - 
   - 
@@ -5239,7 +5238,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5043691991780758643
 Transform:
   m_ObjectHideFlags: 0
@@ -8374,7 +8373,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: 0:00
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ed485c19197f9e34a9df746ffe599200, type: 2}
   m_sharedMaterial: {fileID: -3940620140548613261, guid: ed485c19197f9e34a9df746ffe599200,
@@ -8402,7 +8401,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
+  m_fontSize: 72
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
