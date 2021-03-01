@@ -40,7 +40,7 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] public bool canDelete;
     public bool UI_Active;
     public GameObject[] sceneObjects = null;
-    [SyncVar] public bool gameOver;
+    public bool gameEnded = false;
 
     [Header("ATM_Balance")]
     [SerializeField] private GameObject homePanel = null;
@@ -176,26 +176,26 @@ public class PlayerScript : NetworkBehaviour
             theNameScale.x = Math.Abs(theNameScale.x) * -1;
             gameName.transform.localScale = theNameScale;
 
-            if (pickUpActive && pickup != null)
-            {
-                //if (InitialAndPrevDirection[0] == null)
-                //{
-                //    InitialAndPrevDirection[0] = "Left";
-                //}
-                if (InitialAndPrevDirection[0] != null)
-                {
-                    if ((InitialAndPrevDirection[0] == "Right" && InitialAndPrevDirection[1] == "Right") || (InitialAndPrevDirection[0] == "Left" && InitialAndPrevDirection[1] == "Right"))
-                    {
-                        CmdFlip();
-                        InitialAndPrevDirection[1] = "Left";
-                    }
-                    //else
-                    //{
-                    //    pickup.GetComponent<PickupScript>().FlipIcon(false);
-                    //}
-                }
-                InitialAndPrevDirection[1] = "Left";
-            }
+            //if (pickUpActive && pickup != null)
+            //{
+            //    //if (InitialAndPrevDirection[0] == null)
+            //    //{
+            //    //    InitialAndPrevDirection[0] = "Left";
+            //    //}
+            //    if (InitialAndPrevDirection[0] != null)
+            //    {
+            //        if ((InitialAndPrevDirection[0] == "Right" && InitialAndPrevDirection[1] == "Right") || (InitialAndPrevDirection[0] == "Left" && InitialAndPrevDirection[1] == "Right"))
+            //        {
+            //            CmdFlip();
+            //            InitialAndPrevDirection[1] = "Left";
+            //        }
+            //        //else
+            //        //{
+            //        //    pickup.GetComponent<PickupScript>().FlipIcon(false);
+            //        //}
+            //    }
+            //    InitialAndPrevDirection[1] = "Left";
+            //}
 
             horizontalMove = -moveSpeed;
         }
@@ -212,26 +212,26 @@ public class PlayerScript : NetworkBehaviour
             theNameScale.x = Math.Abs(theNameScale.x);
             gameName.transform.localScale = theNameScale;
 
-            if (pickUpActive && pickup != null)
-            {
-                //if (InitialAndPrevDirection[0] == null)
-                //{
-                //    InitialAndPrevDirection[0] = "Right";
-                //}
-                if (InitialAndPrevDirection[0] != null)
-                {
-                    if ((InitialAndPrevDirection[0] == "Left" && InitialAndPrevDirection[1] == "Left") || (InitialAndPrevDirection[0] == "Right" && InitialAndPrevDirection[1] == "Left"))
-                    {
-                        CmdFlip();
-                        InitialAndPrevDirection[1] = "Right";
-                    }
-                    //else
-                    //{
-                    //    pickup.GetComponent<PickupScript>().FlipIcon(false);
-                    //}
-                }
-                InitialAndPrevDirection[1] = "Right";
-            }
+            //if (pickUpActive && pickup != null)
+            //{
+            //    //if (InitialAndPrevDirection[0] == null)
+            //    //{
+            //    //    InitialAndPrevDirection[0] = "Right";
+            //    //}
+            //    if (InitialAndPrevDirection[0] != null)
+            //    {
+            //        if ((InitialAndPrevDirection[0] == "Left" && InitialAndPrevDirection[1] == "Left") || (InitialAndPrevDirection[0] == "Right" && InitialAndPrevDirection[1] == "Left"))
+            //        {
+            //            CmdFlip();
+            //            InitialAndPrevDirection[1] = "Right";
+            //        }
+            //        //else
+            //        //{
+            //        //    pickup.GetComponent<PickupScript>().FlipIcon(false);
+            //        //}
+            //    }
+            //    InitialAndPrevDirection[1] = "Right";
+            //}
             horizontalMove = moveSpeed;
         }
         else
@@ -857,18 +857,29 @@ public class PlayerScript : NetworkBehaviour
     {
         RpcUpdateItemCount(Room.TotalItems, Room.ItemsRemaining);
         RpcBringUpResultsScreen();
+        StopGame();
     }
-
 
     [ClientRpc]
     public void RpcBringUpResultsScreen()
     {
-        //only bring up your own screen
-        gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
-        gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
-        gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
-        gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-        //gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
+        if (!gameEnded)
+        {
+            //only bring up your own screen
+            gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
+            //gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
+            gameEnded = true;
+        }
+
+    }
+
+    [Server]
+    private void StopGame()
+    {
+        StopCoroutine(Room.waitTimerCoroutine);
     }
     #endregion
 
@@ -1222,6 +1233,9 @@ public class PlayerScript : NetworkBehaviour
 
         ui_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
         results_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
+
+        if (currentMorale / maxMorale == 0.0)
+            CmdEndGame();
 
         if (currentMorale / maxMorale >= 0.6)
         {
