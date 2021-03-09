@@ -873,7 +873,31 @@ public class PlayerScript : NetworkBehaviour
             gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
             gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
-            //gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
+
+            int ptsPerBox = 200;
+            int timeMultiplier = 2;
+
+            int itemScore = (totalItems - remainingItems) * ptsPerBox;
+            // money
+            int timeScore = (int) currentTime * timeMultiplier;
+            int moraleMultiplier = (int)currentMorale;
+
+            int finalScore = (itemScore + timeScore) * moraleMultiplier;
+
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Item_Score.text = "+" + itemScore.ToString();
+            //money
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Time_Score.text = "+" + timeScore.ToString();
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Morale_Score.text = "x" + moraleMultiplier.ToString();
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Total_Score.text = finalScore.ToString();
+
+            int maxItemScore = totalItems * ptsPerBox;
+            //money overspent
+            //int maxMoneyScore =  - 0;
+            int maxTimeScore = (int)matchLength * timeMultiplier;
+            int maxMoraleMultiplier = (int)maxMorale;
+
+            int maxFInalScore = (maxItemScore + maxMoneyScore + maxTimeScore) * maxMoraleMultiplier;
+
             gameEnded = true;
         }
 

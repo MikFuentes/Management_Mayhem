@@ -19,6 +19,12 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [SerializeField] public TMP_Text Remaining_Time;
     [SerializeField] public TMP_Text Team_Morale;
 
+    [SerializeField] public TMP_Text Item_Score;
+    [SerializeField] public TMP_Text Money_Score;
+    [SerializeField] public TMP_Text Time_Score;
+    [SerializeField] public TMP_Text Morale_Score;
+    [SerializeField] public TMP_Text Total_Score;
+
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
     {
