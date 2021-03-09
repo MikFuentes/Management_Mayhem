@@ -56,25 +56,6 @@ public class ItemSpawnerDeleter : NetworkBehaviour
         }
     }
 
-    private IEnumerator CooldownTimer(float time)
-    {
-        yield return new WaitForSeconds(time);
-        Cooldown = false;
-    }
-
-    //public IEnumerator delaySpawnObject()
-    //{
-    //    yield return new WaitForSeconds(2f);
-    //    spawnObject();
-    //    NetworkServer.Spawn(objectQueue.Dequeue());
-    //}
-
-    //public void spawnObject()
-    //{
-    //    Debug.Log("hi");
-    //    //
-    //}
-
     public void queueRandomObject()
     {
         item_array = Resources.LoadAll<GameObject>("SpawnablePrefabs/Boxes").ToList();
@@ -113,5 +94,10 @@ public class ItemSpawnerDeleter : NetworkBehaviour
             }
         }
         return null;
+    }
+    private IEnumerator CooldownTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        Cooldown = false;
     }
 }
