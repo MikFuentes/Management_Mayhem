@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System.Linq;
 
 public class ItemSpawnerDeleter : NetworkBehaviour
 {
+    public List<GameObject> item_array = null;
     public GameObject pickup;
     public Vector3 v;
+    public int prevRand = -1;
+
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -35,7 +39,22 @@ public class ItemSpawnerDeleter : NetworkBehaviour
             NetworkServer.Destroy(pickup);
         }
 
-        GameObject itemPrefab = FindItem(pickup.name);
+        spawnRandomObject();
+    }
+
+    public void spawnRandomObject()
+    {
+        item_array = Resources.LoadAll<GameObject>("SpawnablePrefabs/Boxes").ToList();
+
+        int rand = UnityEngine.Random.Range(0, item_array.Count);
+
+        while (rand == prevRand)
+        {
+            rand = UnityEngine.Random.Range(0, item_array.Count);
+        }
+        prevRand = rand;
+
+        GameObject itemPrefab = FindItem(item_array[rand].name);
         GameObject item = (GameObject)Instantiate(itemPrefab, v, Quaternion.identity);
         NetworkServer.Spawn(item);
     }

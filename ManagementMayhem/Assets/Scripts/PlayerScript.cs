@@ -69,6 +69,7 @@ public class PlayerScript : NetworkBehaviour
     public int totalItems;
     [SyncVar(hook = nameof(HandleNumItems))] public int remainingItems;
     public static event Action<int> OnNumItemsUpdate;
+    public GameObject spawnDestroyer;
 
     [Header("Money")]
     //[SerializeField] private GameObject moneyUI = null;
@@ -299,6 +300,8 @@ public class PlayerScript : NetworkBehaviour
                         CmdTriggerExitPickup();
                         CmdUpdateMoney(-cost);
                         CmdSpawn(itemName);
+
+                        GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().spawnRandomObject();
                     }
                     else
                     {
@@ -1092,13 +1095,13 @@ public class PlayerScript : NetworkBehaviour
     {
         if (!isLocalPlayer) return; //stops double calculations of timer
 
-        if (newValue == 0)
-            CmdEndGame();
-
         //Debug.Log(oldValue + ", " + newValue);
         float minutes = Mathf.FloorToInt(newValue / 60);
         float seconds = Mathf.FloorToInt(newValue % 60);
-        ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);        
+        
+        if (newValue == 0)
+            CmdEndGame();
     }
 
     private string ReturnCurrentTime(float currentMatchTime)
