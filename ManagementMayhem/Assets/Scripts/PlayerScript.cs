@@ -301,7 +301,8 @@ public class PlayerScript : NetworkBehaviour
                         CmdUpdateMoney(-cost);
                         CmdSpawn(itemName);
 
-                        GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().spawnRandomObject();
+                        //GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().queueRandomObject();
+                        //StartCoroutine(GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().delaySpawnObject());
                     }
                     else
                     {

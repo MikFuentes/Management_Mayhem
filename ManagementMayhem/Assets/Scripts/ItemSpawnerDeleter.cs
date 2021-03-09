@@ -10,7 +10,8 @@ public class ItemSpawnerDeleter : NetworkBehaviour
     public GameObject pickup;
     public Vector3 v;
     public int prevRand = -1;
-
+    public Queue<GameObject> objectQueue = new Queue<GameObject>();
+    private bool Cooldown = false;
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -30,19 +31,51 @@ public class ItemSpawnerDeleter : NetworkBehaviour
         v = gameObject.transform.position;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void Update()
     {
+        if (!Cooldown)
+        {
+            if (objectQueue.Count != 0)
+            {
+                GameObject item = (GameObject)Instantiate(objectQueue.Dequeue(), v, Quaternion.identity);
+                NetworkServer.Spawn(item);
+
+                Cooldown = true;
+                StartCoroutine(CooldownTimer(3f));
+            }        
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {  
         if (collision.gameObject.CompareTag("Pickup"))
         {
             pickup = collision.gameObject;
-
             NetworkServer.Destroy(pickup);
+            queueRandomObject();
         }
-
-        spawnRandomObject();
     }
 
-    public void spawnRandomObject()
+    private IEnumerator CooldownTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        Cooldown = false;
+    }
+
+    //public IEnumerator delaySpawnObject()
+    //{
+    //    yield return new WaitForSeconds(2f);
+    //    spawnObject();
+    //    NetworkServer.Spawn(objectQueue.Dequeue());
+    //}
+
+    //public void spawnObject()
+    //{
+    //    Debug.Log("hi");
+    //    //
+    //}
+
+    public void queueRandomObject()
     {
         item_array = Resources.LoadAll<GameObject>("SpawnablePrefabs/Boxes").ToList();
 
@@ -55,8 +88,8 @@ public class ItemSpawnerDeleter : NetworkBehaviour
         prevRand = rand;
 
         GameObject itemPrefab = FindItem(item_array[rand].name);
-        GameObject item = (GameObject)Instantiate(itemPrefab, v, Quaternion.identity);
-        NetworkServer.Spawn(item);
+
+        objectQueue.Enqueue(itemPrefab);
     }
 
     private GameObject FindItem(string name)
