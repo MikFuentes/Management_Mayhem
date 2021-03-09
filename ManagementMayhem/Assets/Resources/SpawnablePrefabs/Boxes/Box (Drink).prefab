@@ -20,7 +20,7 @@ PrefabInstance:
     - target: {fileID: 5446338394444979035, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: itemName
-      value: Drinks
+      value: Drink
       objectReference: {fileID: 0}
     - target: {fileID: 5446338394444979035, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}

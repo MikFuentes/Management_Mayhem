@@ -12,6 +12,7 @@ TagManager:
   - NPC
   - Indoor
   - Hidable
+  - SpawnDestroyer
   layers:
   - Default
   - TransparentFX

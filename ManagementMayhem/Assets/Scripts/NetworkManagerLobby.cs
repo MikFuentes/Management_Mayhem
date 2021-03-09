@@ -57,7 +57,7 @@ public class NetworkManagerLobby : NetworkManager
         selectedCharacterIndexes.Add(-1);
         selectedCharacterIndexes.Add(-1);
 
-        TotalItems = 5;
+        TotalItems = 10;
         ItemsRemaining = TotalItems;
 
         MoraleBar = 5;

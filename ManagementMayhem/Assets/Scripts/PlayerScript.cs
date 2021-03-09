@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,6 +30,8 @@ public class PlayerScript : NetworkBehaviour
     public GameObject Current_Interactable_UI;
     public GameObject Faded_Background;
     [SerializeField] private GameObject gameName;
+    public List<Image> stars;
+    public List<TMP_Text> score;
 
     [Header("Debug Info")]
     [SyncVar] public GameObject pickup;
@@ -76,6 +79,8 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private TMP_Text moneyText = null;
     [SyncVar] [SerializeField] public float currentMoney;
     private static event Action<float> OnMoneyChange;
+    private static event Action<float> OnMoneySpentChange;
+    public float moneySpent;
 
     [Header("Morale")]
     public GameObject ui_MoraleBar;
@@ -132,6 +137,7 @@ public class PlayerScript : NetworkBehaviour
 
         // subscribe to events
         OnMoneyChange += HandleMoneyChange;
+        OnMoneySpentChange += HandleMoneySpentChange;
         OnBalanceChange += HandleBalanceChange;
         PushTheButton.ButtonPressed += AddDigitToSequence;
 
@@ -146,6 +152,7 @@ public class PlayerScript : NetworkBehaviour
     {
         if (!hasAuthority) { return; } // do nothing if we don't have authority
         OnMoneyChange -= HandleMoneyChange;
+        OnMoneySpentChange -= HandleMoneySpentChange;
         OnBalanceChange -= HandleBalanceChange;
     }
 
@@ -301,7 +308,12 @@ public class PlayerScript : NetworkBehaviour
                         CmdUpdateMoney(-cost);
                         CmdSpawn(itemName);
 
-                        GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().queueRandomObject();
+                        CmdUpdateMoneySpent(cost);
+
+                        //fix
+                        //GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().queueRandomObject();
+                        //Debug.Log(spawnDestroyer.name); //valid for host, null for client
+                        CmdQueueRandomObject(spawnDestroyer);
                     }
                     else
                     {
@@ -365,6 +377,7 @@ public class PlayerScript : NetworkBehaviour
 
                 NPC = collision.gameObject;
 
+
                 gameObject.GetComponent<BoxCollider2D>().enabled = false;
 
                 //GameObject Health_Bar = NPC.transform.Find("Health_Bar").gameObject;
@@ -373,6 +386,7 @@ public class PlayerScript : NetworkBehaviour
 
                 if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && Room.GamePlayers[0].timerStarted == false)
                 {
+                    CmdQueueRandomObjects(NPC);
                     CmdStartWaitTimer(NPCWaitTime, NPC);
                 }
                 else
@@ -382,8 +396,8 @@ public class PlayerScript : NetworkBehaviour
                         case "Chair":
                             tempName = "Chair";
                             break;
-                        case "Drinks":
-                            tempName = "Drinks";
+                        case "Drink":
+                            tempName = "Drink";
                             break;
                         case "Food":
                             tempName = "Food";
@@ -484,6 +498,10 @@ public class PlayerScript : NetworkBehaviour
                 }
                 gameObject.GetComponent<BoxCollider2D>().enabled = false;
             }
+            else if (collision.gameObject.CompareTag("SpawnDestroyer"))
+            {
+                spawnDestroyer = collision.gameObject;
+            }
         }
     }
 
@@ -499,7 +517,12 @@ public class PlayerScript : NetworkBehaviour
                 pickup = collision.gameObject;
                 CmdTriggerEnterPickup(pickup);
             }
+            else if (collision.gameObject.CompareTag("SpawnDestroyer"))
+            {
+                spawnDestroyer = collision.gameObject;
+            }
         }
+
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -581,7 +604,11 @@ public class PlayerScript : NetworkBehaviour
         if (!isLocalPlayer) return; //stops double calculations
 
         if (newValue == 0)
+        {
+            Debug.Log("No more items");
             CmdEndGame();
+        }
+
     }
 
     [Server]
@@ -623,6 +650,110 @@ public class PlayerScript : NetworkBehaviour
         remainingItems = Remaining;
     }
 
+    [Command]
+    public void CmdQueueRandomObjects(GameObject NPC)
+    {
+        queueRandomObjects(NPC);
+    }
+
+    [Server]
+    public void queueRandomObjects(GameObject NPC)
+    {
+        int rand = 0;
+        int prevRand = -1;
+        int prevRandd = -2;
+
+        for (int i = 0; i < Room.TotalItems; i++)
+        {
+            rand = UnityEngine.Random.Range(0, NPC.GetComponent<NPC_Script>().item_sprite_list.Count);
+
+            while (rand == prevRand || rand == prevRandd)
+            {
+                rand = UnityEngine.Random.Range(0, NPC.GetComponent<NPC_Script>().item_sprite_list.Count);
+            }
+            prevRandd = prevRand;
+            prevRand = rand;
+
+            RpcAddToQueue(rand, NPC);
+        }
+    }
+
+
+
+
+    [ClientRpc]
+    private void RpcAddToQueue(int r, GameObject go)
+    {
+        NPC = go;
+        NPC.GetComponent<NPC_Script>().item_list.Add(NPC.GetComponent<NPC_Script>().item_sprite_list[r]);
+    }
+
+    [Command]
+    public void CmdQueueRandomObject(GameObject SpawnerDeleter)
+    {
+        Debug.Log(SpawnerDeleter.name);
+        queueRandomObject(SpawnerDeleter);
+    }
+
+    [Server]
+    public void queueRandomObject(GameObject go)
+    {
+        Debug.Log(go.name);
+
+        Debug.Log(go.GetComponent<ItemSpawnerDeleter>().item_array.Count);
+        int rand = 0;
+        int prevRand = -1;
+        int prevRandd = -2;
+
+        List<GameObject> item_array = Resources.LoadAll<GameObject>("SpawnablePrefabs/Boxes").ToList();
+        rand = UnityEngine.Random.Range(0, go.GetComponent<ItemSpawnerDeleter>().item_array.Count);
+
+        while (rand == prevRand || rand == prevRandd)
+        {
+            rand = UnityEngine.Random.Range(0, go.GetComponent<ItemSpawnerDeleter>().item_array.Count);
+        }
+        prevRandd = prevRand;
+        prevRand = rand;
+
+        string temp = "";
+        string name = item_array[rand].name;
+        GameObject itemPrefab = null;
+
+        if (name.StartsWith("P") || name.StartsWith("Box"))
+        {
+            temp = name.Split(')')[0] + ")";
+        }
+        else
+        {
+            temp = "Item (" + name + ")";
+        }
+
+        foreach (var prefab in Room.spawnPrefabs)
+        {
+            if (temp == prefab.name)
+            {
+                itemPrefab = prefab; // return the gameObject
+            }
+        }
+
+        //Debug.Log(itemPrefab.name);
+
+        for (int i = 0; i < 1; i++)
+        {
+            Debug.Log(i);
+            Room.GamePlayers[i].GetComponent<PlayerScript>().spawnDestroyer = go;
+            Room.GamePlayers[i].GetComponent<PlayerScript>().spawnDestroyer.GetComponent<ItemSpawnerDeleter>().objectQueue.Enqueue(itemPrefab);
+        }
+        //RpcAddToSpawnQueue(itemPrefab, go);
+    }
+
+    //[ClientRpc]
+    //private void RpcAddToSpawnQueue(GameObject prefab, GameObject go)
+    //{
+    //    Debug.Log(prefab.name);
+    //    spawnDestroyer = go;
+    //    spawnDestroyer.GetComponent<ItemSpawnerDeleter>().objectQueue.Enqueue(prefab);
+    //}
     #endregion
 
     #region Actions
@@ -871,32 +1002,86 @@ public class PlayerScript : NetworkBehaviour
             //only bring up your own screen
             gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
             gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
-            gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = currentBalance.ToString();
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = moneySpent.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
 
             int ptsPerBox = 200;
             int timeMultiplier = 2;
+            float moneyMultiplier = 0.5f;
 
             int itemScore = (totalItems - remainingItems) * ptsPerBox;
-            // money
+            int moneyScore = (int) ((NPC.GetComponent<NPC_Script>().budget -  moneySpent) * moneyMultiplier);
+            Debug.Log(NPC.GetComponent<NPC_Script>().budget);
+            Debug.Log(moneySpent);
+            Debug.Log(moneyScore);
             int timeScore = (int) currentTime * timeMultiplier;
-            int moraleMultiplier = (int)currentMorale;
+            float moraleMultiplier = (int)currentMorale/2;
+            if (moraleMultiplier < 1)
+                moraleMultiplier = 1;
 
-            int finalScore = (itemScore + timeScore) * moraleMultiplier;
+            int finalScore = (int)((itemScore + moneyScore + timeScore) * moraleMultiplier);
 
             gameObject.GetComponent<NetworkGamePlayerLobby>().Item_Score.text = "+" + itemScore.ToString();
-            //money
+            if(moneyScore < 0)
+                gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = moneyScore.ToString();
+            else
+                gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = "+" + moneyScore.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Time_Score.text = "+" + timeScore.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Morale_Score.text = "x" + moraleMultiplier.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Total_Score.text = finalScore.ToString();
 
             int maxItemScore = totalItems * ptsPerBox;
-            //money overspent
-            //int maxMoneyScore =  - 0;
+            int maxMoneyScore = (int) (NPC.GetComponent<NPC_Script>().budget * moneyMultiplier);
             int maxTimeScore = (int)matchLength * timeMultiplier;
-            int maxMoraleMultiplier = (int)maxMorale;
+            float maxMoraleMultiplier = (int)maxMorale/2;
 
-            int maxFInalScore = (maxItemScore + maxMoneyScore + maxTimeScore) * maxMoraleMultiplier;
+            int maxFinalScore = (int)((maxItemScore + maxMoneyScore + maxTimeScore) * maxMoraleMultiplier);
+
+            float rating = finalScore / maxFinalScore;
+            print(finalScore);
+            print(maxFinalScore);
+
+            float threeStarRating = 0.66f;
+            float twoStarRating = 0.44f;
+            float oneStarRating = 0.22f;
+
+            int highScore = (int) (maxFinalScore * threeStarRating);
+            int medScore = (int)(maxFinalScore * twoStarRating);
+            int lowScore = (int)(maxFinalScore * oneStarRating);
+
+            score[0].text = lowScore.ToString();
+            score[1].text = medScore.ToString();
+            score[2].text = highScore.ToString();
+
+            if (rating > threeStarRating)
+            {
+                for(int i = 0; i < 3;i++)
+                {
+                    var tempColor = stars[i].color;
+                    tempColor.a = 1f;
+                    stars[i].color = tempColor;
+                }
+            }
+            else if(rating > twoStarRating)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    var tempColor = stars[i].color;
+                    tempColor.a = 1f;
+                    stars[i].color = tempColor;
+                }
+            }
+            else if (rating > oneStarRating)
+            {
+                for (int i = 0; i < 1; i++)
+                {
+                    var tempColor = stars[i].color;
+                    tempColor.a = 1f;
+                    stars[i].color = tempColor;
+                }
+            }
+
+
 
             gameEnded = true;
         }
@@ -1112,6 +1297,41 @@ public class PlayerScript : NetworkBehaviour
         withdrawText.text = codeSequence;
     }
 
+    private float calculateBudget(GameObject NPC)
+    {
+        List<Sprite> list = NPC.gameObject.GetComponent<NPC_Script>().item_list;
+        int budget = 0;
+        foreach(var l in list)
+        {
+            foreach (var prefab in Room.spawnPrefabs)
+            {
+                if ("Box (" + l.name + ")" == prefab.name)
+                {
+                    budget += (int)prefab.gameObject.GetComponent<PickupProperties>().value;
+                }
+            }
+        }
+        return budget;
+    }
+
+    private void HandleMoneySpentChange(float value)
+    {
+        moneySpent += value;
+    }
+
+    [Command]
+    private void CmdUpdateMoneySpent(float value)
+    {
+        RpcUpdateMoneySpent(value);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateMoneySpent(float value)
+    {
+        OnMoneySpentChange?.Invoke(value);
+    }
+
+
     #endregion
 
     #region Time
@@ -1125,7 +1345,11 @@ public class PlayerScript : NetworkBehaviour
         ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);        
         
         if (newValue == 0)
+        {
+            print("Time's up");
             CmdEndGame();
+        }
+
     }
 
     private string ReturnCurrentTime(float currentMatchTime)
@@ -1262,7 +1486,11 @@ public class PlayerScript : NetworkBehaviour
         results_MoraleBar.GetComponent<HealthBar>().SetSize(currentMorale / maxMorale);
 
         if (currentMorale / maxMorale == 0.0)
+        {
+            Debug.Log("sadge");
             CmdEndGame();
+        }
+
 
         if (currentMorale / maxMorale >= 0.6)
         {

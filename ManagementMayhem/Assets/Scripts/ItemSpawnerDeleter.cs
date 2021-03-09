@@ -9,7 +9,9 @@ public class ItemSpawnerDeleter : NetworkBehaviour
     public List<GameObject> item_array = null;
     public GameObject pickup;
     public Vector3 v;
+    public int rand = 0;
     public int prevRand = -1;
+    public int prevRandd = -2;
     public Queue<GameObject> objectQueue = new Queue<GameObject>();
     private bool Cooldown = false;
 
@@ -60,12 +62,13 @@ public class ItemSpawnerDeleter : NetworkBehaviour
     {
         item_array = Resources.LoadAll<GameObject>("SpawnablePrefabs/Boxes").ToList();
 
-        int rand = UnityEngine.Random.Range(0, item_array.Count);
+        rand = UnityEngine.Random.Range(0, item_array.Count);
 
-        while (rand == prevRand)
+        while (rand == prevRand || rand == prevRandd)
         {
             rand = UnityEngine.Random.Range(0, item_array.Count);
         }
+        prevRandd = prevRand;
         prevRand = rand;
 
         GameObject itemPrefab = FindItem(item_array[rand].name);

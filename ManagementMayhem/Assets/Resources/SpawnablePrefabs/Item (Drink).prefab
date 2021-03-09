@@ -56,7 +56,7 @@ PrefabInstance:
     - target: {fileID: 2379311832773416044, guid: 7223bba202abd2d40a21ef8b1baf131c,
         type: 3}
       propertyPath: itemName
-      value: Drinks
+      value: Drink
       objectReference: {fileID: 0}
     - target: {fileID: 2699754351681183893, guid: 7223bba202abd2d40a21ef8b1baf131c,
         type: 3}
