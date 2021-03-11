@@ -9,6 +9,7 @@ public class PlayerNameInput : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_InputField nameInputField = null;
     [SerializeField] private Button continueButton = null;
+    [SerializeField] private TMP_Text helloText = null;
 
     public static string DisplayName { get; private set; } //for grabbing the display name in the UI
 
@@ -50,6 +51,8 @@ public class PlayerNameInput : MonoBehaviour
         DisplayName = nameInputField.text;
 
         PlayerPrefs.SetString(PlayerPrefsNameKey, DisplayName);
+
+        helloText.text = "Hello " + DisplayName + "!";
     }
 
     public void ClearPlayerName()

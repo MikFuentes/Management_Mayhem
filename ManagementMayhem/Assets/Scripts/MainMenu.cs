@@ -44,7 +44,7 @@ public class MainMenu : MonoBehaviour
         pages[0].SetActive(true);
         pages[1].SetActive(false);
         pages[2].SetActive(false);
-        nameInput.SetActive(false);
+        //nameInput.SetActive(false);
 
         if (PlayerPrefs.GetInt("firstTime", 1) == 1)
         {
@@ -54,7 +54,7 @@ public class MainMenu : MonoBehaviour
         else
         {
             //get name input
-            nameInput.SetActive(true);
+            landingPagePanel.SetActive(true);
         }
     }
 
