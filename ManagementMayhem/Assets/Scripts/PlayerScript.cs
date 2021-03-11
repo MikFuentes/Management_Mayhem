@@ -296,6 +296,7 @@ public class PlayerScript : NetworkBehaviour
                     CmdDestroy(pickup);
                     CmdTriggerExitPickup();
                     CmdUpdateMoney(value);
+                    CmdUpdateMoneySpent(value); // Money given to cashier = money spent
                 }
                 else if (pickup.GetComponent<PickupProperties>().itemType == "Box")
                 {
@@ -310,7 +311,7 @@ public class PlayerScript : NetworkBehaviour
                         CmdUpdateMoney(-cost);
                         CmdSpawn(itemName);
 
-                        CmdUpdateMoneySpent(cost);
+
 
                         //fix
                         //GameObject.Find("Right_Building/Item_Spawner_Destroyer").GetComponent<ItemSpawnerDeleter>().queueRandomObject();
