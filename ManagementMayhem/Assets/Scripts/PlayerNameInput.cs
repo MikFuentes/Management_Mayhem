@@ -16,11 +16,15 @@ public class PlayerNameInput : MonoBehaviour
 
     void Start() => SetUpInputField();
 
-    private void SetUpInputField()
-    {
-        if (!PlayerPrefs.HasKey(PlayerPrefsNameKey)) { return; }
+    public void SetUpInputField()
+    {   
+        // If no name, do nothing
+        if (!PlayerPrefs.HasKey(PlayerPrefsNameKey)) {
+            nameInputField.text = "";
+            return; 
+        } 
 
-        string defaultName = PlayerPrefs.GetString(PlayerPrefsNameKey);
+        string defaultName = PlayerPrefs.GetString(PlayerPrefsNameKey, "");
 
         nameInputField.text = defaultName;
 
@@ -39,7 +43,6 @@ public class PlayerNameInput : MonoBehaviour
         {
             continueButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
         }
-
     }
 
     public void SavePlayerName()

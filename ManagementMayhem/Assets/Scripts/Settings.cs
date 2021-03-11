@@ -15,6 +15,11 @@ public class Settings : MonoBehaviour
 
     void Start()
     {
+        setDefaultVolume();
+    }
+
+    public void setDefaultVolume()
+    {
         masterSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1f);
         musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
         sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
@@ -36,5 +41,10 @@ public class Settings : MonoBehaviour
     {
         audioMixer.SetFloat("sfx", Mathf.Log10(sfxVolume)*20);
         PlayerPrefs.SetFloat("SFXVolume", sfxVolume);
+    }
+
+    public void reset()
+    {
+        PlayerPrefs.DeleteAll();
     }
 }

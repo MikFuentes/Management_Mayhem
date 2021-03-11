@@ -14,6 +14,16 @@ public class MainMenu : MonoBehaviour
     [Header("UI")]
     [SerializeField] private GameObject landingPagePanel = null;
 
+    [SerializeField] private GameObject home = null;
+    [SerializeField] private GameObject stageNegativeOne = null;
+    [SerializeField] private List<GameObject> pages = null;
+    [SerializeField] private GameObject nameInput = null;
+
+    void Start()
+    {
+        setDefaultFirstTime();
+    }
+
     public void HostLobby()
     {
         NetworkManager.StartHost();
@@ -25,5 +35,35 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         FindObjectOfType<AudioManager>().Play("MenuMusic", false);
+    }
+
+    public void StartButton()
+    {
+        home.SetActive(false);
+        stageNegativeOne.SetActive(false);
+        pages[0].SetActive(true);
+        pages[1].SetActive(false);
+        pages[2].SetActive(false);
+        nameInput.SetActive(false);
+
+        if (PlayerPrefs.GetInt("firstTime", 1) == 1)
+        {
+            //load stage -1
+            stageNegativeOne.SetActive(true);
+        }
+        else
+        {
+            //get name input
+            nameInput.SetActive(true);
+        }
+    }
+
+    public void setDefaultFirstTime()
+    {
+        PlayerPrefs.GetInt("firstTime", 1);
+    }
+    public void NotFirstTime()
+    {
+        PlayerPrefs.SetInt("firstTime", 0);
     }
 }
