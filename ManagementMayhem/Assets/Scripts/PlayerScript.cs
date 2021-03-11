@@ -80,7 +80,8 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] [SerializeField] public float currentMoney;
     private static event Action<float> OnMoneyChange;
     private static event Action<float> OnMoneySpentChange;
-    public float moneySpent;
+    [SyncVar] public float moneySpent;
+    public float budget;
 
     [Header("Morale")]
     public GameObject ui_MoraleBar;
@@ -90,6 +91,7 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private TMP_Text ui_Morale_text = null;
     [SyncVar] public float maxMorale;
     [SyncVar(hook = nameof(UpdateMoraleBar))] public float currentMorale;
+    [SerializeField] private TMP_Text morale_number = null;
 
     [Header("Movement")]
     [SyncVar] public Vector3 playerPos;
@@ -691,16 +693,16 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     public void CmdQueueRandomObject(GameObject SpawnerDeleter)
     {
-        Debug.Log(SpawnerDeleter.name);
+        //Debug.Log(SpawnerDeleter.name);
         queueRandomObject(SpawnerDeleter);
     }
 
     [Server]
     public void queueRandomObject(GameObject go)
     {
-        Debug.Log(go.name);
+        //Debug.Log(go.name);
 
-        Debug.Log(go.GetComponent<ItemSpawnerDeleter>().item_array.Count);
+        //Debug.Log(go.GetComponent<ItemSpawnerDeleter>().item_array.Count);
         int rand = 0;
         int prevRand = -1;
         int prevRandd = -2;
@@ -740,7 +742,7 @@ public class PlayerScript : NetworkBehaviour
 
         for (int i = 0; i < 1; i++)
         {
-            Debug.Log(i);
+            //Debug.Log(i);
             Room.GamePlayers[i].GetComponent<PlayerScript>().spawnDestroyer = go;
             Room.GamePlayers[i].GetComponent<PlayerScript>().spawnDestroyer.GetComponent<ItemSpawnerDeleter>().objectQueue.Enqueue(itemPrefab);
         }
@@ -990,6 +992,7 @@ public class PlayerScript : NetworkBehaviour
     private void CmdEndGame()
     {
         RpcUpdateItemCount(Room.TotalItems, Room.ItemsRemaining);
+        calculateBudget(NPC);
         RpcBringUpResultsScreen();
         StopGame();
     }
@@ -1004,16 +1007,14 @@ public class PlayerScript : NetworkBehaviour
             gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;
             gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Balance.text = moneySpent.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Remaining_Time.text = ReturnCurrentTime(currentTime);
+            gameObject.GetComponent<NetworkGamePlayerLobby>().Team_Morale.text = currentMorale.ToString() + "/" + maxMorale.ToString();
 
             int ptsPerBox = 200;
             int timeMultiplier = 2;
             float moneyMultiplier = 0.5f;
 
             int itemScore = (totalItems - remainingItems) * ptsPerBox;
-            int moneyScore = (int) ((NPC.GetComponent<NPC_Script>().budget -  moneySpent) * moneyMultiplier);
-            Debug.Log(NPC.GetComponent<NPC_Script>().budget);
-            Debug.Log(moneySpent);
-            Debug.Log(moneyScore);
+            int moneyScore = (int) ((budget -  moneySpent) * moneyMultiplier);
             int timeScore = (int) currentTime * timeMultiplier;
             float moraleMultiplier = (int)currentMorale/2;
             if (moraleMultiplier < 1)
@@ -1037,10 +1038,6 @@ public class PlayerScript : NetworkBehaviour
 
             int maxFinalScore = (int)((maxItemScore + maxMoneyScore + maxTimeScore) * maxMoraleMultiplier);
 
-            float rating = finalScore / maxFinalScore;
-            print(finalScore);
-            print(maxFinalScore);
-
             float threeStarRating = 0.66f;
             float twoStarRating = 0.44f;
             float oneStarRating = 0.22f;
@@ -1053,7 +1050,7 @@ public class PlayerScript : NetworkBehaviour
             score[1].text = medScore.ToString();
             score[2].text = highScore.ToString();
 
-            if (rating > threeStarRating)
+            if (finalScore > highScore)
             {
                 for(int i = 0; i < 3;i++)
                 {
@@ -1062,7 +1059,7 @@ public class PlayerScript : NetworkBehaviour
                     stars[i].color = tempColor;
                 }
             }
-            else if(rating > twoStarRating)
+            else if(finalScore > medScore)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -1071,7 +1068,7 @@ public class PlayerScript : NetworkBehaviour
                     stars[i].color = tempColor;
                 }
             }
-            else if (rating > oneStarRating)
+            else if (finalScore > lowScore)
             {
                 for (int i = 0; i < 1; i++)
                 {
@@ -1080,12 +1077,8 @@ public class PlayerScript : NetworkBehaviour
                     stars[i].color = tempColor;
                 }
             }
-
-
-
             gameEnded = true;
         }
-
     }
 
     [Server]
@@ -1296,10 +1289,12 @@ public class PlayerScript : NetworkBehaviour
         codeSequence = "0";
         withdrawText.text = codeSequence;
     }
-
-    private float calculateBudget(GameObject NPC)
+    
+    [Server]
+    private void calculateBudget(GameObject NPC)
     {
         List<Sprite> list = NPC.gameObject.GetComponent<NPC_Script>().item_list;
+
         int budget = 0;
         foreach(var l in list)
         {
@@ -1311,7 +1306,17 @@ public class PlayerScript : NetworkBehaviour
                 }
             }
         }
-        return budget;
+
+        calculateBudget(budget);
+    }
+
+    [ClientRpc]
+    private void calculateBudget(int budget)
+    {
+        for (int i = 0; i < Room.GamePlayers.Count; i++) 
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().budget = budget;
+        }
     }
 
     private void HandleMoneySpentChange(float value)
@@ -1346,7 +1351,7 @@ public class PlayerScript : NetworkBehaviour
         
         if (newValue == 0)
         {
-            print("Time's up");
+            Debug.Log("Time's up");
             CmdEndGame();
         }
 
@@ -1507,6 +1512,9 @@ public class PlayerScript : NetworkBehaviour
             ui_MoraleBar.GetComponent<HealthBar>().SetColor(Color.red);
             results_MoraleBar.GetComponent<HealthBar>().SetColor(Color.red);
         }
+
+        morale_number.text = currentMorale.ToString() + "/" + maxMorale.ToString();
+
     }
     #endregion
 }

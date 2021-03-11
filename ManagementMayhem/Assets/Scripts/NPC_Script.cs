@@ -39,7 +39,6 @@ public class NPC_Script : NetworkBehaviour
         item_sprite_list = Resources.LoadAll<Sprite>("Val's_Lovely_Art/Pickups/Items").ToList();
 
         //queueRandomObjects();
-        budget = calculateBudget();
     }
 
     public void RemoveFromArray(string sprite_name)
@@ -92,11 +91,13 @@ public class NPC_Script : NetworkBehaviour
     //    }
     //}
 
-    private float calculateBudget()
+    public float calculateBudget(List<Sprite> item_list)
     {
         int budget = 0;
+        Debug.Log(item_list.Count);
         foreach (var l in item_list)
         {
+            Debug.Log(l.name);
             foreach (var prefab in Room.spawnPrefabs)
             {
                 if ("Box (" + l.name + ")" == prefab.name)
