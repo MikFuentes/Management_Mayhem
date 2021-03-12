@@ -1,0 +1,21 @@
+﻿1. Welcome to Event Management Mayhem. You and two others have been tasked to keep our event running smoothly.
+2. ...
+3. Oh, the event? It's none other than the Gato Game Summit!
+4. GGS is the annual gaming expo hosted by us Cateneans to promote the latest technologies in games for our campus community.
+5. The three of you have been selected to be part of the core team for the event.
+6. Decide who will be the Finance, Programs, and Logistics person in your group of three.
+7. There are three stations that correspond to each of your roles.
+8. The Bank is the Finance person's station.
+9. At the Bank, the Finance person can withdraw coins from the ATM and secure sponsorship funds using the Phone. 
+10. The role of the Finance person is to find a way to get the coins to Logistics whilst making sure the group has enough money to buy items needed for the event.
+11. Next, we have the Warehouse.
+12. The Warehouse is the Logistics person's station.
+13. This is where the Logistics person can purchase objects from the Warehouse.
+14. The role of the Logistics person is to purchase the necessary items from the cashier using the coins given to them and to get the purchased items to the Programs player.
+15. Lastly, we have the Stage Area.
+16. The Stage Area is Programs person’s station
+17. Here, the Programs person can interact with the NPC to see what items are needed for the event and help transfer things from one station to the other using the conveyer belts.
+18. The role of the Programs person is to deliver the items to the NPC in time and to act as the middle person between the two other players.
+19. Do you want me to go over the stations and roles again? [19, 7]
+20. It is highly recommended for everyone to stay in their respective stations. Don’t forget to communicate!
+21. pee pee poo poo

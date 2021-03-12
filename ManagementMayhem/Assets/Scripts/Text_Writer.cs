@@ -4,6 +4,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Text.RegularExpressions;
 
 // https://youtu.be/ZVh4nH8Mayg
 public class Text_Writer : MonoBehaviour
@@ -17,18 +18,18 @@ public class Text_Writer : MonoBehaviour
         textWriterSingleList = new List<TextWriterSingle>();
     }
 
-    public static TextWriterSingle addWriterStatic(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, bool removeWriterBeforeAdd, Action onComplete)
+    public static TextWriterSingle addWriterStatic(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, bool hasHighlights, bool removeWriterBeforeAdd, Action onComplete)
     {
         if (removeWriterBeforeAdd)
         {
             instance.removeWriter(text);
         }
-        return instance.addWriter(text, textToWrite, timePerChar, invisibleChar, onComplete);
+        return instance.addWriter(text, textToWrite, timePerChar, invisibleChar, hasHighlights, onComplete);
     }
 
-    public TextWriterSingle addWriter(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, Action onComplete)
+    public TextWriterSingle addWriter(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, bool hasHighlights, Action onComplete)
     {
-        TextWriterSingle textWriterSingle = new TextWriterSingle(text, textToWrite, timePerChar, invisibleChar, onComplete);
+        TextWriterSingle textWriterSingle = new TextWriterSingle(text, textToWrite, timePerChar, invisibleChar, hasHighlights, onComplete);
         textWriterSingleList.Add(textWriterSingle);
         return textWriterSingle;
     }
@@ -71,15 +72,17 @@ public class Text_Writer : MonoBehaviour
 
         private int characterIndex;
         private bool invisibleChar;
+        private bool hasHighlights;
         private float timer;
         private Action onComplete;
 
-        public TextWriterSingle(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, Action onComplete)
+        public TextWriterSingle(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, bool hasHighlights, Action onComplete)
         {
             this.text = text;
             this.textToWrite = textToWrite;
             this.timePerChar = timePerChar;
             this.invisibleChar = invisibleChar;
+            this.hasHighlights = hasHighlights;
             this.onComplete = onComplete;
             characterIndex = 0;
         }
@@ -94,10 +97,16 @@ public class Text_Writer : MonoBehaviour
                 timer += timePerChar;
                 characterIndex++;
                 string temp = textToWrite.Substring(0, characterIndex);
+
+                if (hasHighlights)
+                {
+                    temp = HighlightKeyWords(temp);
+                }
                 if (invisibleChar)
                 {
                     temp += "<color=#00000000>" + textToWrite.Substring(characterIndex) + "</color>";
                 }
+
                 text.text = temp;
 
                 // When it reaches the end of the line
@@ -124,9 +133,37 @@ public class Text_Writer : MonoBehaviour
         public void WriteAllAndDestroy()
         {
             text.text = textToWrite;
+            if(hasHighlights) text.text = HighlightKeyWords(textToWrite);
+
             characterIndex = textToWrite.Length;
+
             if (onComplete != null) onComplete();
             Text_Writer.removeWriterStatic(text);
+        }
+
+        public string HighlightKeyWords(string s)
+        {
+            List<string> keyWords = new List<string>()
+            {
+                "Event Management Mayhem",
+                "Finance person",
+                "Programs person",
+                "Logistics person"
+            };
+
+            foreach (var keyWord in keyWords)
+            {
+                Match match = Regex.Match(s, keyWord);
+
+                if (match.Success)
+                {
+                    System.Text.StringBuilder builder = new System.Text.StringBuilder(s);
+                    builder.Replace(keyWord, "<color=yellow>" + keyWord + "</color>");
+                    s = builder.ToString();
+                }
+            }
+
+            return s;
         }
     }
 }
