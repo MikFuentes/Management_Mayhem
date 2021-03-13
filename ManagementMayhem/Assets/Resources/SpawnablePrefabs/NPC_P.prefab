@@ -309,6 +309,7 @@ GameObject:
   - component: {fileID: 3885501252917898749}
   - component: {fileID: 5508833920049937781}
   - component: {fileID: 9160706487988944558}
+  - component: {fileID: 1018426691693955219}
   m_Layer: 0
   m_Name: NPC_P
   m_TagString: NPC
@@ -415,10 +416,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  item_sprite_array: []
+  item_sprite_list: []
+  item_list: []
   sprite_go: {fileID: 6395227257061697959}
   blank_sprite: {fileID: -5900909567032057635, guid: 8d0c4e301d79ce84ca9e6c6e66e9d44a,
     type: 3}
+  rand: 0
+  prevRand: -1
+  budget: 0
 --- !u!70 &5508833920049937781
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -454,6 +459,32 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!61 &1018426691693955219
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5934964285671695091}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -11}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.1}
+    oldSize: {x: 1.03125, y: 1}
+    newSize: {x: 1.03125, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.03125, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &6395227257061697959
 GameObject:
   m_ObjectHideFlags: 0

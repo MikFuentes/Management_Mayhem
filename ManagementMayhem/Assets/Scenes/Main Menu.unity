@@ -1402,7 +1402,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &239694720
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3397,12 +3397,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   messageText: {fileID: 729363117}
   nextButton: {fileID: 1701236325}
-  yesButton: {fileID: 0}
-  noButton: {fileID: 0}
-  image: {fileID: 0}
+  yesButton: {fileID: 1607484183}
+  noButton: {fileID: 689039225}
+  image: {fileID: 255742947}
   nextArrow: {fileID: 1563750263}
   namePanel: {fileID: 333049772}
   message: 
+  showButtons: 0
 --- !u!1 &607117915
 GameObject:
   m_ObjectHideFlags: 0
@@ -3914,7 +3915,7 @@ RectTransform:
   m_Children:
   - {fileID: 1885693473}
   m_Father: {fileID: 2086040970}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5496,13 +5497,14 @@ MonoBehaviour:
   minPlayers: 1
   countdownScene: 
   menuScene: Assets/Scenes/Main Menu.unity
+  gameScene: Assets/Scenes/Stage 2 - Coordination.unity
   roomPlayerPrefab: {fileID: 6091407814012667515, guid: a8736b8edcb84c148ae6445d363b4200,
     type: 3}
   gamePlayerPrefab: {fileID: 740951527728588880, guid: 229270462700af1498b082a9a69138a8,
     type: 3}
   playerSpawnSystem: {fileID: 2739164877689454984, guid: c50b4ae2263c3284ca523faaf49ee473,
     type: 3}
-  matchLength: 300
+  matchLength: 15
   currentMatchTime: 0
   TotalItems: 0
   ItemsRemaining: 0
@@ -7213,7 +7215,7 @@ RectTransform:
   m_Children:
   - {fileID: 1045509136}
   m_Father: {fileID: 2086040970}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -10135,7 +10137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2086040970
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10151,8 +10153,8 @@ RectTransform:
   - {fileID: 255742948}
   - {fileID: 597470522}
   - {fileID: 1701236324}
-  - {fileID: 689039224}
   - {fileID: 1607484182}
+  - {fileID: 689039224}
   m_Father: {fileID: 1719542004}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

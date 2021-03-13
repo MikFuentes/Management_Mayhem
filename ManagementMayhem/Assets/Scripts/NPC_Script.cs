@@ -16,6 +16,8 @@ public class NPC_Script : NetworkBehaviour
     public int prevRand = -1;
     public float budget;
 
+    public BoxCollider2D initialCollider;
+
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
     {
@@ -39,6 +41,15 @@ public class NPC_Script : NetworkBehaviour
         item_sprite_list = Resources.LoadAll<Sprite>("Val's_Lovely_Art/Pickups/Items").ToList();
 
         //queueRandomObjects();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.IsTouching(initialCollider) && collision.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("lol");
+            gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        }
     }
 
     public void RemoveFromArray(string sprite_name)

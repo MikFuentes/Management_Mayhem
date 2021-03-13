@@ -13,6 +13,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text playerName = null;
     [SyncVar] [SerializeField] public int animatorIndex = 0;
     public bool timerStarted = false;
+    [SerializeField] private Button retryButton = null;
 
     [SerializeField] public TMP_Text Items_Gathered;
     [SerializeField] public TMP_Text Remaining_Balance;
@@ -41,6 +42,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         set
         {
             isLeader = value;
+            retryButton.gameObject.SetActive(value);
         }
     }
 
@@ -73,5 +75,17 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         this.animatorIndex = index;
         //gameObject.GetComponent<Animator>().runtimeAnimatorController = Room.animations[1];
         //this.gameObject.GetComponent<Animator>().runtimeAnimatorController = Resources.Load("Animation/Logistics") as RuntimeAnimatorController;
+    }
+
+    [Command]
+    public void CmdRestartGame()
+    {
+        Debug.Log(Room.GamePlayers[Room.GamePlayers.Count - 1].connectionToClient);
+        Debug.Log(connectionToClient);
+        //if (Room.GamePlayers[Room.GamePlayers.Count-1].connectionToClient != connectionToClient) { return; }
+
+        //Start Game again
+
+        Room.RestartGame();
     }
 }

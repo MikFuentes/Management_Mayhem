@@ -11,6 +11,7 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private int minPlayers = 2;
     [Scene] [SerializeField] private string countdownScene = string.Empty;
     [Scene] [SerializeField] private string menuScene = string.Empty;
+    [Scene] [SerializeField] private string gameScene = string.Empty;
 
     [Header("Room")]
     [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
@@ -185,6 +186,16 @@ public class NetworkManagerLobby : NetworkManager
         }
     }
 
+    public void RestartGame()
+    {
+        if (SceneManager.GetActiveScene().path == gameScene)
+        {
+            ServerChangeScene("Stage 2 - Coordination");
+            //initializeCountdown();
+            RestartTimer();
+        }
+    }
+
     public void StartGameCountdown()
     {
         if (SceneManager.GetActiveScene().path == menuScene)
@@ -201,6 +212,20 @@ public class NetworkManagerLobby : NetworkManager
     {
         currentMatchTime = matchLength;
         timerCoroutine = StartCoroutine(Timer());
+    }
+
+    private void RestartTimer()
+    {
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+        }
+        else
+        {
+            currentMatchTime = matchLength;
+            timerCoroutine = StartCoroutine(Timer());
+        }
+
     }
 
     private IEnumerator Timer()
@@ -269,6 +294,22 @@ public class NetworkManagerLobby : NetworkManager
 
             }
         }
+        else if (SceneManager.GetActiveScene().path == gameScene && newSceneName.StartsWith("Stage"))
+        {
+            for (int i = GamePlayers.Count - 1; i >= 0; i--)
+            {
+                var conn = GamePlayers[i].connectionToClient;
+                var gamePlayerInstance = Instantiate(gamePlayerPrefab);
+                gamePlayerInstance.SetCharacter(GamePlayers[i].animatorIndex); // Same index as CharacterIndex
+                gamePlayerInstance.SetDisplayName(GamePlayers[i].displayName);
+
+                bool isLeader = i == GamePlayers.Count - 1;
+                gamePlayerInstance.IsLeader = isLeader;
+
+                NetworkServer.Destroy(conn.identity.gameObject);
+                NetworkServer.ReplacePlayerForConnection(conn, gamePlayerInstance.gameObject, true);
+            }
+        }        
         base.ServerChangeScene(newSceneName);
     }
 

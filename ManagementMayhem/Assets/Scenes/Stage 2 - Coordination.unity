@@ -4331,6 +4331,11 @@ PrefabInstance:
       propertyPath: m_Color.b
       value: 0.46666667
       objectReference: {fileID: 0}
+    - target: {fileID: 3885501252917898749, guid: 7c669c43396e878458f8e6aece460a16,
+        type: 3}
+      propertyPath: initialCollider
+      value: 
+      objectReference: {fileID: 946699543}
     - target: {fileID: 5934964285671695091, guid: 7c669c43396e878458f8e6aece460a16,
         type: 3}
       propertyPath: m_Name
@@ -4346,6 +4351,12 @@ PrefabInstance:
 --- !u!4 &946699541 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 28473118550912393, guid: 7c669c43396e878458f8e6aece460a16,
+    type: 3}
+  m_PrefabInstance: {fileID: 946699540}
+  m_PrefabAsset: {fileID: 0}
+--- !u!61 &946699543 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 1018426691693955219, guid: 7c669c43396e878458f8e6aece460a16,
     type: 3}
   m_PrefabInstance: {fileID: 946699540}
   m_PrefabAsset: {fileID: 0}
