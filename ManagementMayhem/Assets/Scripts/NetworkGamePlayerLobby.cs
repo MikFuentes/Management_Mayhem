@@ -7,8 +7,6 @@ using UnityEngine.UI;
 
 public class NetworkGamePlayerLobby : NetworkBehaviour
 {
-
-
     [SyncVar] [SerializeField] public string displayName = "Loading...";
     [SerializeField] private TMP_Text playerName = null;
     [SyncVar] [SerializeField] public int animatorIndex = 0;

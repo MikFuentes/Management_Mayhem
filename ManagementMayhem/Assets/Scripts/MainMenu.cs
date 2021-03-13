@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Mirror;
 
 /**Sources
  * https://www.youtube.com/watch?v=zc8ac_qUXQY
  * https://youtu.be/Fx8efi2MNz0?list=PLS6sInD7ThM1aUDj8lZrF4b4lpvejB2uB
  **/
-public class MainMenu : MonoBehaviour
+public class MainMenu : NetworkBehaviour
 {
     [SerializeField] private NetworkManagerLobby NetworkManager = null;
 
@@ -24,8 +25,20 @@ public class MainMenu : MonoBehaviour
         setDefaultFirstTime();
     }
 
+    //private NetworkManagerLobby room;
+    //private NetworkManagerLobby Room
+    //{
+    //    get
+    //    {
+    //        if (room != null) { return room; }
+    //        return room = NetworkManager.singleton as NetworkManagerLobby;
+    //    }
+    //}
+
+
     public void HostLobby()
     {
+        Debug.Log("StartHost()");
         NetworkManager.StartHost();
 
         //landingPagePanel.SetActive(false);

@@ -28,6 +28,13 @@ public class JoinLobbyMenu : MonoBehaviour
         NetworkManagerLobby.OnClientDisconnected -= HandleClientDisconnected;
     }
 
+    public void Start()
+    {
+        setDefaultip();
+        joinButton.interactable = false;
+        joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
+    }
+
     public void SetIPAddress(string name)
     {
         joinButton.interactable = !string.IsNullOrEmpty(name);
@@ -45,7 +52,11 @@ public class JoinLobbyMenu : MonoBehaviour
 
     public void JoinLobby()
     {
+        if(ipAddressInputField.text.Length == 0) { return; }
+
         string ipAddress = ipAddressInputField.text;
+
+        PlayerPrefs.SetString("ipAddress", ipAddress);
 
         networkManager.networkAddress = ipAddress; //set network address to specified ip address
         networkManager.StartClient(); //start as a client
@@ -68,6 +79,7 @@ public class JoinLobbyMenu : MonoBehaviour
         backButton.interactable = true;
 
         joinButton.interactable = true;
+        joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
 
         landingPagePanel.SetActive(true);
         gameObject.SetActive(false); 
@@ -81,7 +93,12 @@ public class JoinLobbyMenu : MonoBehaviour
 
         backButton.interactable = true;
 
+        ipAddressInputField.text = PlayerPrefs.GetString("ipAddress", "");
         joinButton.interactable = true;
         joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
+    }
+    public void setDefaultip()
+    {
+        ipAddressInputField.text = PlayerPrefs.GetString("ipAddress", "");
     }
 }

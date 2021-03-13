@@ -58,7 +58,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
-
         // get a reference to the scene you want to search. 
         Scene s = SceneManager.GetSceneByName("Main Menu");
 
@@ -73,7 +72,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             }
         }
 
-
         CmdSetDisplayName(PlayerNameInput.DisplayName);
         CmdDeselectCharacter();
 
@@ -85,10 +83,9 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             b.onClick.AddListener(CmdSetCharacterRight);
         }
-
         lobbyUI.SetActive(true);
-
     }
+
     public override void OnStartClient()
     {
         Room.RoomPlayers.Add(this);
@@ -314,14 +311,26 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [Command]
     public void CmdLeaveLobby()
     {
-        if (isLeader) { Room.StopHost(); }
+        //// Close the lobby
+        //if (isLeader) {
+        //    Room.StopHost();
+        //    Debug.Log("StopHost()");
+        //}
     }
 
     public void LeaveLobby()
     {
+        // Close the lobby
+        if (isLeader)
+        {
+            Room.StopHost();
+            Debug.Log("StopHost()");
+        }
+        // Leave the lobby
         if (!isLeader && hasAuthority)
         {
             Room.StopClient();
+            Debug.Log("StopClient()");
             Room.RoomPlayers.Clear();
         }
     }

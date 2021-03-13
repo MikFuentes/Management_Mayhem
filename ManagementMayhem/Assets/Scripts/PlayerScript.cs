@@ -1017,7 +1017,7 @@ public class PlayerScript : NetworkBehaviour
             int itemScore = (totalItems - remainingItems) * ptsPerBox;
             int moneyScore = (int) ((budget -  moneySpent) * moneyMultiplier);
             int timeScore = (int) currentTime * timeMultiplier;
-            float moraleMultiplier = (int)currentMorale/2;
+            float moraleMultiplier = currentMorale/2;
             if (moraleMultiplier < 1)
                 moraleMultiplier = 1;
 
@@ -1477,8 +1477,12 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdInitializeMoraleBar()
     {
+        Debug.Log("moralll");
         maxMorale = Room.MoraleBar;
         currentMorale = Room.MoraleBar;
+
+        Debug.Log(maxMorale);
+        Debug.Log(currentMorale);
     }
 
     private void UpdateMoraleBar(float oldValue, float newValue)

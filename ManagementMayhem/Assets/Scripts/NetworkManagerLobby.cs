@@ -45,8 +45,14 @@ public class NetworkManagerLobby : NetworkManager
     public static event Action OnServerStopped;
     public static event Action OnTimerCountdown;
 
+    public void Start()
+    {
+        Debug.Log("Start()");
+    }
+
     public override void OnStartServer()
     {
+        Debug.Log("OnStartServer()");
         spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
         animations = new RuntimeAnimatorController[3];
@@ -149,6 +155,7 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnStopServer()
     {
+        Debug.Log("OnStopServer()");
         OnServerStopped?.Invoke();
 
         RoomPlayers.Clear();
@@ -190,6 +197,9 @@ public class NetworkManagerLobby : NetworkManager
     {
         if (SceneManager.GetActiveScene().path == gameScene)
         {
+            TotalItems = 10;
+            ItemsRemaining = TotalItems;
+            MoraleBar = 5;
             ServerChangeScene("Stage 2 - Coordination");
             //initializeCountdown();
             RestartTimer();
