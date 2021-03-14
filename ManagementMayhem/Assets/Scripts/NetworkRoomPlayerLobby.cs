@@ -24,6 +24,9 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private Button startGameButton = null;
     [SerializeField] private Button readyUpButton = null;
 
+    private GameObject hostDCMessage = null;
+    private GameObject backButton = null;
+
     [SyncVar(hook = nameof(HandleDisplayNameChanged))]
     public string DisplayName = "Loading...";
     [SyncVar(hook = nameof(HandleReadyStatusChanged))]
@@ -56,22 +59,48 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         }
     }
 
-    public override void OnStartAuthority()
+    public void Start()
     {
-        Debug.Log("OnStartAuthority()");
-        // get a reference to the scene you want to search. 
         Scene s = SceneManager.GetSceneByName("Main Menu");
 
         GameObject[] gameObjects = s.GetRootGameObjects();
 
         foreach (GameObject g in gameObjects)
         {
+            Debug.Log(g.name);
             if (g.name == "Main Camera")
             {
                 gameObject.transform.Find("Canvas Lobby").GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
-                break;
+            }
+            else if (g.name == "Main Menu")
+            {
+                hostDCMessage = g.transform.Find("Landing_Page/Host_DC_Message_Panel").gameObject;
+                backButton = g.transform.Find("Landing_Page/BackButton").gameObject;
             }
         }
+    }
+
+    public override void OnStartAuthority()
+    {
+        Debug.Log("OnStartAuthority()");
+        // get a reference to the scene you want to search. 
+        //Scene s = SceneManager.GetSceneByName("Main Menu");
+
+        //GameObject[] gameObjects = s.GetRootGameObjects();
+
+        //foreach (GameObject g in gameObjects)
+        //{
+        //    Debug.Log(g.name);
+        //    if (g.name == "Main Camera")
+        //    {
+        //        gameObject.transform.Find("Canvas Lobby").GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
+        //    }
+        //    else if (g.name == "Main Menu")
+        //    {
+        //        hostDCMessage = g.transform.Find("Landing_Page/Host_DC_Message_Panel").gameObject;
+        //        backButton = g.transform.Find("Landing_Page/BackButton").gameObject;
+        //    }
+        //}
 
         CmdSetDisplayName(PlayerNameInput.DisplayName);
         CmdDeselectCharacter();
@@ -138,6 +167,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
             {
+                hostDCMessage.SetActive(true);
+                backButton.SetActive(false);
                 if (!Room.RoomPlayers[i].isLeader)
                 {
                     Debug.Log("Client left lobby");

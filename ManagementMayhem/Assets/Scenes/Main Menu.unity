@@ -6227,7 +6227,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Host Disconnected
+  m_text: 'Lobby Session
+
+    Was Terminated'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ed485c19197f9e34a9df746ffe599200, type: 2}
   m_sharedMaterial: {fileID: -3940620140548613261, guid: ed485c19197f9e34a9df746ffe599200,
@@ -8764,7 +8766,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1297021833}
   m_Layer: 5
-  m_Name: Landing Page
+  m_Name: Landing_Page
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
