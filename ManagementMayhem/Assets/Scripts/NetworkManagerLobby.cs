@@ -300,6 +300,7 @@ public class NetworkManagerLobby : NetworkManager
 
             }
         }
+        // From game to game
         else if (SceneManager.GetActiveScene().path == gameScene && newSceneName.StartsWith("Stage"))
         {
             for (int i = GamePlayers.Count - 1; i >= 0; i--)
@@ -315,7 +316,12 @@ public class NetworkManagerLobby : NetworkManager
                 NetworkServer.Destroy(conn.identity.gameObject);
                 NetworkServer.ReplacePlayerForConnection(conn, gamePlayerInstance.gameObject, true);
             }
-        }        
+        }
+        //From game to menu
+        else if (SceneManager.GetActiveScene().path == gameScene && newSceneName.StartsWith("Main"))
+        {
+
+        }
         base.ServerChangeScene(newSceneName);
     }
 

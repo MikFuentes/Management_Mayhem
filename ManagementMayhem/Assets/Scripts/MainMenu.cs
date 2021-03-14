@@ -10,7 +10,7 @@ using Mirror;
  **/
 public class MainMenu : NetworkBehaviour
 {
-    [SerializeField] private NetworkManagerLobby NetworkManager = null;
+    //[SerializeField] private NetworkManagerLobby NetworkManager = null;
 
     [Header("UI")]
     [SerializeField] private GameObject landingPagePanel = null;
@@ -25,21 +25,21 @@ public class MainMenu : NetworkBehaviour
         setDefaultFirstTime();
     }
 
-    //private NetworkManagerLobby room;
-    //private NetworkManagerLobby Room
-    //{
-    //    get
-    //    {
-    //        if (room != null) { return room; }
-    //        return room = NetworkManager.singleton as NetworkManagerLobby;
-    //    }
-    //}
+    private NetworkManagerLobby room;
+    private NetworkManagerLobby Room
+    {
+        get
+        {
+            if (room != null) { return room; }
+            return room = NetworkManager.singleton as NetworkManagerLobby;
+        }
+    }
 
 
     public void HostLobby()
     {
         Debug.Log("StartHost()");
-        NetworkManager.StartHost();
+        Room.StartHost();
 
         //landingPagePanel.SetActive(false);
     }

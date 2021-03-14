@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 
-public class JoinLobbyMenu : MonoBehaviour
+public class JoinLobbyMenu : NetworkBehaviour
 {
-    [SerializeField] private NetworkManagerLobby networkManager = null;
+    //[SerializeField] private NetworkManagerLobby networkManager = null;
 
     [Header("UI")]
     [SerializeField] private GameObject landingPagePanel = null;
@@ -15,6 +16,16 @@ public class JoinLobbyMenu : MonoBehaviour
     [SerializeField] private Button backButton = null;
     [SerializeField] private GameObject LoadingIcon = null;
     [SerializeField] private GameObject ErrorIcon = null;
+
+    private NetworkManagerLobby room;
+    private NetworkManagerLobby Room
+    {
+        get
+        {
+            if (room != null) { return room; }
+            return room = NetworkManager.singleton as NetworkManagerLobby;
+        }
+    }
 
     private void OnEnable()
     {
@@ -67,8 +78,8 @@ public class JoinLobbyMenu : MonoBehaviour
 
         PlayerPrefs.SetString("ipAddress", ipAddress);
 
-        networkManager.networkAddress = ipAddress; //set network address to specified ip address
-        networkManager.StartClient(); //start as a client
+        Room.networkAddress = ipAddress; //set network address to specified ip address
+        Room.StartClient(); //start as a client
 
         LoadingIcon.SetActive(true);
         ErrorIcon.SetActive(false);

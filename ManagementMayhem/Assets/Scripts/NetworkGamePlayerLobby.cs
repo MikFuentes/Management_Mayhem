@@ -4,6 +4,8 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkGamePlayerLobby : NetworkBehaviour
 {
@@ -85,5 +87,82 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         //Start Game again
 
         Room.RestartGame();
+    }
+
+    [Command]
+    public void CmdResetPlayerCounts()
+    {
+        if (!isLeader) { return; } // Do nothing
+        Debug.Log("CmdResetPlayerCounts()");
+        ResetPlayerCounts();
+    }
+
+    [Server]
+    public void ResetPlayerCounts()
+    {
+        Debug.Log("ResetPlayerCounts()");
+        RpcResetPlayerCount();
+    }
+
+    [ClientRpc]
+    public void RpcResetPlayerCount()
+    {
+        for (int i = Room.GamePlayers.Count - 1; i >= 0; --i)
+        {
+            if (Room.GamePlayers[i].hasAuthority) //find the one that belongs to us
+            {
+                if (!Room.GamePlayers[i].isLeader)
+                {
+                    Debug.Log("Client left lobby");
+                    Room.GamePlayers[i].LeaveLobby();
+                }
+                else
+                {
+                    Debug.Log("Host closed lobby");
+                    Room.GamePlayers[i].CloseLobby();
+                }
+            }
+        }
+    }
+
+    public void LeaveLobby()
+    {
+        if (isLeader) { return; } // Do nothing
+
+        // Leave the lobby
+        Debug.Log("LeaveLobby()");
+
+        Room.StopClient();
+        //Debug.Log("StopClient()");
+        //Debug.Log(Room.RoomPlayers.Count);
+
+        Room.GamePlayers.Remove(this);
+        //Debug.Log("Room.RoomPlayers.Remove(this)");
+        //Debug.Log(Room.RoomPlayers.Count);
+
+        Room.GamePlayers.Clear(); // Makes Room.RoomPlayers.Count = 0
+        //Debug.Log("Room.RoomPlayers.Clear()");
+        //Debug.Log(Room.RoomPlayers.Count);
+
+        //Room.ServerChangeScene("Main Menu");
+        SceneManager.LoadScene("Main Menu");
+    }
+
+    public void CloseLobby()
+    {
+        Debug.Log("CloseLobby()");
+        Room.StopClient();
+
+        Room.GamePlayers.Remove(this);
+
+        Room.GamePlayers.Clear(); // Makes Room.RoomPlayers.Count = 0
+
+        // Close the lobby
+        if (Room.GamePlayers.Count == 0)
+        {
+            Room.StopHost();
+            Debug.Log("StopHost()");
+            SceneManager.LoadScene("Main Menu");
+        }
     }
 }

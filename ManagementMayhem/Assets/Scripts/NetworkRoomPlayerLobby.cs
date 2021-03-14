@@ -61,6 +61,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public void Start()
     {
+        // get a reference to the scene you want to search. 
         Scene s = SceneManager.GetSceneByName("Main Menu");
 
         GameObject[] gameObjects = s.GetRootGameObjects();
@@ -83,24 +84,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public override void OnStartAuthority()
     {
         Debug.Log("OnStartAuthority()");
-        // get a reference to the scene you want to search. 
-        //Scene s = SceneManager.GetSceneByName("Main Menu");
-
-        //GameObject[] gameObjects = s.GetRootGameObjects();
-
-        //foreach (GameObject g in gameObjects)
-        //{
-        //    Debug.Log(g.name);
-        //    if (g.name == "Main Camera")
-        //    {
-        //        gameObject.transform.Find("Canvas Lobby").GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
-        //    }
-        //    else if (g.name == "Main Menu")
-        //    {
-        //        hostDCMessage = g.transform.Find("Landing_Page/Host_DC_Message_Panel").gameObject;
-        //        backButton = g.transform.Find("Landing_Page/BackButton").gameObject;
-        //    }
-        //}
 
         CmdSetDisplayName(PlayerNameInput.DisplayName);
         CmdDeselectCharacter();
