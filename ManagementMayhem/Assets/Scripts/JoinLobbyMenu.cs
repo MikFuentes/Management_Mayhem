@@ -31,8 +31,17 @@ public class JoinLobbyMenu : MonoBehaviour
     public void Start()
     {
         setDefaultip();
-        joinButton.interactable = false;
-        joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
+        if (ipAddressInputField.text.Length == 0)
+        {
+            joinButton.interactable = false;
+            joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
+        }
+        else
+        {
+            joinButton.interactable = true;
+            joinButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1);
+        }
+
     }
 
     public void SetIPAddress(string name)
