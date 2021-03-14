@@ -35,6 +35,11 @@ public class NetworkManagerLobby : NetworkManager
     public float currentWaitTime;
     public int prev_rand = -1;
 
+    public float currentMessageTime;
+    public Coroutine messageTimerCoroutine;
+    public static event Action<float> OnMessageTimeUpdate;
+
+
     public RuntimeAnimatorController[] animations;
     public List<int> selectedCharacterIndexes;
 
@@ -65,6 +70,7 @@ public class NetworkManagerLobby : NetworkManager
         MoraleBar = 5;
 
         OnTimeUpdate += HandleTimeUpdate;
+        OnMessageTimeUpdate += HandleMessageTimerUpdate;
     }
 
     public override void OnStartClient()
@@ -144,6 +150,15 @@ public class NetworkManagerLobby : NetworkManager
             RoomPlayers.Remove(player); //remove player from the list
 
             NotifyPlayersOfReadyState();
+
+            var gamePlayer = conn.identity.GetComponent<NetworkGamePlayerLobby>(); //get the gamePlayerScript
+            string message = gamePlayer.gameObject.GetComponent<NetworkGamePlayerLobby>().displayName + " disconnected from the game.";
+
+            for(int i = 0; i < GamePlayers.Count; i++)
+            {
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message);
+            }
+            restartMessageTimer();
         }
 
         base.OnServerDisconnect(conn);
@@ -153,10 +168,17 @@ public class NetworkManagerLobby : NetworkManager
     {
         Debug.Log("OnStopServer()");
         OnServerStopped?.Invoke();
+        Debug.Log(RoomPlayers.Count);
+
+        if (RoomPlayers.Count != 0) RoomPlayers[0].ResetPlayerCounts();
+        else if (GamePlayers.Count != 0) GamePlayers[0].ResetPlayerCounts();
 
         RoomPlayers.Clear();
         GamePlayers.Clear();
     }
+
+
+
 
     public void NotifyPlayersOfReadyState()
     {
@@ -261,6 +283,61 @@ public class NetworkManagerLobby : NetworkManager
             GamePlayers[i].GetComponent<PlayerScript>().currentTime = currentMatchTime; //triggers the hook method of each player
         }
     }
+
+    private void restartMessageTimer()
+    {
+        if (messageTimerCoroutine != null)
+        {
+            StopCoroutine(messageTimerCoroutine);
+        }
+        else
+        {
+            currentMessageTime = 7;
+            messageTimerCoroutine = StartCoroutine(messageTimer());
+        }
+    }
+
+    private IEnumerator messageTimer()
+    {
+        currentMessageTime--;
+        OnMessageTimeUpdate?.Invoke(currentMessageTime);
+        if (currentMessageTime <= 0)
+        {
+            yield return new WaitForSeconds(1f);
+            OnMessageTimeUpdate?.Invoke(currentMessageTime);
+            StopCoroutine(messageTimerCoroutine);
+            messageTimerCoroutine = null;
+        }
+        else
+        {
+            yield return new WaitForSeconds(1f);
+            messageTimerCoroutine = StartCoroutine(messageTimer());
+        }
+    }
+
+    //this hook method is triggered when currentMatchTime changes
+    private void HandleMessageTimerUpdate(float currentMessageTime)
+    {
+        if (currentMessageTime != 0)
+        {
+            for (int i = 0; i < GamePlayers.Count; i++)
+            {
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < GamePlayers.Count; i++)
+            {
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(false);
+            }
+        }
+    }
+
+
+
+
+
 
     private void EndGame()
     {

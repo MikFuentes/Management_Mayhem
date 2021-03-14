@@ -47,7 +47,6 @@ public class NPC_Script : NetworkBehaviour
     {
         if (collision.IsTouching(initialCollider) && collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("lol");
             gameObject.GetComponent<BoxCollider2D>().enabled = false;
         }
     }

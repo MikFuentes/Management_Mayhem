@@ -1355,7 +1355,6 @@ public class PlayerScript : NetworkBehaviour
             Debug.Log("Time's up");
             CmdEndGame();
         }
-
     }
 
     private string ReturnCurrentTime(float currentMatchTime)
@@ -1477,12 +1476,8 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdInitializeMoraleBar()
     {
-        Debug.Log("moralll");
         maxMorale = Room.MoraleBar;
         currentMorale = Room.MoraleBar;
-
-        Debug.Log(maxMorale);
-        Debug.Log(currentMorale);
     }
 
     private void UpdateMoraleBar(float oldValue, float newValue)

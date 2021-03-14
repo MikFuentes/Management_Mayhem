@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System;
 
 public class NetworkGamePlayerLobby : NetworkBehaviour
 {
@@ -14,6 +15,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [SyncVar] [SerializeField] public int animatorIndex = 0;
     public bool timerStarted = false;
     [SerializeField] private Button retryButton = null;
+    [SerializeField] public TMP_Text serverMessage = null;
+    private int messageCounter = 0;
 
     [SerializeField] public TMP_Text Items_Gathered;
     [SerializeField] public TMP_Text Remaining_Balance;
@@ -42,7 +45,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         set
         {
             isLeader = value;
-            retryButton.gameObject.SetActive(value);
+            retryButton.gameObject.GetComponent<Button>().interactable = true;
+            retryButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 1f);
         }
     }
 
@@ -53,6 +57,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 
         gameObject.GetComponent<Animator>().runtimeAnimatorController = Room.animations[animatorIndex];
         playerName.text = displayName;
+
+        FindObjectOfType<AudioManager>().Play("GameMusic", false);
 
         FindObjectOfType<AudioManager>().Play("MenuMusic", false);
         FindObjectOfType<AudioManager>().Play("GameMusic", true);
@@ -67,6 +73,20 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     public void SetDisplayName(string displayName)
     {
         this.displayName = displayName;
+    }
+
+    public void UpdateServerMessage(string message)
+    {
+        if(messageCounter > 3)
+        {
+            messageCounter = 0;
+            serverMessage.text = message;
+        }
+        else
+        {
+            serverMessage.text += message + "\n";
+        }
+        messageCounter++;
     }
 
     [Server]
@@ -145,6 +165,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         //Debug.Log(Room.RoomPlayers.Count);
 
         //Room.ServerChangeScene("Main Menu");
+        FindObjectOfType<AudioManager>().Play("GameMusic", false);
+        FindObjectOfType<AudioManager>().Play("MenuMusic", true);
         SceneManager.LoadScene("Main Menu");
     }
 
@@ -162,6 +184,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         {
             Room.StopHost();
             Debug.Log("StopHost()");
+            FindObjectOfType<AudioManager>().Play("GameMusic", false);
+            FindObjectOfType<AudioManager>().Play("MenuMusic", true);
             SceneManager.LoadScene("Main Menu");
         }
     }

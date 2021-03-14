@@ -4306,6 +4306,21 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 2.2
       objectReference: {fileID: 0}
+    - target: {fileID: 1018426691693955219, guid: 7c669c43396e878458f8e6aece460a16,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1018426691693955219, guid: 7c669c43396e878458f8e6aece460a16,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: -11.267952
+      objectReference: {fileID: 0}
+    - target: {fileID: 1018426691693955219, guid: 7c669c43396e878458f8e6aece460a16,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 1.5359049
+      objectReference: {fileID: 0}
     - target: {fileID: 2263368037054881021, guid: 7c669c43396e878458f8e6aece460a16,
         type: 3}
       propertyPath: sceneId

@@ -38,7 +38,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SyncVar]
     public int CharacterSelectedIndex = -1;
 
-    private bool isLeader;
+    public bool isLeader;
     public bool IsLeader
     {
         set
@@ -68,7 +68,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
         foreach (GameObject g in gameObjects)
         {
-            Debug.Log(g.name);
             if (g.name == "Main Camera")
             {
                 gameObject.transform.Find("Canvas Lobby").GetComponent<Canvas>().worldCamera = g.GetComponent<Camera>();
