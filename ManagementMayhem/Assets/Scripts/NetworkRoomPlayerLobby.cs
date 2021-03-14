@@ -58,6 +58,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
+        Debug.Log("OnStartAuthority()");
         // get a reference to the scene you want to search. 
         Scene s = SceneManager.GetSceneByName("Main Menu");
 
@@ -88,10 +89,13 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public override void OnStartClient()
     {
+        Debug.Log("OnStartClient()");
         Room.RoomPlayers.Add(this);
+        Debug.Log(Room.RoomPlayers.Count);
 
         //CmdDeselectCharacter();
 
+        //Debug.Log(Room.RoomPlayers.Count);
         for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
         {
             if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
@@ -103,12 +107,95 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         UpdateDisplay();
     }
 
-    public override void OnNetworkDestroy()
+    public override void OnStopClient()
     {
+        Debug.Log("OnStopClient()");
         Room.RoomPlayers.Remove(this);
+        Debug.Log(Room.RoomPlayers.Count);
 
         UpdateDisplay();
     }
+
+    [Command]
+    public void CmdResetPlayerCounts()
+    {
+        if (!isLeader) { return; } // Do nothing
+        Debug.Log("CmdResetPlayerCounts()");
+        ResetPlayerCounts();
+    }
+
+    [Server]
+    public void ResetPlayerCounts()
+    {
+        Debug.Log("ResetPlayerCounts()");
+        RpcResetPlayerCount();
+    }
+
+    [ClientRpc]
+    public void RpcResetPlayerCount()
+    {
+        for (int i = Room.RoomPlayers.Count-1; i >= 0; --i)
+        {
+            if (Room.RoomPlayers[i].hasAuthority) //find the one that belongs to us
+            {
+                if (!Room.RoomPlayers[i].isLeader)
+                {
+                    Debug.Log("Client left lobby");
+                    Room.RoomPlayers[i].LeaveLobby();
+                }
+                else
+                {
+                    Debug.Log("Host closed lobby");
+                    Room.RoomPlayers[i].CloseLobby();
+                }            
+            }
+        }
+    }
+
+    public void LeaveLobby()
+    {
+        if (isLeader) { return; } // Do nothing
+
+        // Leave the lobby
+        Debug.Log("LeaveLobby()");
+
+        Room.StopClient();
+        //Debug.Log("StopClient()");
+        //Debug.Log(Room.RoomPlayers.Count);
+
+        Room.RoomPlayers.Remove(this);
+        //Debug.Log("Room.RoomPlayers.Remove(this)");
+        //Debug.Log(Room.RoomPlayers.Count);
+
+        Room.RoomPlayers.Clear(); // Makes Room.RoomPlayers.Count = 0
+        //Debug.Log("Room.RoomPlayers.Clear()");
+        //Debug.Log(Room.RoomPlayers.Count);
+    }
+
+    public void CloseLobby()
+    {
+        Debug.Log("CloseLobby()");
+        Room.StopClient();
+
+        Room.RoomPlayers.Remove(this);
+
+        Room.RoomPlayers.Clear(); // Makes Room.RoomPlayers.Count = 0
+
+        // Close the lobby
+        if (Room.RoomPlayers.Count == 0)
+        {
+            Room.StopHost();
+            Debug.Log("StopHost()");
+        }
+    }
+
+    //public override void OnNetworkDestroy()
+    //{
+    //    Debug.Log("OnNetworkDestroy()");
+    //    Room.RoomPlayers.Remove(this);
+
+    //    UpdateDisplay();
+    //}
 
     public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay(); //call the method without using the parameters (they are not needed)
     public void HandleDisplayNameChanged(string oldValue, string newValue) => UpdateDisplay();
@@ -306,32 +393,5 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         //Start Game
 
         Room.StartGame();
-    }
-
-    [Command]
-    public void CmdLeaveLobby()
-    {
-        //// Close the lobby
-        //if (isLeader) {
-        //    Room.StopHost();
-        //    Debug.Log("StopHost()");
-        //}
-    }
-
-    public void LeaveLobby()
-    {
-        // Close the lobby
-        if (isLeader)
-        {
-            Room.StopHost();
-            Debug.Log("StopHost()");
-        }
-        // Leave the lobby
-        if (!isLeader && hasAuthority)
-        {
-            Room.StopClient();
-            Debug.Log("StopClient()");
-            Room.RoomPlayers.Clear();
-        }
     }
 }

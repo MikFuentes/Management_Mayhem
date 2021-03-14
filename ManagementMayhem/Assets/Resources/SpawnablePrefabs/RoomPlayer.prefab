@@ -584,7 +584,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6091407814012667515}
-        m_MethodName: CmdLeaveLobby
+        m_MethodName: LeaveLobby
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -595,7 +595,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 6091407814012667515}
-        m_MethodName: LeaveLobby
+        m_MethodName: CmdResetPlayerCounts
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

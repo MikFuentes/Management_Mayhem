@@ -6371,7 +6371,7 @@ MonoBehaviour:
   playerName: {fileID: 2328041787542742268}
   animatorIndex: 0
   timerStarted: 0
-  retryButton: {fileID: 0}
+  retryButton: {fileID: 4830871094266294181}
   Items_Gathered: {fileID: 6251496108778134239}
   Remaining_Balance: {fileID: 6897393352236605766}
   Remaining_Time: {fileID: 6050111260197555718}

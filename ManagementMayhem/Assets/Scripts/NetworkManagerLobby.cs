@@ -45,11 +45,6 @@ public class NetworkManagerLobby : NetworkManager
     public static event Action OnServerStopped;
     public static event Action OnTimerCountdown;
 
-    public void Start()
-    {
-        Debug.Log("Start()");
-    }
-
     public override void OnStartServer()
     {
         Debug.Log("OnStartServer()");
@@ -141,6 +136,7 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
+        Debug.Log("OnServerDisconnect()");
         if (conn.identity != null)
         {
             var player = conn.identity.GetComponent<NetworkRoomPlayerLobby>(); //get the roomPlayerScript
