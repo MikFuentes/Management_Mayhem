@@ -18,9 +18,14 @@ public class Text_Panel : MonoBehaviour
     [SerializeField] private GameObject nextArrow;
     [SerializeField] private GameObject namePanel;
     private Text_Writer.TextWriterSingle textWriterSingle;
-    private int index = 0;
+
+    [SerializeField] private GameObject stageZero;
+    [SerializeField] private GameObject landingPage;
+    [SerializeField] private GameObject rulesPage;
+
+    public int index = 0;
     private List<string> messageArray = new List<string>();
-    private string fileName = "EMM_Stage_Zero_Script.docx.txt";
+    private string fileName = "EMM_Stage_Zero_Script.txt";
     public string message;
     public bool showButtons;
 
@@ -29,20 +34,49 @@ public class Text_Panel : MonoBehaviour
     private void Awake()
     {
         nextButton.onClick.AddListener(clickFunct);
+        noButton.onClick.AddListener(nextText);
     }
-    void Start()
+    public void Start()
     {
+
+    }
+
+    private void OnEnable()
+    {
+        index = 0;
+        messageArray = new List<string>();
+        queue = new Queue<List<int>>();
+
+        nextArrow.SetActive(false);
+        nextButton.onClick.RemoveAllListeners();
+        nextButton.onClick.AddListener(clickFunct);
+
+        if (textWriterSingle != null && textWriterSingle.IsActive())
+        {
+            Debug.Log("writer is active");
+            clickFunct(); //write all the text
+            if (PlayerPrefs.HasKey("PlayerName"))
+                messageArray.Add("Hello, " + PlayerNameInput.DisplayName + "!");
+        }
+
+        foreach (Transform child in image.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+        image.gameObject.SetActive(true);
+
         var sr = new StreamReader(Application.dataPath + "/" + fileName);
         var fileContents = sr.ReadToEnd();
         sr.Close();
 
-        messageArray.Add("Hello, " + PlayerNameInput.DisplayName + "!");
+        if (PlayerPrefs.HasKey("PlayerName"))
+            messageArray.Add("Hello, " + PlayerNameInput.DisplayName + "!");
         var lines = fileContents.Split("\n"[0]);
 
         foreach (var line in lines)
         {
             string index = line.Split(new[] { '.' }, 2)[0];
-            string s = line.Split(new[] { '.' }, 2)[1].Split(new[] {' '}, 2)[1];
+            string s = line.Split(new[] { '.' }, 2)[1].Split(new[] { ' ' }, 2)[1];
 
             if (line.Contains("["))
             {
@@ -50,12 +84,22 @@ public class Text_Panel : MonoBehaviour
                 int val = System.Int32.Parse(line.Split(new[] { '[' })[1].Split(',')[1].Split(']')[0]);
                 s = s.Split('[')[0];
 
+                if (!PlayerPrefs.HasKey("PlayerName"))
+                    key--; val--;
+
                 List<int> l = new List<int>() { key, val };
                 queue.Enqueue(l);
             }
+
             messageArray.Add(s);
         }
+
+        Debug.Log("writer is NOT active");
         clickFunct();
+
+        //clickFunct();
+
+        Debug.Log("Enabled");
     }
 
     private void clickFunct()
@@ -75,15 +119,34 @@ public class Text_Panel : MonoBehaviour
             // Will go to the next line
             if (index == messageArray.Count)
             {
+                Debug.Log("bro");
                 nextButton.onClick.RemoveListener(clickFunct);
                 nextButton.onClick.AddListener(clickFunct2); //add diff listener with diff function
+                clickFunct2();
                 return;
             }
             else
             {
+                string imgName = "";
                 message = messageArray[index];
+                if (message.Contains("{"))
+                {                    
+                    imgName = message.Split('{')[1].Split('}')[0];
+
+                    message = message.Split('{')[0];
+
+                }
 
                 startTalking();
+                if(imgName != "")
+                {
+                    foreach (Transform child in image.transform)
+                    {
+                        child.gameObject.SetActive(false);
+                    }
+                    image.transform.Find(imgName).gameObject.SetActive(true);
+                }
+
                 textWriterSingle = Text_Writer.addWriterStatic(messageText, message, 0.03f, true, true, true, stopTalking);
             }
 
@@ -95,14 +158,62 @@ public class Text_Panel : MonoBehaviour
             {
                 image.gameObject.SetActive(false);
                 showButtons = true;
+
+                yesButton.onClick.RemoveAllListeners();
+                yesButton.onClick.AddListener(delegate {repeatText(queue.Peek()[1]);});
             }
-
         }            
-
     }
+
+    private void repeatText(int stringIndex)
+    {
+        index = stringIndex;
+        nextButton.onClick.AddListener(clickFunct);
+        clickFunct();
+
+        foreach (Transform child in image.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+        image.gameObject.SetActive(true);
+
+        showButtons = false;
+        yesButton.gameObject.SetActive(false);
+        noButton.gameObject.SetActive(false);
+    }
+
+    private void nextText()
+    {
+        queue.Dequeue();
+        index++;
+        nextButton.onClick.AddListener(clickFunct);
+        clickFunct();
+
+        foreach (Transform child in image.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+        image.gameObject.SetActive(true);
+
+        showButtons = false;
+        yesButton.gameObject.SetActive(false);
+        noButton.gameObject.SetActive(false);
+    }
+
     private void clickFunct2()
     {
-        Debug.Log("hi");
+        if (PlayerPrefs.HasKey("PlayerName"))
+        {
+            stageZero.SetActive(false);
+            landingPage.SetActive(true);
+        }
+        else
+        {
+            stageZero.SetActive(false);
+            rulesPage.SetActive(true);
+        }
+
+
     }
 
     private void startTalking()
@@ -127,7 +238,7 @@ public class Text_Panel : MonoBehaviour
         if(index == messageArray.Count-1)
         {
             //activate different arrow
-            //nextArrow.SetActive(true);
+            nextArrow.SetActive(true);
         }
         index++;
     }

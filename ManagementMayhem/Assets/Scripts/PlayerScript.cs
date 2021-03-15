@@ -19,6 +19,9 @@ public class PlayerScript : NetworkBehaviour
     public Animator animator;
     [SerializeField] private List<Sprite> buttonSprites;
 
+    [Header("Audio")]
+    public AudioClip ATM_withdraw_sound;
+
     [Header("UI Elements")]
     public Button interactButton;
     public Button pickUpButton;
@@ -49,7 +52,7 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private GameObject homePanel = null;
     [SerializeField] private GameObject balanceUI = null;
     [SerializeField] private TMP_Text balanceText = null;
-    [SyncVar] [SerializeField] public float currentBalance = 1000;
+    [SyncVar] [SerializeField] public float currentBalance = 500;
     private static event Action<float> OnBalanceChange;
 
     [Header("ATM_Processing")]
@@ -73,6 +76,15 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar(hook = nameof(HandleNumItems))] public int remainingItems;
     public static event Action<int> OnNumItemsUpdate;
     public GameObject spawnDestroyer;
+
+    [Header("Phone")]
+    public GameObject phone = null;
+    [SerializeField] private GameObject mainPanel = null;
+    [SerializeField] private GameObject phoneProcessingPanel = null;
+    [SerializeField] private TMP_Text phoneProcessingOffer = null;
+    [SerializeField] private TMP_Text phoneProcessingText = null;
+    int offer = 0;
+    int prevOffer = -1;
 
     [Header("Money")]
     //[SerializeField] private GameObject moneyUI = null;
@@ -370,7 +382,7 @@ public class PlayerScript : NetworkBehaviour
                 pickup = collision.gameObject;
                 CmdTriggerEnterPickup(pickup);
             }
-            else if (collision.gameObject.CompareTag("NPC"))
+            else if (collision.gameObject.CompareTag("NPC") && collision.isTrigger)
             {
                 if (pickUpActive && pickup.GetComponent<PickupProperties>().itemType == "Item")
                 {
@@ -381,7 +393,7 @@ public class PlayerScript : NetworkBehaviour
                 NPC = collision.gameObject;
 
 
-                gameObject.GetComponent<BoxCollider2D>().enabled = false;
+                //gameObject.GetComponent<BoxCollider2D>().enabled = false;
 
                 //GameObject Health_Bar = NPC.transform.Find("Health_Bar").gameObject;
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
@@ -425,7 +437,7 @@ public class PlayerScript : NetworkBehaviour
                     }
                 }
             }
-            else if (collision.gameObject.CompareTag("Interactable"))
+            else if (collision.gameObject.CompareTag("Interactable") && collision.isTrigger)
             {
                 interactable = collision.gameObject;
                 interactButton.gameObject.SetActive(true);
@@ -448,10 +460,12 @@ public class PlayerScript : NetworkBehaviour
                 else if (interactable.name == "Phone")
                 {
                     interactButton.GetComponent<Image>().sprite = buttonSprites[0];
-                    interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Call";
+                    interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Answer";
+
+                    mainPanel.SetActive(true);
                 }
             }
-            else if (collision.gameObject.CompareTag("Depositor"))
+            else if (collision.gameObject.CompareTag("Depositor") && collision.isTrigger)
             {
                 canDeposit = true;
 
@@ -479,7 +493,7 @@ public class PlayerScript : NetworkBehaviour
                 //    interactButton.transform.Find("Text").GetComponent<Text>().text = "Buy";
                 //}
             }
-            else if (collision.gameObject.CompareTag("Deleter"))
+            else if (collision.gameObject.CompareTag("Deleter") && collision.isTrigger)
                 canDelete = true;
             else if (collision.gameObject.CompareTag("Indoor"))
             {
@@ -524,6 +538,13 @@ public class PlayerScript : NetworkBehaviour
             {
                 spawnDestroyer = collision.gameObject;
             }
+            //else if (collision.gameObject.CompareTag("Interactable") && interactable.name == "Phone")
+            //{
+            //    interactButton.GetComponent<Image>().sprite = buttonSprites[0];
+            //    interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Answer";
+
+            //    mainPanel.SetActive(true);
+            //}
         }
 
     }
@@ -540,7 +561,7 @@ public class PlayerScript : NetworkBehaviour
                 pickup = null;
                 CmdTriggerExitPickup();
             }
-            else if (collision.gameObject.CompareTag("NPC"))
+            else if (collision.gameObject.CompareTag("NPC") && collision.isTrigger)
             {
                 dropButton.GetComponent<Image>().sprite = buttonSprites[7];
                 dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Drop";
@@ -558,14 +579,14 @@ public class PlayerScript : NetworkBehaviour
 
                 Deactivate_Interactable_UI();
             }
-            else if (collision.gameObject.CompareTag("Depositor"))
+            else if (collision.gameObject.CompareTag("Depositor") && collision.isTrigger)
             {
                 dropButton.GetComponent<Image>().sprite = buttonSprites[7];
                 dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Drop";
                 canDeposit = false;
             }
 
-            else if (collision.gameObject.CompareTag("Deleter"))
+            else if (collision.gameObject.CompareTag("Deleter") && collision.isTrigger)
                 canDelete = false;
             else if (collision.gameObject.CompareTag("Indoor"))
             {
@@ -770,7 +791,72 @@ public class PlayerScript : NetworkBehaviour
         Faded_Background.SetActive(true);
         UI_Active = true; // set bool
         Game_UI.SetActive(false); // deactivate game_UI
+
+        if(name == "Phone")
+        {
+            offer = UnityEngine.Random.Range(3, 7);
+            while (offer == prevOffer)
+                offer = UnityEngine.Random.Range(3, 7);
+            prevOffer = offer;
+            offer *= 100;
+            phoneProcessingOffer.text = offer.ToString();
+            Debug.Log("phon");
+
+            phone = obj.gameObject;
+
+            CmdAnswerPhone(phone);
+            //phone.GetComponent<Phone_Script>().beingUsedBySomeoneElse = false; //i'm using it
+            //phone.GetComponent<CapsuleCollider2D>().enabled = true; //renable it for us
+            //stop the ringing sound for everyone
+
+        }
     }
+
+    [Command]
+    private void CmdAnswerPhone(GameObject go)
+    {
+        AnswerPhone(go);
+    }
+
+    [Server]
+    private void AnswerPhone(GameObject go)
+    {
+        phone = go;
+        RpcAnswerPhone(go);
+    }
+
+    [ClientRpc]
+    private void RpcAnswerPhone(GameObject go)
+    {
+        phone = go;
+        phone.GetComponent<Phone_Script>().answeringPhone();
+    }
+
+    public void DoneAnswering()
+    {
+        CmdDoneAnsweringPhone(phone);
+    }
+
+    [Command]
+    private void CmdDoneAnsweringPhone(GameObject go)
+    {
+        DoneAnsweringPhone(go);
+    }
+
+    [Server]
+    private void DoneAnsweringPhone(GameObject go)
+    {
+        phone = go;
+        RpcDoneAnsweringPhone(go);
+    }
+
+    [ClientRpc]
+    private void RpcDoneAnsweringPhone(GameObject go)
+    {
+        phone = go;
+        phone.GetComponent<Phone_Script>().doneAnsweringPhone();
+    }
+
 
     void Deactivate_Interactable_UI()
     {
@@ -781,6 +867,12 @@ public class PlayerScript : NetworkBehaviour
             UI_Active = false; // set bool
         }
         Game_UI.SetActive(true); // activate game_UI
+
+        //if (name == "Phone")
+        //{
+        //    //restart the sponsorship timer
+        //    phone.GetComponent<Phone_Script>().enabled = true;
+        //}
     }
 
     [Command]
@@ -1015,7 +1107,10 @@ public class PlayerScript : NetworkBehaviour
             float moneyMultiplier = 0.5f;
 
             int itemScore = (totalItems - remainingItems) * ptsPerBox;
+
             int moneyScore = (int) ((budget -  moneySpent) * moneyMultiplier);
+            if (moneySpent <= budget)
+                moneyScore = 0;
             int timeScore = (int) currentTime * timeMultiplier;
             float moraleMultiplier = currentMorale/2;
             if (moraleMultiplier < 1)
@@ -1027,13 +1122,13 @@ public class PlayerScript : NetworkBehaviour
             if(moneyScore < 0)
                 gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = moneyScore.ToString();
             else
-                gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = "+" + moneyScore.ToString();
+                gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = "-" + moneyScore.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Time_Score.text = "+" + timeScore.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Morale_Score.text = "x" + moraleMultiplier.ToString();
             gameObject.GetComponent<NetworkGamePlayerLobby>().Total_Score.text = finalScore.ToString();
 
             int maxItemScore = totalItems * ptsPerBox;
-            int maxMoneyScore = (int) (NPC.GetComponent<NPC_Script>().budget * moneyMultiplier);
+            int maxMoneyScore = 0;
             int maxTimeScore = (int)matchLength * timeMultiplier;
             float maxMoraleMultiplier = (int)maxMorale/2;
 
@@ -1266,10 +1361,10 @@ public class PlayerScript : NetworkBehaviour
 
     private IEnumerator ActivateATMLoadScreen()
     {
+        //AudioSource.PlayClipAtPoint(ATM_withdraw_sound, new Vector3(-19, 0, 0), 0.1f);
         processingText.text = "Withdrawing";
         processingPanel.SetActive(true);
         withdrawPanel.SetActive(false);
-        yield return new WaitForSeconds(1);
 
         //wait some time
         processingText.text += ".";
@@ -1290,7 +1385,47 @@ public class PlayerScript : NetworkBehaviour
         codeSequence = "0";
         withdrawText.text = codeSequence;
     }
-    
+
+    public void addSponsorshipFunds()
+    {
+        StartCoroutine(ActivatePhoneProcessingPanel());
+
+        CmdUpdateBalance(offer);
+    }
+    public void declineSponsorshipFunds()
+    {
+        StartCoroutine(ActivatePhoneProcessingPanel());
+    }
+    public IEnumerator ActivatePhoneProcessingPanel()
+    {
+        //AudioSource.PlayClipAtPoint(ATM_withdraw_sound, new Vector3(-19, 0, 0), 0.1f);
+        phoneProcessingText.text = "Processing";
+        phoneProcessingPanel.SetActive(true);
+        mainPanel.SetActive(false);
+        yield return new WaitForSeconds(1.5f);
+
+        //wait some time
+        phoneProcessingText.text += ".";
+        yield return new WaitForSeconds(1.5f);
+
+        phoneProcessingText.text += ".";
+        yield return new WaitForSeconds(1.5f);
+
+        phoneProcessingText.text += ".";
+        yield return new WaitForSeconds(1.5f);
+
+        phoneProcessingText.text = "Processing Completed";
+        yield return new WaitForSeconds(1.5f);
+
+        phoneProcessingPanel.SetActive(false);
+        mainPanel.SetActive(true);
+        Deactivate_Interactable_UI();
+
+        DoneAnswering();
+        //homePanel.SetActive(true);
+    }
+
+
     [Server]
     private void calculateBudget(GameObject NPC)
     {

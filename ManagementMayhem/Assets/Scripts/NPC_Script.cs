@@ -16,7 +16,7 @@ public class NPC_Script : NetworkBehaviour
     public int prevRand = -1;
     public float budget;
 
-    public BoxCollider2D initialCollider;
+    public CircleCollider2D initialCollider;
 
     private NetworkManagerLobby room;
     private NetworkManagerLobby Room
@@ -47,7 +47,7 @@ public class NPC_Script : NetworkBehaviour
     {
         if (collision.IsTouching(initialCollider) && collision.gameObject.CompareTag("Player"))
         {
-            gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            gameObject.GetComponent<CircleCollider2D>().enabled = false;
         }
     }
 

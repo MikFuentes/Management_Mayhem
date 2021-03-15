@@ -76,6 +76,9 @@ public class Text_Writer : MonoBehaviour
         private float timer;
         private Action onComplete;
 
+        //private List<string> keyWords = new List<string>();
+        //private string fileName = "EMM_Stage_Zero_Keywords.txt";
+
         public TextWriterSingle(TMP_Text text, string textToWrite, float timePerChar, bool invisibleChar, bool hasHighlights, Action onComplete)
         {
             this.text = text;
@@ -85,6 +88,17 @@ public class Text_Writer : MonoBehaviour
             this.hasHighlights = hasHighlights;
             this.onComplete = onComplete;
             characterIndex = 0;
+
+            //var sr = new System.IO.StreamReader(Application.dataPath + "/" + fileName);
+            //var fileContents = sr.ReadToEnd();
+            //sr.Close();
+
+            //var lines = fileContents.Split("\n"[0]);
+
+            //foreach (var line in lines)
+            //{
+            //    keyWords.Add(line);
+            //}
         }
 
         // returns true when complete
@@ -145,22 +159,68 @@ public class Text_Writer : MonoBehaviour
         {
             List<string> keyWords = new List<string>()
             {
+                "ATM",
+                "Bank",
                 "Event Management Mayhem",
-                "Finance person",
-                "Programs person",
-                "Logistics person"
+                "Finance",
+                "Gato Game Summit",
+                "GGS",
+                "Logistics",
+                "Main Menu",
+                "NPC",
+                "Phone",
+                "Rules",
+                "Programs",
+                "Stage Area",
+                "Warehouse",
+                "coins",
+                "communicate",
+                "conveyor belts",
+                "goal",
+                "items",
+                "latest technologies",
+                "roles",
+                "sponsorship funds",
+                "stations"
             };
 
-            foreach (var keyWord in keyWords)
+            foreach (string keyWord in keyWords)
             {
                 Match match = Regex.Match(s, keyWord);
+                string color = "white";
 
-                if (match.Success)
-                {
+                if (keyWord == "ATM" || 
+                    keyWord == "Phone") { color = "red"; }
+                else if (
+                        keyWord == "Bank" || 
+                        keyWord == "Finance") { color = "green";  }
+                else if (
+                        keyWord == "Event Management Mayhem" ||
+                        keyWord == "Gato Game Summit" ||
+                        keyWord == "GGS" ||
+                        keyWord == "Rules" ||
+                        keyWord == "Main Menu" ||
+                        keyWord == "communicate" ||
+                        keyWord == "latest technologies" ||
+                        keyWord == "roles" ||
+                        keyWord == "stations") { color = "#FF00F1"; }
+                else if (
+                        keyWord == "Logistics" ||
+                        keyWord == "Warehouse"){ color = "#00EFFF"; }
+                else if (
+                        keyWord == "Programs" ||
+                        keyWord == "Program" ||
+                        keyWord == "Stage Area") { color = "orange"; }
+                else if (
+                        keyWord == "coins" ||
+                        keyWord == "conveyor belts" ||
+                        keyWord == "sponsorship funds" ||
+                        keyWord == "NPC" ||
+                        keyWord == "items") { color = "yellow"; }
+
                     System.Text.StringBuilder builder = new System.Text.StringBuilder(s);
-                    builder.Replace(keyWord, "<color=yellow>" + keyWord + "</color>");
+                    builder.Replace(keyWord, "<color=" + color + ">" + keyWord + "</color>");
                     s = builder.ToString();
-                }
             }
 
             return s;
