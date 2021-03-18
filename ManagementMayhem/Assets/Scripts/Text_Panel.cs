@@ -65,7 +65,8 @@ public class Text_Panel : MonoBehaviour
         }
         image.gameObject.SetActive(true);
 
-        var sr = new StreamReader(Application.dataPath + "/" + fileName);
+        //var sr = new StreamReader(Application.dataPath + "/" + fileName);
+        var sr = new StreamReader("Assets/Resources/Dialogue/" + fileName);
         var fileContents = sr.ReadToEnd();
         sr.Close();
 
