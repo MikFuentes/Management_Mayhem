@@ -160,7 +160,7 @@ public class NetworkManagerLobby : NetworkManager
 
             for(int i = 0; i < GamePlayers.Count; i++)
             {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message);
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
             }
             restartMessageTimer();
         }
@@ -273,9 +273,40 @@ public class NetworkManagerLobby : NetworkManager
         else if (currentMatchTime == 60)
         {
             yield return new WaitForSeconds(1f);
-            FindObjectOfType<AudioManager>().Play("GameMusic", true, 1.3f);
+            string message = "<color=yellow>One minute remaining!</color>";
+
+            for (int i = 0; i < GamePlayers.Count; i++)
+            {
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+            }
+
+            restartMessageTimer();
+            FindObjectOfType<AudioManager>().Play("GameMusic", true, 1.2f);
             timerCoroutine = StartCoroutine(Timer());
         }
+        else if (currentMatchTime == 30 || currentMatchTime == 10)
+        {
+            yield return new WaitForSeconds(1f);
+            string message = "<color=yellow>" + currentMatchTime.ToString() + " seconds remaining!</color>";
+
+            for (int i = 0; i < GamePlayers.Count; i++)
+            {
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+            }
+
+            restartMessageTimer();
+            timerCoroutine = StartCoroutine(Timer());
+        }
+        //else if (currentMatchTime <= 10 && currentMatchTime > 0)
+        //{
+        //    yield return new WaitForSeconds(1f);
+        //    for (int j = 0; j < GamePlayers.Count; j++)
+        //    {
+        //        GamePlayers[j].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage("<color=yellow>" + currentMatchTime.ToString() + "</color>");
+        //    }
+        //    restartMessageTimer();
+        //    timerCoroutine = StartCoroutine(Timer());
+        //}
         else
         {
             yield return new WaitForSeconds(1f);
@@ -298,11 +329,8 @@ public class NetworkManagerLobby : NetworkManager
         {
             StopCoroutine(messageTimerCoroutine);
         }
-        else
-        {
-            currentMessageTime = 7;
-            messageTimerCoroutine = StartCoroutine(messageTimer());
-        }
+        currentMessageTime = 7;
+        messageTimerCoroutine = StartCoroutine(messageTimer());
     }
 
     private IEnumerator messageTimer()
@@ -330,14 +358,16 @@ public class NetworkManagerLobby : NetworkManager
         {
             for (int i = 0; i < GamePlayers.Count; i++)
             {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(true);
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverPanel.gameObject.SetActive(true);
+                //GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(true);
             }
         }
         else
         {
             for (int i = 0; i < GamePlayers.Count; i++)
             {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(false);
+                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverPanel.gameObject.SetActive(false);
+                //GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(false);
             }
         }
     }

@@ -16,6 +16,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     public bool timerStarted = false;
     [SerializeField] private Button retryButton = null;
     [SerializeField] public TMP_Text serverMessage = null;
+    [SerializeField] public GameObject serverPanel = null;
     private int messageCounter = 0;
 
     [SerializeField] public TMP_Text Items_Gathered;
@@ -75,12 +76,13 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         this.displayName = displayName;
     }
 
-    public void UpdateServerMessage(string message)
+    public void UpdateServerMessage(string message, bool clearMessages)
     {
-        if(messageCounter > 3)
+        Debug.Log(serverMessage.text);
+        if(messageCounter >= 3 || clearMessages)
         {
             messageCounter = 0;
-            serverMessage.text = message;
+            serverMessage.text = message + "\n";
         }
         else
         {

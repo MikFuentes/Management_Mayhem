@@ -7731,7 +7731,7 @@ MonoBehaviour:
   namePanel: {fileID: 333049772}
   stageZero: {fileID: 2086040969}
   landingPage: {fileID: 1297021831}
-  rulesPage: {fileID: 1889130640}
+  howToPlay: {fileID: 1222923669}
   index: 0
   message: 
   showButtons: 0
