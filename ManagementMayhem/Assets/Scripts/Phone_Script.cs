@@ -16,14 +16,10 @@ public class Phone_Script : MonoBehaviour
 
     private void Update()
     {
-        //if (beingUsedBySomeoneElse)
-        //{
-        //    gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
-        //}
-        //else
-        //{
-        //    gameObject.GetComponent<CapsuleCollider2D>().enabled = true;
-        //}
+        if (beingUsedBySomeoneElse)
+        {
+            gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
+        }
     }
 
     private IEnumerator ring()
@@ -46,7 +42,7 @@ public class Phone_Script : MonoBehaviour
             audio.Stop();
         }
 
-        //beingUsedBySomeoneElse = true;
+        beingUsedBySomeoneElse = true;
         // called when the phone is answered
 
         //gameObject.GetComponent<CapsuleCollider2D>().enabled = false; //so that no other people can use the phone
@@ -55,5 +51,16 @@ public class Phone_Script : MonoBehaviour
     public void doneAnsweringPhone()
     {
         ringing = StartCoroutine(ring());
+        beingUsedBySomeoneElse = false;
+    }
+
+    public void stop()
+    {
+        if (ringing != null)
+        {
+            StopCoroutine(ringing);
+            audio.Stop();
+        }
+        gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
     }
 }

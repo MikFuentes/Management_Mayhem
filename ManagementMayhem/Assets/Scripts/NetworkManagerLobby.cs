@@ -31,6 +31,8 @@ public class NetworkManagerLobby : NetworkManager
 
     public float MoraleBar;
 
+    public int remainingSponsorshipslots;
+
     public Coroutine waitTimerCoroutine;
     public float currentWaitTime;
     public int prev_rand = -1;
@@ -68,6 +70,8 @@ public class NetworkManagerLobby : NetworkManager
         ItemsRemaining = TotalItems;
 
         MoraleBar = 5;
+
+        remainingSponsorshipslots = 2;
 
         OnTimeUpdate += HandleTimeUpdate;
         OnMessageTimeUpdate += HandleMessageTimerUpdate;
@@ -218,6 +222,7 @@ public class NetworkManagerLobby : NetworkManager
             TotalItems = 10;
             ItemsRemaining = TotalItems;
             MoraleBar = 5;
+            remainingSponsorshipslots = 2;
             ServerChangeScene("Stage 2 - Coordination");
             //initializeCountdown();
             RestartTimer();
