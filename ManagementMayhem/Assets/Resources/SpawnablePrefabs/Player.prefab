@@ -7575,6 +7575,7 @@ MonoBehaviour:
   phoneProcessingPanel: {fileID: 8584471624654522053}
   phoneProcessingOffer: {fileID: 4873659487160127137}
   phoneProcessingText: {fileID: 4926869636463929812}
+  remainingSponsorshipslots: 0
   remainingSlots: {fileID: 1721013964198005524}
   moneyText: {fileID: 1747922413685236022}
   currentMoney: 0

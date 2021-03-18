@@ -21,11 +21,11 @@ public class Text_Panel : MonoBehaviour
 
     [SerializeField] private GameObject stageZero;
     [SerializeField] private GameObject landingPage;
-    [SerializeField] private GameObject rulesPage;
+    [SerializeField] private GameObject howToPlay;
 
     public int index = 0;
     private List<string> messageArray = new List<string>();
-    private string fileName = "EMM_Stage_Zero_Script.txt";
+    private string fileName = "EMM_Stage_Zero_Script";
     public string message;
     public bool showButtons;
 
@@ -35,10 +35,6 @@ public class Text_Panel : MonoBehaviour
     {
         nextButton.onClick.AddListener(clickFunct);
         noButton.onClick.AddListener(nextText);
-    }
-    public void Start()
-    {
-
     }
 
     private void OnEnable()
@@ -51,27 +47,21 @@ public class Text_Panel : MonoBehaviour
         nextButton.onClick.RemoveAllListeners();
         nextButton.onClick.AddListener(clickFunct);
 
-        if (textWriterSingle != null && textWriterSingle.IsActive())
-        {
-            Debug.Log("writer is active");
-            clickFunct(); //write all the text
-            if (PlayerPrefs.HasKey("PlayerName"))
-                messageArray.Add("Hello, " + PlayerNameInput.DisplayName + "!");
-        }
-
         foreach (Transform child in image.transform)
         {
             child.gameObject.SetActive(false);
         }
         image.gameObject.SetActive(true);
 
-        //var sr = new StreamReader(Application.dataPath + "/" + fileName);
-        var sr = new StreamReader("Assets/Resources/Dialogue/" + fileName);
-        var fileContents = sr.ReadToEnd();
-        sr.Close();
+        TextAsset txt = (TextAsset)Resources.Load("Dialogue/" + fileName, typeof(TextAsset));
+        string fileContents = txt.text;
 
-        if (PlayerPrefs.HasKey("PlayerName"))
-            messageArray.Add("Hello, " + PlayerNameInput.DisplayName + "!");
+        if (PlayerPrefs.HasKey("PlayerName") && PlayerPrefs.GetString("PlayerName") != "")
+        {
+            Debug.Log(PlayerPrefs.GetString("PlayerName"));
+            messageArray.Add("Hello, " + PlayerPrefs.GetString("PlayerName") + "!");
+        }
+
         var lines = fileContents.Split("\n"[0]);
 
         foreach (var line in lines)
@@ -85,7 +75,7 @@ public class Text_Panel : MonoBehaviour
                 int val = System.Int32.Parse(line.Split(new[] { '[' })[1].Split(',')[1].Split(']')[0]);
                 s = s.Split('[')[0];
 
-                if (!PlayerPrefs.HasKey("PlayerName"))
+                if (!PlayerPrefs.HasKey("PlayerName") && PlayerNameInput.DisplayName != "")
                     key--; val--;
 
                 List<int> l = new List<int>() { key, val };
@@ -94,11 +84,7 @@ public class Text_Panel : MonoBehaviour
 
             messageArray.Add(s);
         }
-
-        Debug.Log("writer is NOT active");
         clickFunct();
-
-        //clickFunct();
 
         Debug.Log("Enabled");
     }
@@ -107,6 +93,7 @@ public class Text_Panel : MonoBehaviour
     {
         if (textWriterSingle != null && textWriterSingle.IsActive())
         {
+            Debug.Log("Finished line");
             // Will finish the current line
             textWriterSingle.WriteAllAndDestroy();
 
@@ -117,6 +104,7 @@ public class Text_Panel : MonoBehaviour
             }
         }
         else{
+            Debug.Log("Next line");
             // Will go to the next line
             if (index == messageArray.Count)
             {
@@ -135,7 +123,6 @@ public class Text_Panel : MonoBehaviour
                     imgName = message.Split('{')[1].Split('}')[0];
 
                     message = message.Split('{')[0];
-
                 }
 
                 startTalking();
@@ -211,7 +198,7 @@ public class Text_Panel : MonoBehaviour
         else
         {
             stageZero.SetActive(false);
-            rulesPage.SetActive(true);
+            howToPlay.SetActive(true);
         }
 
 
@@ -243,4 +230,14 @@ public class Text_Panel : MonoBehaviour
         }
         index++;
     }
+
+    public void clearText()
+    {
+        if (textWriterSingle != null && textWriterSingle.IsActive())
+        {
+            // Will finish the current line
+            textWriterSingle.WriteAllAndDestroy();
+        }
+    }
 }
+

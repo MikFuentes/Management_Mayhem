@@ -47,7 +47,7 @@ public class MainMenu : NetworkBehaviour
     public void StartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        FindObjectOfType<AudioManager>().Play("MenuMusic", false);
+        FindObjectOfType<AudioManager>().Play("MenuMusic", false, 1);
     }
 
     public void StartButton()

@@ -253,12 +253,9 @@ public class NetworkManagerLobby : NetworkManager
         {
             StopCoroutine(timerCoroutine);
         }
-        else
-        {
-            currentMatchTime = matchLength;
-            timerCoroutine = StartCoroutine(Timer());
-        }
 
+        currentMatchTime = matchLength;
+        timerCoroutine = StartCoroutine(Timer());
     }
 
     private IEnumerator Timer()
@@ -272,6 +269,12 @@ public class NetworkManagerLobby : NetworkManager
             OnTimeUpdate?.Invoke(currentMatchTime);
             StopCoroutine(timerCoroutine);
             timerCoroutine = null;
+        }
+        else if (currentMatchTime == 60)
+        {
+            yield return new WaitForSeconds(1f);
+            FindObjectOfType<AudioManager>().Play("GameMusic", true, 1.3f);
+            timerCoroutine = StartCoroutine(Timer());
         }
         else
         {

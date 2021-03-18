@@ -41,10 +41,10 @@ public class AudioManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Play("MenuMusic", true);
+        Play("MenuMusic", true, 1);
     }
 
-    public void Play(string name, bool willPlay)
+    public void Play(string name, bool willPlay, float pitch)
     {
         Sound s = Array.Find(sounds, sound => sound.name == name);
 
@@ -53,6 +53,8 @@ public class AudioManager : MonoBehaviour
             Debug.LogWarning("Sound " + name + " not found!");
             return;
         }
+
+        s.source.pitch = pitch;
 
         if (willPlay)
             s.source.Play();

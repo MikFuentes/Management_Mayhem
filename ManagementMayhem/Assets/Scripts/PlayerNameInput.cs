@@ -15,7 +15,7 @@ public class PlayerNameInput : MonoBehaviour
 
     private const string PlayerPrefsNameKey = "PlayerName";
 
-    void Start() => SetUpInputField();
+    void OnEnable() => SetUpInputField();
 
     public void SetUpInputField()
     {   

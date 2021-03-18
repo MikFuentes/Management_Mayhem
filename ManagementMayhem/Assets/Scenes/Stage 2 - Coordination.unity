@@ -482,6 +482,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beingUsedBySomeoneElse: 0
+  initialCollider: {fileID: 25641290}
+--- !u!58 &25641290
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25641286}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 5.24, y: -4.6}
+  serializedVersion: 2
+  m_Radius: 1.5
 --- !u!1 &26323236
 GameObject:
   m_ObjectHideFlags: 0

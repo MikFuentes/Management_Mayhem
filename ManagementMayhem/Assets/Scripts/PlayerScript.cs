@@ -468,6 +468,8 @@ public class PlayerScript : NetworkBehaviour
                     interactButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Answer";
 
                     mainPanel.SetActive(true);
+
+                    phone = collision.gameObject;
                 }
             }
             else if (collision.gameObject.CompareTag("Depositor") && collision.isTrigger)
@@ -1107,6 +1109,11 @@ public class PlayerScript : NetworkBehaviour
     {
         if (!gameEnded)
         {
+            FindObjectOfType<AudioManager>().Play("GameMusic", false, 1); //stop the music
+            phone.GetComponent<Phone_Script>().stop(); //stop the ringing
+            //stop the npc
+
+
             //only bring up your own screen
             gameObject.transform.Find("CameraPlayer/HUD_Canvas/Results_UI").gameObject.SetActive(true);
             gameObject.GetComponent<NetworkGamePlayerLobby>().Items_Gathered.text = (totalItems - remainingItems).ToString() + "/" + totalItems;

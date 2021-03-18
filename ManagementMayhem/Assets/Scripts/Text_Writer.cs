@@ -155,6 +155,12 @@ public class Text_Writer : MonoBehaviour
             Text_Writer.removeWriterStatic(text);
         }
 
+        public void destroy()
+        {
+            text.text = "";
+            Text_Writer.removeWriterStatic(text);
+        }
+
         public string HighlightKeyWords(string s)
         {
             List<string> keyWords = new List<string>()

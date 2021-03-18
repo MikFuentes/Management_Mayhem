@@ -7,6 +7,9 @@ public class Phone_Script : MonoBehaviour
     AudioSource audio;
     Coroutine ringing;
     public bool beingUsedBySomeoneElse = false;
+
+    public CircleCollider2D initialCollider;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +22,14 @@ public class Phone_Script : MonoBehaviour
         if (beingUsedBySomeoneElse)
         {
             gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.IsTouching(initialCollider) && collision.gameObject.CompareTag("Player"))
+        {
+            gameObject.GetComponent<CircleCollider2D>().enabled = false;
         }
     }
 

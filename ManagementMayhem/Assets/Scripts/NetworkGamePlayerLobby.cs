@@ -58,10 +58,10 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         gameObject.GetComponent<Animator>().runtimeAnimatorController = Room.animations[animatorIndex];
         playerName.text = displayName;
 
-        FindObjectOfType<AudioManager>().Play("GameMusic", false);
+        FindObjectOfType<AudioManager>().Play("GameMusic", false, 1);
 
-        FindObjectOfType<AudioManager>().Play("MenuMusic", false);
-        FindObjectOfType<AudioManager>().Play("GameMusic", true);
+        FindObjectOfType<AudioManager>().Play("MenuMusic", false, 1);
+        FindObjectOfType<AudioManager>().Play("GameMusic", true, 1);
     }
 
     public override void OnNetworkDestroy()
@@ -165,8 +165,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         //Debug.Log(Room.RoomPlayers.Count);
 
         //Room.ServerChangeScene("Main Menu");
-        FindObjectOfType<AudioManager>().Play("GameMusic", false);
-        FindObjectOfType<AudioManager>().Play("MenuMusic", true);
+        FindObjectOfType<AudioManager>().Play("GameMusic", false, 1);
+        FindObjectOfType<AudioManager>().Play("MenuMusic", true, 1);
         SceneManager.LoadScene("Main Menu");
     }
 
@@ -184,8 +184,8 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         {
             Room.StopHost();
             Debug.Log("StopHost()");
-            FindObjectOfType<AudioManager>().Play("GameMusic", false);
-            FindObjectOfType<AudioManager>().Play("MenuMusic", true);
+            FindObjectOfType<AudioManager>().Play("GameMusic", false, 1);
+            FindObjectOfType<AudioManager>().Play("MenuMusic", true, 1);
             SceneManager.LoadScene("Main Menu");
         }
     }
