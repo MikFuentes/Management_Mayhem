@@ -41,7 +41,7 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] public bool pickUpActive = false;
     public GameObject interactable;
     public GameObject NPC;
-    public int NPCWaitTime = 20;
+    public int NPCWaitTime = 30;
     [SyncVar] public bool canDeposit;
     [SyncVar] public bool canDelete;
     public bool UI_Active;
@@ -85,6 +85,9 @@ public class PlayerScript : NetworkBehaviour
     [SerializeField] private TMP_Text phoneProcessingText = null;
     int offer = 0;
     int prevOffer = -1;
+    bool imUsingPhone = false;
+    [SyncVar] public int remainingSponsorshipslots;
+    [SerializeField] private TMP_Text remainingSlots = null;
 
     [Header("Money")]
     //[SerializeField] private GameObject moneyUI = null;
@@ -159,7 +162,9 @@ public class PlayerScript : NetworkBehaviour
 
         CmdSyncStartTime();
         CmdInitializeMoraleBar();
+        CmdInitializeSponsorships();
     }
+
 
     [ClientCallback]
     public void OnDestroy()
@@ -792,7 +797,7 @@ public class PlayerScript : NetworkBehaviour
         UI_Active = true; // set bool
         Game_UI.SetActive(false); // deactivate game_UI
 
-        if(name == "Phone")
+        if(name == "Phone" && remainingSponsorshipslots != 0)
         {
             offer = UnityEngine.Random.Range(3, 7);
             while (offer == prevOffer)
@@ -805,6 +810,8 @@ public class PlayerScript : NetworkBehaviour
             phone = obj.gameObject;
 
             CmdAnswerPhone(phone);
+            imUsingPhone = true;
+            CmdInitializeSponsorships();
             //phone.GetComponent<Phone_Script>().beingUsedBySomeoneElse = false; //i'm using it
             //phone.GetComponent<CapsuleCollider2D>().enabled = true; //renable it for us
             //stop the ringing sound for everyone
@@ -855,12 +862,17 @@ public class PlayerScript : NetworkBehaviour
     {
         phone = go;
         phone.GetComponent<Phone_Script>().doneAnsweringPhone();
+
+        if(remainingSponsorshipslots == 0)
+        {
+            phone.GetComponent<Phone_Script>().stop();
+        }
     }
 
 
     void Deactivate_Interactable_UI()
     {
-        if (UI_Active)
+        if (UI_Active && !imUsingPhone)
         {
             Current_Interactable_UI.SetActive(false); // deactivate UI
             Faded_Background.SetActive(false);
@@ -1388,14 +1400,45 @@ public class PlayerScript : NetworkBehaviour
 
     public void addSponsorshipFunds()
     {
+        imUsingPhone = false;
         StartCoroutine(ActivatePhoneProcessingPanel());
 
         CmdUpdateBalance(offer);
+        CmdUpdateSponsorshipSlots();
     }
     public void declineSponsorshipFunds()
     {
+        imUsingPhone = false;
         StartCoroutine(ActivatePhoneProcessingPanel());
     }
+
+    [Command]
+    public void CmdUpdateSponsorshipSlots()
+    {
+        UpdateSponsorhipSlots();
+    }
+
+    [Server]
+    public void UpdateSponsorhipSlots()
+    {
+        Room.remainingSponsorshipslots--;
+
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().remainingSponsorshipslots = Room.remainingSponsorshipslots;
+        }
+
+        RpcUpdateSponsorshipSlots();
+    }
+
+    [ClientRpc]
+    public void RpcUpdateSponsorshipSlots()
+    {
+        Debug.Log(remainingSponsorshipslots);
+        remainingSlots.text = remainingSponsorshipslots.ToString();
+    }
+
+
     public IEnumerator ActivatePhoneProcessingPanel()
     {
         //AudioSource.PlayClipAtPoint(ATM_withdraw_sound, new Vector3(-19, 0, 0), 0.1f);
@@ -1613,6 +1656,34 @@ public class PlayerScript : NetworkBehaviour
     {
         maxMorale = Room.MoraleBar;
         currentMorale = Room.MoraleBar;
+    }
+
+    [Command]
+    private void CmdInitializeSponsorships()
+    {
+        Debug.Log("CmdInitializeSponsorships()");
+        remainingSponsorshipslots = Room.remainingSponsorshipslots;
+
+        InitializeSponsorships();
+    }
+
+    [Server]
+    private void InitializeSponsorships()
+    {
+        Debug.Log(Room.GamePlayers.Count);
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().remainingSponsorshipslots = Room.remainingSponsorshipslots;
+        }
+
+        RpcInitializeSponsorships();
+    }
+
+    [ClientRpc]
+    private void RpcInitializeSponsorships()
+    {
+        Debug.Log(remainingSponsorshipslots);
+        remainingSlots.text = remainingSponsorshipslots.ToString();
     }
 
     private void UpdateMoraleBar(float oldValue, float newValue)
