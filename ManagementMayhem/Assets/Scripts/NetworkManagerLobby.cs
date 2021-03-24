@@ -53,6 +53,7 @@ public class NetworkManagerLobby : NetworkManager
     public static event Action OnTimerCountdown;
 
     public bool beenCalled;
+    public int hostIndex;
     public override void OnStartServer()
     {
         Debug.Log("OnStartServer()");
@@ -74,6 +75,16 @@ public class NetworkManagerLobby : NetworkManager
 
         remainingSponsorshipslots = 2;
         beenCalled = false;
+
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+        }
+
+        if (messageTimerCoroutine != null)
+        {
+            StopCoroutine(messageTimerCoroutine);
+        }
 
         OnTimeUpdate += HandleTimeUpdate;
         OnMessageTimeUpdate += HandleMessageTimerUpdate;
@@ -164,8 +175,14 @@ public class NetworkManagerLobby : NetworkManager
             //{
             //    GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
             //}
-            if(GamePlayers.Count != 0)
-                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
+
+            //Debug.Log("roomplayers: " + RoomPlayers.Count);
+            //Debug.Log("gameplayers: " + GamePlayers.Count);
+            hostIndex = GamePlayers.Count - 1;
+            //Debug.Log("hostIndex: " + hostIndex);
+
+            if (GamePlayers.Count != 0)
+                GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
 
             restartMessageTimer();
         }
@@ -177,10 +194,19 @@ public class NetworkManagerLobby : NetworkManager
     {
         Debug.Log("OnStopServer()");
         OnServerStopped?.Invoke();
-        Debug.Log(RoomPlayers.Count);
 
-        if (RoomPlayers.Count != 0) RoomPlayers[0].ResetPlayerCounts();
-        else if (GamePlayers.Count != 0) GamePlayers[0].ResetPlayerCounts();
+        if (RoomPlayers.Count != 0)
+        {
+            hostIndex = 0;
+
+            RoomPlayers[hostIndex].ResetPlayerCounts();
+        }
+        else if (GamePlayers.Count != 0)
+        {
+            hostIndex = GamePlayers.Count - 1;
+
+            GamePlayers[hostIndex].ResetPlayerCounts();
+        }
 
         RoomPlayers.Clear();
         GamePlayers.Clear();
@@ -232,6 +258,11 @@ public class NetworkManagerLobby : NetworkManager
             ServerChangeScene("Stage 2 - Coordination");
             //initializeCountdown();
             RestartTimer();
+
+            if (messageTimerCoroutine != null)
+            {
+                StopCoroutine(messageTimerCoroutine);
+            }
         }
     }
 
@@ -289,8 +320,10 @@ public class NetworkManagerLobby : NetworkManager
 
             if (GamePlayers.Count != 0)
             {
-                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
-                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().SpeedUpMusic();
+                hostIndex = GamePlayers.Count - 1;
+
+                GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+                GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().SpeedUpMusic();
             }
 
             restartMessageTimer();
@@ -307,7 +340,12 @@ public class NetworkManagerLobby : NetworkManager
             //    GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
             //}
             if (GamePlayers.Count != 0)
-                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+            {
+                hostIndex = GamePlayers.Count - 1;
+
+                GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+            }
+
 
             restartMessageTimer();
             timerCoroutine = StartCoroutine(Timer());
@@ -369,8 +407,10 @@ public class NetworkManagerLobby : NetworkManager
     //this hook method is triggered when currentMatchTime changes
     private void HandleMessageTimerUpdate(float currentMessageTime)
     {
-        if(GamePlayers.Count != 0)
-            GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().HandleMessageTimerUpdate(currentMessageTime);
+        hostIndex = GamePlayers.Count - 1;
+
+        if (GamePlayers.Count != 0)
+            GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().HandleMessageTimerUpdate(currentMessageTime);
     }
 
     private void EndGame()
@@ -395,6 +435,8 @@ public class NetworkManagerLobby : NetworkManager
         //From menu to game
         else if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Stage"))
         {
+            hostIndex = RoomPlayers.Count - 1;
+
             for (int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
                 //RoomPlayers = [H, C]
@@ -413,12 +455,13 @@ public class NetworkManagerLobby : NetworkManager
                 NetworkServer.Destroy(conn.identity.gameObject); //get rid of room player
 
                 NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject, true); //adding true here gets rid of an error
-
             }
         }
         // From game to game
         else if (SceneManager.GetActiveScene().path == gameScene && newSceneName.StartsWith("Stage"))
         {
+            hostIndex = GamePlayers.Count - 1;
+
             //Stacks LIFO 
             Stack<NetworkConnection> connStack = new Stack<NetworkConnection>();
             Stack<GameObject> gameObjectStack = new Stack<GameObject>();

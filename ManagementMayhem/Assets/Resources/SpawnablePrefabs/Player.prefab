@@ -1853,7 +1853,7 @@ GameObject:
   - component: {fileID: 3906011773158375128}
   - component: {fileID: 1299496601268386498}
   m_Layer: 0
-  m_Name: Menu_Button (2)
+  m_Name: Disconnect_Button (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3676,7 +3676,7 @@ GameObject:
   - component: {fileID: 3745884078175049298}
   - component: {fileID: 1364661044966486893}
   m_Layer: 0
-  m_Name: Menu_Button (3)
+  m_Name: Cancel_Button (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5573,7 +5573,7 @@ GameObject:
   - component: {fileID: 476865905585389940}
   - component: {fileID: 3122320004909772655}
   m_Layer: 0
-  m_Name: Menu_Button (3)
+  m_Name: Disconnect_Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7093,10 +7093,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
+  m_fontSize: 50
   m_fontSizeBase: 60
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 50
   m_fontStyle: 1

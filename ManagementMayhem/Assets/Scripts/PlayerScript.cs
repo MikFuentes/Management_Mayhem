@@ -1667,7 +1667,6 @@ public class PlayerScript : NetworkBehaviour
     private void HandleTimeChange(float oldValue, float newValue)
     {
         if (!isLocalPlayer) return; //stops double calculations of timer
-
         //Debug.Log(oldValue + ", " + newValue);
         float minutes = Mathf.FloorToInt(newValue / 60);
         float seconds = Mathf.FloorToInt(newValue % 60);

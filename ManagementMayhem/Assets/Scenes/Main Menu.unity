@@ -6980,7 +6980,7 @@ PrefabInstance:
     - target: {fileID: -1307364602658009596, guid: 7af7ff9e31d287a4c82304a57854ba36,
         type: 3}
       propertyPath: sounds.Array.data[0].volume
-      value: 0.1
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: -1307364602658009596, guid: 7af7ff9e31d287a4c82304a57854ba36,
         type: 3}
@@ -13711,6 +13711,8 @@ MonoBehaviour:
   currentMessageTime: 0
   animations: []
   selectedCharacterIndexes: 
+  beenCalled: 0
+  hostIndex: 0
 --- !u!4 &1122674849
 Transform:
   m_ObjectHideFlags: 0
