@@ -162,31 +162,30 @@ public class NetworkManagerLobby : NetworkManager
         Debug.Log("OnServerDisconnect()");
         if (conn.identity != null)
         {
-            var player = conn.identity.GetComponent<NetworkRoomPlayerLobby>(); //get the roomPlayerScript
+            if (SceneManager.GetActiveScene().path == menuScene)
+            {
+                var player = conn.identity.GetComponent<NetworkRoomPlayerLobby>(); //get the roomPlayerScript
 
-            RoomPlayers.Remove(player); //remove player from the list
+                RoomPlayers.Remove(player); //remove player from the list
 
-            NotifyPlayersOfReadyState();
+                NotifyPlayersOfReadyState();
+            }
+            else
+            {
+                var gamePlayer = conn.identity.GetComponent<NetworkGamePlayerLobby>(); //get the gamePlayerScript
+                string message = gamePlayer.gameObject.GetComponent<NetworkGamePlayerLobby>().displayName + " disconnected from the game.";
 
-            var gamePlayer = conn.identity.GetComponent<NetworkGamePlayerLobby>(); //get the gamePlayerScript
-            string message = gamePlayer.gameObject.GetComponent<NetworkGamePlayerLobby>().displayName + " disconnected from the game.";
-
-            //for(int i = 0; i < GamePlayers.Count; i++)
-            //{
-            //    GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
-            //}
-
-            //Debug.Log("roomplayers: " + RoomPlayers.Count);
-            //Debug.Log("gameplayers: " + GamePlayers.Count);
-            hostIndex = GamePlayers.Count - 1;
-            //Debug.Log("hostIndex: " + hostIndex);
-
-            if (GamePlayers.Count != 0)
-                GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
-
-            restartMessageTimer();
+                if (GamePlayers.Count != 0)
+                {
+                    //Debug.Log("roomplayers: " + RoomPlayers.Count);
+                    //Debug.Log("gameplayers: " + GamePlayers.Count);
+                    hostIndex = GamePlayers.Count - 1;
+                    //Debug.Log("hostIndex: " + hostIndex);
+                    GamePlayers[hostIndex].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
+                }
+                restartMessageTimer();
+            }
         }
-
         base.OnServerDisconnect(conn);
     }
 
@@ -210,6 +209,8 @@ public class NetworkManagerLobby : NetworkManager
 
         RoomPlayers.Clear();
         GamePlayers.Clear();
+
+        FindObjectOfType<AudioManager>().Play("GameMusic", false, 1.0f); // stop music
     }
 
 
