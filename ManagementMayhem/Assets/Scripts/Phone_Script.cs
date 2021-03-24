@@ -15,6 +15,7 @@ public class Phone_Script : MonoBehaviour
     {
         audio = gameObject.GetComponent<AudioSource>();
         ringing = StartCoroutine(ring());
+        initialCollider.enabled = true;
     }
 
     private void Update()
@@ -29,7 +30,7 @@ public class Phone_Script : MonoBehaviour
     {
         if (collision.IsTouching(initialCollider) && collision.gameObject.CompareTag("Player"))
         {
-            gameObject.GetComponent<CircleCollider2D>().enabled = false;
+            initialCollider.enabled = false;
         }
     }
 

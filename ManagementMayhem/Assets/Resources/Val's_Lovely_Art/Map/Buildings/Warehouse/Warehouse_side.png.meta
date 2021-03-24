@@ -26,6 +26,12 @@ TextureImporter:
   - first:
       213: 7481261407985902156
     second: Warehouse_side_1
+  - first:
+      213: 4177180040428209948
+    second: Warehouse_side_6
+  - first:
+      213: 4383464048255594046
+    second: Warehouse_side_7
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -139,11 +145,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 80
+        y: 140
         width: 192
-        height: 80
+        height: 20
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -160,11 +166,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 120
         width: 192
-        height: 80
-      alignment: 9
-      pivot: {x: 0.5, y: 0.1}
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -172,6 +178,132 @@ TextureImporter:
       bones: []
       spriteID: c42a6d6fc97c2d760800000000000000
       internalID: 7481261407985902156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warehouse_side_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 100
+        width: 192
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 304c3345836f1a580800000000000000
+      internalID: -8817495873623440381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warehouse_side_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 80
+        width: 192
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f307cf8733dc89380800000000000000
+      internalID: -8964189437324136385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warehouse_side_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 60
+        width: 192
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a59056901fbbe7c0800000000000000
+      internalID: -4040926162672642652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warehouse_side_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 40
+        width: 192
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a3c9d6ea81406ac0800000000000000
+      internalID: -3864016415449562202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warehouse_side_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 20
+        width: 192
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1743987d1358f930800000000000000
+      internalID: 4177180040428209948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warehouse_side_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 192
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3e68f9c35135dc30800000000000000
+      internalID: 4383464048255594046
       vertices: []
       indices: 
       edges: []

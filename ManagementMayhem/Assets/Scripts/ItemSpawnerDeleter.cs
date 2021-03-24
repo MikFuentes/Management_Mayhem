@@ -37,7 +37,7 @@ public class ItemSpawnerDeleter : NetworkBehaviour
     {
         if (!Cooldown)
         {
-            if (objectQueue.Count != 0)
+            if (objectQueue.Count != 0 && objectQueue.Peek() != null)
             {
                 GameObject item = (GameObject)Instantiate(objectQueue.Dequeue(), v, Quaternion.identity);
                 NetworkServer.Spawn(item);

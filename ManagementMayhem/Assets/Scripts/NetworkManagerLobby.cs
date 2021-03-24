@@ -52,6 +52,7 @@ public class NetworkManagerLobby : NetworkManager
     public static event Action OnServerStopped;
     public static event Action OnTimerCountdown;
 
+    public bool beenCalled;
     public override void OnStartServer()
     {
         Debug.Log("OnStartServer()");
@@ -72,6 +73,7 @@ public class NetworkManagerLobby : NetworkManager
         MoraleBar = 5;
 
         remainingSponsorshipslots = 2;
+        beenCalled = false;
 
         OnTimeUpdate += HandleTimeUpdate;
         OnMessageTimeUpdate += HandleMessageTimerUpdate;
@@ -158,10 +160,13 @@ public class NetworkManagerLobby : NetworkManager
             var gamePlayer = conn.identity.GetComponent<NetworkGamePlayerLobby>(); //get the gamePlayerScript
             string message = gamePlayer.gameObject.GetComponent<NetworkGamePlayerLobby>().displayName + " disconnected from the game.";
 
-            for(int i = 0; i < GamePlayers.Count; i++)
-            {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
-            }
+            //for(int i = 0; i < GamePlayers.Count; i++)
+            //{
+            //    GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
+            //}
+            if(GamePlayers.Count != 0)
+                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, false);
+
             restartMessageTimer();
         }
 
@@ -223,6 +228,7 @@ public class NetworkManagerLobby : NetworkManager
             ItemsRemaining = TotalItems;
             MoraleBar = 5;
             remainingSponsorshipslots = 2;
+            beenCalled = false;
             ServerChangeScene("Stage 2 - Coordination");
             //initializeCountdown();
             RestartTimer();
@@ -269,19 +275,26 @@ public class NetworkManagerLobby : NetworkManager
             OnTimeUpdate?.Invoke(currentMatchTime);
             StopCoroutine(timerCoroutine);
             timerCoroutine = null;
+            FindObjectOfType<AudioManager>().Play("GameMusic", false, 1.2f); // stop music
         }
         else if (currentMatchTime == 60)
         {
             yield return new WaitForSeconds(1f);
             string message = "<color=yellow>One minute remaining!</color>";
 
-            for (int i = 0; i < GamePlayers.Count; i++)
+            //for (int i = 0; i < GamePlayers.Count; i++)
+            //{
+            //    GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+            //}
+
+            if (GamePlayers.Count != 0)
             {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().SpeedUpMusic();
             }
 
             restartMessageTimer();
-            FindObjectOfType<AudioManager>().Play("GameMusic", true, 1.2f);
+
             timerCoroutine = StartCoroutine(Timer());
         }
         else if (currentMatchTime == 30 || currentMatchTime == 10)
@@ -289,10 +302,12 @@ public class NetworkManagerLobby : NetworkManager
             yield return new WaitForSeconds(1f);
             string message = "<color=yellow>" + currentMatchTime.ToString() + " seconds remaining!</color>";
 
-            for (int i = 0; i < GamePlayers.Count; i++)
-            {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
-            }
+            //for (int i = 0; i < GamePlayers.Count; i++)
+            //{
+            //    GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
+            //}
+            if (GamePlayers.Count != 0)
+                GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().UpdateServerMessage(message, true);
 
             restartMessageTimer();
             timerCoroutine = StartCoroutine(Timer());
@@ -354,28 +369,9 @@ public class NetworkManagerLobby : NetworkManager
     //this hook method is triggered when currentMatchTime changes
     private void HandleMessageTimerUpdate(float currentMessageTime)
     {
-        if (currentMessageTime != 0)
-        {
-            for (int i = 0; i < GamePlayers.Count; i++)
-            {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverPanel.gameObject.SetActive(true);
-                //GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(true);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < GamePlayers.Count; i++)
-            {
-                GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverPanel.gameObject.SetActive(false);
-                //GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.gameObject.SetActive(false);
-            }
-        }
+        if(GamePlayers.Count != 0)
+            GamePlayers[0].GetComponent<NetworkGamePlayerLobby>().HandleMessageTimerUpdate(currentMessageTime);
     }
-
-
-
-
-
 
     private void EndGame()
     {
@@ -401,6 +397,11 @@ public class NetworkManagerLobby : NetworkManager
         {
             for (int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
+                //RoomPlayers = [H, C]
+                //1, 0
+                //leader assigned at last loop
+                //leader spawned at last loop
+                //GamePlayers = [C, H]
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
                 gameplayerInstance.SetCharacter(RoomPlayers[i].CharacterIndex);
@@ -418,18 +419,38 @@ public class NetworkManagerLobby : NetworkManager
         // From game to game
         else if (SceneManager.GetActiveScene().path == gameScene && newSceneName.StartsWith("Stage"))
         {
+            //Stacks LIFO 
+            Stack<NetworkConnection> connStack = new Stack<NetworkConnection>();
+            Stack<GameObject> gameObjectStack = new Stack<GameObject>();
+
             for (int i = GamePlayers.Count - 1; i >= 0; i--)
             {
+                //GamePlayers = [C, H]
+                //1, 0
+                //stack = [H, C]
                 var conn = GamePlayers[i].connectionToClient;
                 var gamePlayerInstance = Instantiate(gamePlayerPrefab);
                 gamePlayerInstance.SetCharacter(GamePlayers[i].animatorIndex); // Same index as CharacterIndex
                 gamePlayerInstance.SetDisplayName(GamePlayers[i].displayName);
 
-                bool isLeader = i == GamePlayers.Count - 1;
+                bool isLeader = i == RoomPlayers.Count - 1;
+
                 gamePlayerInstance.IsLeader = isLeader;
 
+                // put into stack
+                connStack.Push(conn);
+                gameObjectStack.Push(gamePlayerInstance.gameObject);
+
                 NetworkServer.Destroy(conn.identity.gameObject);
-                NetworkServer.ReplacePlayerForConnection(conn, gamePlayerInstance.gameObject, true);
+            }
+
+            int count = connStack.Count;
+            for (int i = 0; i < count; i++)
+            {
+                //stack = [H, C]
+                // 0, 1
+                //GamePlayers = [C, H]
+                NetworkServer.ReplacePlayerForConnection(connStack.Pop(), gameObjectStack.Pop(), true);
             }
         }
         //From game to menu

@@ -41,7 +41,7 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar] public bool pickUpActive = false;
     public GameObject interactable;
     public GameObject NPC;
-    public int NPCWaitTime = 30;
+    public int NPCWaitTime;
     [SyncVar] public bool canDeposit;
     [SyncVar] public bool canDelete;
     public bool UI_Active;
@@ -78,7 +78,7 @@ public class PlayerScript : NetworkBehaviour
     public GameObject spawnDestroyer;
 
     [Header("Phone")]
-    public GameObject phone = null;
+    public GameObject phone;
     [SerializeField] private GameObject mainPanel = null;
     [SerializeField] private GameObject phoneProcessingPanel = null;
     [SerializeField] private TMP_Text phoneProcessingOffer = null;
@@ -118,7 +118,7 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Terrain")]
     public List<GameObject> frontWalls;
-    public bool Indoors = false; 
+    public bool Indoors = false;
 
     [Header("Time")]
     [SerializeField] private TMP_Text ui_Timer = null;
@@ -387,16 +387,52 @@ public class PlayerScript : NetworkBehaviour
                 pickup = collision.gameObject;
                 CmdTriggerEnterPickup(pickup);
             }
-            else if (collision.gameObject.CompareTag("NPC") && collision.isTrigger)
+            else if (collision.gameObject.CompareTag("NPC") && collision.isTrigger && collision is CircleCollider2D)
             {
+                Debug.Log("entered"); //happens twice on 3rd replay
+                if (NPC == null)
+                {
+                    Debug.Log("NPC == null");
+                    NPC = collision.gameObject;
+                    CmdUpdateNPCPrefab(NPC);
+                    CmdStartNPCQueue(NPCWaitTime, NPC);
+                }
+
+                //NPC = collision.gameObject;
+
+
+                //Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
+
+
+                //CmdStartNPCQueue();
+
+
+                //// this is being called twice on the third, 5th, 7th, odd numbers?
+                //if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && Room.GamePlayers[0].timerStarted == false)
+                //{
+                //    //Room.GamePlayers[0].timerStarted == false is the problem, gameplayer[0] is gonna be the client
+                //    //if gameplayer[0] triggers this, his timer will start before the host
+                //    //if the host triggers this, his timer will start before the gameplayer[0]
+                //    Debug.Log("start wait timer");
+                //    CmdQueueRandomObjects(NPC);
+                //    CmdStartWaitTimer(NPCWaitTime, NPC);
+                //}
+            }
+            else if (collision.gameObject.CompareTag("NPC") && collision.isTrigger && !(collision is CircleCollider2D))
+            {
+                //Debug.Log("entered"); //happens twice on 3rd replay
+                //if (NPC == null)
+                //{
+                //    Debug.Log("NPC == null");
+                //    NPC = collision.gameObject;
+                //    CmdUpdateNPCPrefab(NPC);
+                //}
+
                 if (pickUpActive && pickup.GetComponent<PickupProperties>().itemType == "Item")
                 {
                     dropButton.GetComponent<Image>().sprite = buttonSprites[4];
                     dropButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Give";
                 }
-
-                NPC = collision.gameObject;
-
 
                 //gameObject.GetComponent<BoxCollider2D>().enabled = false;
 
@@ -404,43 +440,45 @@ public class PlayerScript : NetworkBehaviour
                 Sprite Item_Sprite = NPC.transform.Find("Item_Sprite").GetComponent<SpriteRenderer>().sprite;
                 tempName = null;
 
-                if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite && Room.GamePlayers[0].timerStarted == false)
+                //// this is being called twice on the third, 5th, 7th, odd numbers?
+                //if (Item_Sprite == NPC.GetComponent<NPC_Script>().blank_sprite)
+                //{
+                //    Debug.Log("start wait timer");
+                //    CmdQueueRandomObjects(NPC);
+                //    CmdStartWaitTimer(NPCWaitTime, NPC);
+                //}
+                //else
+                //{
+                switch (Item_Sprite.name)
                 {
-                    CmdQueueRandomObjects(NPC);
-                    CmdStartWaitTimer(NPCWaitTime, NPC);
+                    case "Chair":
+                        tempName = "Chair";
+                        break;
+                    case "Drink":
+                        tempName = "Drink";
+                        break;
+                    case "Food":
+                        tempName = "Food";
+                        break;
+                    case "Microphone":
+                        tempName = "Microphone";
+                        break;
+                    case "Speaker":
+                        tempName = "Speaker";
+                        break;
+                }
+
+                if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == tempName)
+                {
+                    Debug.Log("You have what I want!");
+                    canDelete = true;
+                    NPC_item_match = true;
                 }
                 else
                 {
-                    switch (Item_Sprite.name)
-                    {
-                        case "Chair":
-                            tempName = "Chair";
-                            break;
-                        case "Drink":
-                            tempName = "Drink";
-                            break;
-                        case "Food":
-                            tempName = "Food";
-                            break;
-                        case "Microphone":
-                            tempName = "Microphone";
-                            break;
-                        case "Speaker":
-                            tempName = "Speaker";
-                            break;
-                    }
-
-                    if (pickup != null && pickup.GetComponent<PickupProperties>().itemType == "Item" && pickup.GetComponent<PickupProperties>().itemName == tempName)
-                    {
-                        Debug.Log("You have what I want!");
-                        canDelete = true;
-                        NPC_item_match = true;
-                    }
-                    else
-                    {
-                        Debug.Log("I want " + tempName);
-                    }
+                    Debug.Log("I want " + tempName);
                 }
+                //}
             }
             else if (collision.gameObject.CompareTag("Interactable") && collision.isTrigger)
             {
@@ -469,7 +507,12 @@ public class PlayerScript : NetworkBehaviour
 
                     mainPanel.SetActive(true);
 
-                    phone = collision.gameObject;
+                    if (phone == null)
+                    {
+                        phone = collision.gameObject;
+
+                        CmdUpdatePhonePrefab(phone);
+                    }
                 }
             }
             else if (collision.gameObject.CompareTag("Depositor") && collision.isTrigger)
@@ -709,13 +752,19 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
-
-
-
     [ClientRpc]
     private void RpcAddToQueue(int r, GameObject go)
     {
         NPC = go;
+
+        if (NPC.GetComponent<NPC_Script>().item_list.Count >= 10)
+            NPC.GetComponent<NPC_Script>().item_list.Clear(); // in case it's not emptied
+
+        if (NPC.GetComponent<NPC_Script>().item_sprite_list.Count() == 0)
+            NPC.GetComponent<NPC_Script>().item_sprite_list = Resources.LoadAll<Sprite>("Val's_Lovely_Art/Pickups/Items").ToList();
+
+        //Debug.Log(NPC.GetComponent<NPC_Script>().item_sprite_list.Count() + ", rand: " + r); //count is sometimes 0
+
         NPC.GetComponent<NPC_Script>().item_list.Add(NPC.GetComponent<NPC_Script>().item_sprite_list[r]);
     }
 
@@ -799,7 +848,7 @@ public class PlayerScript : NetworkBehaviour
         UI_Active = true; // set bool
         Game_UI.SetActive(false); // deactivate game_UI
 
-        if(name == "Phone" && remainingSponsorshipslots != 0)
+        if (name == "Phone" && remainingSponsorshipslots != 0)
         {
             offer = UnityEngine.Random.Range(3, 7);
             while (offer == prevOffer)
@@ -807,7 +856,7 @@ public class PlayerScript : NetworkBehaviour
             prevOffer = offer;
             offer *= 100;
             phoneProcessingOffer.text = offer.ToString();
-            Debug.Log("phon");
+            //Debug.Log("phon");
 
             phone = obj.gameObject;
 
@@ -818,6 +867,28 @@ public class PlayerScript : NetworkBehaviour
             //phone.GetComponent<CapsuleCollider2D>().enabled = true; //renable it for us
             //stop the ringing sound for everyone
 
+        }
+    }
+
+    [Command]
+    private void CmdUpdatePhonePrefab(GameObject phon)
+    {
+        //Debug.Log("CmdUpdatePhonePrefab()");
+        UpdatePhonePrefab(phon);
+    }
+
+    [Server]
+    private void UpdatePhonePrefab(GameObject phon)
+    {
+        RpcUpdatePhonePrefab(phon);
+    }
+
+    [ClientRpc]
+    private void RpcUpdatePhonePrefab(GameObject phon)
+    {
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().phone = phon;
         }
     }
 
@@ -865,7 +936,7 @@ public class PlayerScript : NetworkBehaviour
         phone = go;
         phone.GetComponent<Phone_Script>().doneAnsweringPhone();
 
-        if(remainingSponsorshipslots == 0)
+        if (remainingSponsorshipslots == 0)
         {
             phone.GetComponent<Phone_Script>().stop();
         }
@@ -900,6 +971,7 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     void RpcPickUpOnClick()
     {
+        if (pickup == null) return;
         pickUpButton.gameObject.SetActive(false);
         dropButton.gameObject.SetActive(true);
         pickup.transform.Find("Shadow").gameObject.SetActive(false); //disable shadow when picking up
@@ -921,7 +993,7 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     public void CmdHold()
     {
-        if(pickup == null)
+        if (pickup == null)
         {
             pickUpActive = false;
         }
@@ -952,7 +1024,7 @@ public class PlayerScript : NetworkBehaviour
 
     [ClientRpc]
     void RpcDropOnClick()
-    {        
+    {
         pickUpButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
         pickUpButton.interactable = false; // (2/2) and making pickUpButton non-interactable
         pickUpButton.gameObject.SetActive(true);
@@ -1000,10 +1072,58 @@ public class PlayerScript : NetworkBehaviour
                     rand = UnityEngine.Random.Range(0, Room.ItemsRemaining); //0, 1 --> 0
                 }
             }
+            //Debug.Log(rand);
+            //Debug.Log(go.GetComponent<NPC_Script>().item_list[rand].name);
+            //if(go.GetComponent<NPC_Script>().sprite_go.GetComponent<SpriteRenderer>().sprite.name = prevSpriteName )
 
             RpcChangeItemSprite(rand, go);
 
             Room.prev_rand = rand;
+        }
+    }
+
+    [Command]
+    private void CmdStartNPCQueue(int waitTime, GameObject go)
+    {
+        StartNPCQueue(waitTime, go);
+    }
+
+    [Server]
+    private void StartNPCQueue(int waitTime, GameObject go)
+    {
+        //server method does the below
+        //in the server method, check if the method has been run once already
+
+        if (!Room.beenCalled)
+        {
+            Debug.Log("start wait timer");
+            queueRandomObjects(go);
+            StartWaitTimer(waitTime, go);
+            Room.beenCalled = true;
+        }
+    }
+
+
+
+    [Command]
+    private void CmdUpdateNPCPrefab(GameObject npc)
+    {
+        Debug.Log("CmdUpdateNPCPrefab()");
+        UpdateNPCPrefab(npc);
+    }
+
+    [Server]
+    private void UpdateNPCPrefab(GameObject npc)
+    {
+        RpcUpdateNPCPrefab(npc);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateNPCPrefab(GameObject npc)
+    {
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC = npc;
         }
     }
 
@@ -1070,8 +1190,11 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     private void RpcChangeItemSprite(int rand, GameObject go)
     {
-        NPC = go;
-        NPC.GetComponent<NPC_Script>().ChangeSprite(rand);
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC = go;
+            Room.GamePlayers[i].GetComponent<PlayerScript>().NPC.GetComponent<NPC_Script>().ChangeSprite(rand);
+        }
     }
 
     [ClientRpc]
@@ -1127,18 +1250,18 @@ public class PlayerScript : NetworkBehaviour
 
             int itemScore = (totalItems - remainingItems) * ptsPerBox;
 
-            int moneyScore = (int) ((budget -  moneySpent) * moneyMultiplier);
+            int moneyScore = (int)((budget - moneySpent) * moneyMultiplier);
             if (moneySpent <= budget)
                 moneyScore = 0;
-            int timeScore = (int) currentTime * timeMultiplier;
-            float moraleMultiplier = currentMorale/2;
+            int timeScore = (int)currentTime * timeMultiplier;
+            float moraleMultiplier = currentMorale / 2;
             if (moraleMultiplier < 1)
                 moraleMultiplier = 1;
 
             int finalScore = (int)((itemScore + moneyScore + timeScore) * moraleMultiplier);
 
             gameObject.GetComponent<NetworkGamePlayerLobby>().Item_Score.text = "+" + itemScore.ToString();
-            if(moneyScore < 0)
+            if (moneyScore < 0)
                 gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = moneyScore.ToString();
             else
                 gameObject.GetComponent<NetworkGamePlayerLobby>().Money_Score.text = "-" + moneyScore.ToString();
@@ -1149,7 +1272,7 @@ public class PlayerScript : NetworkBehaviour
             int maxItemScore = totalItems * ptsPerBox;
             int maxMoneyScore = 0;
             int maxTimeScore = (int)matchLength * timeMultiplier;
-            float maxMoraleMultiplier = (int)maxMorale/2;
+            float maxMoraleMultiplier = (int)maxMorale / 2;
 
             int maxFinalScore = (int)((maxItemScore + maxMoneyScore + maxTimeScore) * maxMoraleMultiplier);
 
@@ -1157,7 +1280,7 @@ public class PlayerScript : NetworkBehaviour
             float twoStarRating = 0.44f;
             float oneStarRating = 0.22f;
 
-            int highScore = (int) (maxFinalScore * threeStarRating);
+            int highScore = (int)(maxFinalScore * threeStarRating);
             int medScore = (int)(maxFinalScore * twoStarRating);
             int lowScore = (int)(maxFinalScore * oneStarRating);
 
@@ -1167,14 +1290,14 @@ public class PlayerScript : NetworkBehaviour
 
             if (finalScore > highScore)
             {
-                for(int i = 0; i < 3;i++)
+                for (int i = 0; i < 3; i++)
                 {
                     var tempColor = stars[i].color;
                     tempColor.a = 1f;
                     stars[i].color = tempColor;
                 }
             }
-            else if(finalScore > medScore)
+            else if (finalScore > medScore)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -1192,6 +1315,10 @@ public class PlayerScript : NetworkBehaviour
                     stars[i].color = tempColor;
                 }
             }
+
+            //gameObject.GetComponent<PlayerScript>().NPC.GetComponent<NPC_Script>().ChangeSprite(-1);
+            //gameObject.GetComponent<PlayerScript>().NPC.GetComponent<NPC_Script>().Reset();
+            //RemoveFromArray
             gameEnded = true;
         }
     }
@@ -1199,7 +1326,18 @@ public class PlayerScript : NetworkBehaviour
     [Server]
     private void StopGame()
     {
-        StopCoroutine(Room.waitTimerCoroutine);
+        if (Room.waitTimerCoroutine != null) //Stop the timer
+        {
+            StopCoroutine(Room.waitTimerCoroutine); //stop NPC
+            Room.waitTimerCoroutine = null;
+        }
+
+        if (Room.timerCoroutine != null) //Stop the timer
+        {
+            StopCoroutine(Room.timerCoroutine);
+            Room.timerCoroutine = null;
+            FindObjectOfType<AudioManager>().Play("GameMusic", false, 1.2f); // stop music
+        }
     }
     #endregion
 
@@ -1482,7 +1620,7 @@ public class PlayerScript : NetworkBehaviour
         List<Sprite> list = NPC.gameObject.GetComponent<NPC_Script>().item_list;
 
         int budget = 0;
-        foreach(var l in list)
+        foreach (var l in list)
         {
             foreach (var prefab in Room.spawnPrefabs)
             {
@@ -1499,7 +1637,7 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     private void calculateBudget(int budget)
     {
-        for (int i = 0; i < Room.GamePlayers.Count; i++) 
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
         {
             Room.GamePlayers[i].GetComponent<PlayerScript>().budget = budget;
         }
@@ -1533,8 +1671,8 @@ public class PlayerScript : NetworkBehaviour
         //Debug.Log(oldValue + ", " + newValue);
         float minutes = Mathf.FloorToInt(newValue / 60);
         float seconds = Mathf.FloorToInt(newValue % 60);
-        ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);        
-        
+        ui_Timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
         if (newValue == 0)
         {
             Debug.Log("Time's up");
@@ -1553,15 +1691,24 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdStartWaitTimer(int value, GameObject NPC)
     {
-        RpcSyncTimers(NPC);
+        StartWaitTimer(value, NPC);
+    }
+
+    [Server]
+    private void StartWaitTimer(int value, GameObject NPC)
+    {
         Room.waitTimerCoroutine = StartCoroutine(StartWaiting(value, NPC));
+        RpcSyncTimers(NPC);
     }
 
     //Tell the server to restart the wait timer
     [Command]
     private void CmdRestartWaitTimer(int value, GameObject NPC)
     {
-        StopCoroutine(Room.waitTimerCoroutine);
+        if (Room.waitTimerCoroutine != null)
+        {
+            StopCoroutine(Room.waitTimerCoroutine);
+        }
         Room.waitTimerCoroutine = StartCoroutine(StartWaiting(value, NPC));
     }
 
@@ -1586,6 +1733,7 @@ public class PlayerScript : NetworkBehaviour
         if (Room.ItemsRemaining == 0)
         {
             StopCoroutine(Room.waitTimerCoroutine);
+            Room.waitTimerCoroutine = null;
         }
         else
         {
@@ -1601,10 +1749,10 @@ public class PlayerScript : NetworkBehaviour
 
             if (Room.currentWaitTime == 0)
             {
-                if(Room.MoraleBar != 0)
+                if (Room.MoraleBar != 0)
                 {
                     Room.MoraleBar--;
-                    
+
                     for (int i = 0; i < Room.GamePlayers.Count; i++)
                     {
                         Room.GamePlayers[i].GetComponent<PlayerScript>().currentMorale = Room.MoraleBar;
@@ -1629,6 +1777,7 @@ public class PlayerScript : NetworkBehaviour
     {
         NPC = go;
         float size = f;
+        if (NPC.GetComponent<NPC_Script>().bar == null) NPC.GetComponent<NPC_Script>().bar = NPC.transform.Find("Health_Bar/Bar");
         NPC.GetComponent<NPC_Script>().SetSize(size);
     }
 
@@ -1668,7 +1817,7 @@ public class PlayerScript : NetworkBehaviour
     [Command]
     private void CmdInitializeSponsorships()
     {
-        Debug.Log("CmdInitializeSponsorships()");
+        //Debug.Log("CmdInitializeSponsorships()");
         remainingSponsorshipslots = Room.remainingSponsorshipslots;
 
         InitializeSponsorships();
@@ -1677,7 +1826,6 @@ public class PlayerScript : NetworkBehaviour
     [Server]
     private void InitializeSponsorships()
     {
-        Debug.Log(Room.GamePlayers.Count);
         for (int i = 0; i < Room.GamePlayers.Count; i++)
         {
             Room.GamePlayers[i].GetComponent<PlayerScript>().remainingSponsorshipslots = Room.remainingSponsorshipslots;
@@ -1689,7 +1837,6 @@ public class PlayerScript : NetworkBehaviour
     [ClientRpc]
     private void RpcInitializeSponsorships()
     {
-        Debug.Log(remainingSponsorshipslots);
         remainingSlots.text = remainingSponsorshipslots.ToString();
     }
 

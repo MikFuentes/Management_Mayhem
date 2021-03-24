@@ -43,6 +43,11 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7444136437229943704, guid: 449b3bc2a8e5cc642a237709333a7d79,
+        type: 3}
+      propertyPath: m_text
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 7444369022186658912, guid: 449b3bc2a8e5cc642a237709333a7d79,
         type: 3}
       propertyPath: m_Name

@@ -76,19 +76,35 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         this.displayName = displayName;
     }
 
+    //[Command]
+    //public void CmdUpdateServerMessage(string message, bool clearMessages)
+    //{
+    //    UpdateServerMessage(message, clearMessages);
+    //}
+
+    [Server]
     public void UpdateServerMessage(string message, bool clearMessages)
     {
+        RpcUpdateServerMessage(message, clearMessages);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateServerMessage(string message, bool clearMessages)
+    {
+        for (int i = 0; i < Room.GamePlayers.Count; i++)
+        {
+            if (Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().messageCounter >= 3 || clearMessages)
+            {
+                Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().messageCounter = 0;
+                Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.text = message + "\n";
+            }
+            else
+            {
+                Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverMessage.text += message + "\n";
+            }
+            Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().messageCounter++;
+        }
         Debug.Log(serverMessage.text);
-        if(messageCounter >= 3 || clearMessages)
-        {
-            messageCounter = 0;
-            serverMessage.text = message + "\n";
-        }
-        else
-        {
-            serverMessage.text += message + "\n";
-        }
-        messageCounter++;
     }
 
     [Server]
@@ -189,6 +205,50 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
             FindObjectOfType<AudioManager>().Play("GameMusic", false, 1);
             FindObjectOfType<AudioManager>().Play("MenuMusic", true, 1);
             SceneManager.LoadScene("Main Menu");
+        }
+    }
+
+
+    //[Command]
+    //public void CmdSpeedUpMusic()
+    //{
+    //    SpeedUpMusic();
+    //}
+
+    [Server]
+    public void SpeedUpMusic()
+    {
+        RpcSpeedUpMusic();
+    }
+
+    [ClientRpc]
+    public void RpcSpeedUpMusic()
+    {
+        FindObjectOfType<AudioManager>().Play("GameMusic", true, 1.2f);
+    }
+
+    [Server]
+    public void HandleMessageTimerUpdate(float currentMessageTime)
+    {
+        RpcHandleMessageTimerUpdate(currentMessageTime);
+    }
+
+    [ClientRpc]
+    public void RpcHandleMessageTimerUpdate(float currentMessageTime)
+    {
+        if (currentMessageTime != 0)
+        {
+            for (int i = 0; i < Room.GamePlayers.Count; i++)
+            {
+                Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverPanel.SetActive(true);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < Room.GamePlayers.Count; i++)
+            {
+                Room.GamePlayers[i].GetComponent<NetworkGamePlayerLobby>().serverPanel.SetActive(false);
+            }
         }
     }
 }

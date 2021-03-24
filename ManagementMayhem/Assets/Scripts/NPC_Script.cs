@@ -11,7 +11,7 @@ public class NPC_Script : NetworkBehaviour
     public List<Sprite> item_list = null;
     public GameObject sprite_go;
     public Sprite blank_sprite;
-    private Transform bar;
+    public Transform bar;
     public int rand = 0;
     public int prevRand = -1;
     public float budget;
@@ -31,10 +31,11 @@ public class NPC_Script : NetworkBehaviour
         }
     }
 
-    private void Start()
+    public void Start()
     {
+        Debug.Log("NPC: Start()");
         //RpcResetSprite();
-        sprite_go.GetComponent<SpriteRenderer>().sprite = blank_sprite;
+        //sprite_go.GetComponent<SpriteRenderer>().sprite = blank_sprite;
 
         bar = transform.Find("Health_Bar/Bar");
 
@@ -47,7 +48,7 @@ public class NPC_Script : NetworkBehaviour
     {
         if (collision.IsTouching(initialCollider) && collision.gameObject.CompareTag("Player"))
         {
-            gameObject.GetComponent<CircleCollider2D>().enabled = false;
+            initialCollider.enabled = false;
         }
     }
 
