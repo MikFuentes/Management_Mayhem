@@ -7549,7 +7549,7 @@ MonoBehaviour:
   pickUpActive: 0
   interactable: {fileID: 0}
   NPC: {fileID: 0}
-  NPCWaitTime: 30
+  NPCWaitTime: 45
   canDeposit: 0
   canDelete: 0
   UI_Active: 0
@@ -7590,7 +7590,7 @@ MonoBehaviour:
   currentMorale: 0
   morale_number: {fileID: 7939248494514115322}
   playerPos: {x: 0, y: 0, z: 0}
-  moveSpeed: 6
+  moveSpeed: 5
   InitialAndPrevDirection:
   - 
   - 
