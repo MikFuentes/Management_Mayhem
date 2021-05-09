@@ -1276,9 +1276,9 @@ public class PlayerScript : NetworkBehaviour
 
             int maxFinalScore = (int)((maxItemScore + maxMoneyScore + maxTimeScore) * maxMoraleMultiplier);
 
-            float threeStarRating = 0.66f;
-            float twoStarRating = 0.44f;
-            float oneStarRating = 0.22f;
+            float threeStarRating = 0.55f;
+            float twoStarRating = 0.33f;
+            float oneStarRating = 0.11f;
 
             int highScore = (int)(maxFinalScore * threeStarRating);
             int medScore = (int)(maxFinalScore * twoStarRating);
