@@ -679,6 +679,7 @@ public class PlayerScript : NetworkBehaviour
 
         if (newValue == 0)
         {
+            Debug.Log("boop3");
             Debug.Log("No more items");
             CmdEndGame();
         }
@@ -1051,9 +1052,10 @@ public class PlayerScript : NetworkBehaviour
 
         if (Room.ItemsRemaining == 0)
         {
+            Debug.Log("boop");
             RpcChangeItemSprite(-1, go);
             RpcDisableNPC(go);
-            RpcBringUpResultsScreen();
+            //RpcBringUpResultsScreen();
         }
         else if (ItemName != null)
         {
@@ -1326,7 +1328,7 @@ public class PlayerScript : NetworkBehaviour
     [Server]
     private void StopGame()
     {
-        if (Room.waitTimerCoroutine != null) //Stop the timer
+        if (Room.waitTimerCoroutine != null) //Stop the wait timer
         {
             StopCoroutine(Room.waitTimerCoroutine); //stop NPC
             Room.waitTimerCoroutine = null;
@@ -1731,8 +1733,12 @@ public class PlayerScript : NetworkBehaviour
         ChangeSprite(null, NPC);
         if (Room.ItemsRemaining == 0)
         {
-            StopCoroutine(Room.waitTimerCoroutine);
-            Room.waitTimerCoroutine = null;
+            Debug.Log("boop2");
+            if (Room.waitTimerCoroutine != null)
+            {
+                StopCoroutine(Room.waitTimerCoroutine);
+                Room.waitTimerCoroutine = null;
+            }
         }
         else
         {
