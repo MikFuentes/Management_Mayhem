@@ -7,7 +7,7 @@ Play now: https://play.unity.com/mg/other/event-management-mayhem
 ## Build Instructions:
 These instructionsa are for compiling the game's source code!
 
-If you want ot just 
+If you want to just play the game, use the link above! 
 
 ### System Requirements
 - Windows 7/8/10
@@ -34,9 +34,9 @@ If you want ot just
   - Scripting Backend Configuration set to **IL2CPP** 
   - **ARM64** ticked in Target Architectures 
 
-#### Game Window
+##### Game Window
 - Set Game Resolution to **2960x1440 Landscape**
 
-### Setting Up Unity with Visual Studio
+#### Setting Up Unity with Visual Studio
 1. Download Visual Studio Tools for Unity from this [link](https://marketplace.visualstudio.com/items?itemName=SebastienLebreton.VisualStudio2015ToolsforUnity). Do this while Unity and Visual Studio are both closed.
 2. From Unity Editor, go to Edit > Preferences > External Tools. On the External Script Editor drop down menu, change that to Visual Studio.
