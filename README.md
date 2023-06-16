@@ -1,4 +1,6 @@
-# Management Mayhem
+# Event Management Mayhem: A Team-Based Multiplayer Game
+
+A multiplayer party simulation game for mobile devices that aims to teach students the basics of event management. Learn about the different roles in event management and work together to complete the assigned tasks in this fun and chaotic game!
 
 ## System Requirements
 - Windows 7/8/10
