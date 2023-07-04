@@ -2,7 +2,7 @@
 
 This is the repository for Event Management Mayhem, a multiplayer party simulation game for mobile devices that aims to teach students the basics of event management. Learn about the different roles in event management and work together to complete the assigned tasks in this chaotic team game!
 
-Play now: https://play.unity.com/mg/other/event-management-mayhem
+## [Play now!](https://play.unity.com/mg/other/event-management-mayhem)
 
 ## Build Instructions:
 These instructionsa are for compiling the game's source code!
